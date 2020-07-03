@@ -13,6 +13,21 @@ from sqlalchemy import or_
 
 @app.route('/api/air_quality_measurements/', methods=['GET', 'POST'])
 def storeAirQualityData():
+    """
+    Endpoint POST: To store hourly data from valid processed measurement between two hours
+    
+    Json data to store hourly data
+
+    Endpoint GET: To get hourly data in interval hours
+
+    :type name: string
+    :param name: qHAWAX name
+
+    :type interval_hours: integer
+    :param interval_hours: period of time
+
+
+    """
     if request.method == 'GET':
         qhawax_name = request.args.get('name')
         interval_hours = int(request.args.get('interval_hours')) \
@@ -38,6 +53,20 @@ def storeAirQualityData():
 
 @app.route('/api/air_quality_measurements_period/', methods=['GET'])
 def getAirQualityMeasurementsTimePeriod():
+    """
+    To get hourly processed data in two period of time
+
+    :type name: string
+    :param name: qHAWAX name
+
+    :type initial_timestamp: timestamp
+    :param initial_timestamp: initial time
+
+    :type final_timestamp: timestamp
+    :param final_timestamp: end time
+
+
+    """
     qhawax_name = request.args.get('name')
     initial_timestamp = dateutil.parser.parse(request.args.get('initial_timestamp'))
     final_timestamp = dateutil.parser.parse(request.args.get('final_timestamp'))
@@ -51,6 +80,16 @@ def getAirQualityMeasurementsTimePeriod():
 
 @app.route('/api/gas_average_measurement/', methods=['GET'])
 def getGasAverageMeasurementsEvery24():
+    """
+    To get gas average measurement every 24 hours
+
+    :type qhawax: string
+    :param qhawax: qHAWAX name
+
+    :type gas: string
+    :param gas: type of gas
+
+    """
     qhawax_name = request.args.get('qhawax')
     gas_name = request.args.get('gas')
     installation_id = helper.getInstallationIdBaseName(qhawax_name)
@@ -86,6 +125,23 @@ def getGasAverageMeasurementsEvery24():
 
 @app.route('/api/average_valid_processed_period/', methods=['GET'])
 def getAverageValidProcessedMeasurementsTimePeriodByCompany():
+    """
+    To get hourly valid processed data in two period of time based on company
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type company_id: integer
+    :param company_id: company ID
+
+    :type initial_timestamp: timestamp
+    :param initial_timestamp: initial time
+
+    :type final_timestamp: timestamp
+    :param final_timestamp: end time
+
+
+    """
     qhawax_id = request.args.get('qhawax_id')
     company_id = request.args.get('company_id')
     initial_timestamp = dateutil.parser.parse(request.args.get('initial_timestamp'))

@@ -925,36 +925,6 @@ def setQhawaxName(qhawax_in_field_list):
     return qhawax_in_field_list
 
 
-def writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date):
-    """
-    Write Bitacora
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type observation_type: string
-    :param observation_type: Observation type
-
-    :type description: string
-    :param description: Bitacora description
-
-    :type solution: string
-    :param solution: Bitacora Solution
-
-    :type person_in_charge: string
-    :param person_in_charge: Person in Charge
-
-    :type end_date: string
-    :param end_date: End date
-
-    """
-    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
-    bitacora = {'timestamp': datetime.datetime.now()-datetime.timedelta(hours=5),'observation_type': observation_type,'description': description, 'qhawax_id':qhawax_id,'solution':solution,'person_in_charge':person_in_charge,'end_date':end_date}
-    bitacora_update = Bitacora(**bitacora)
-    session.add(bitacora_update)
-    session.commit()
-
-
 def isItFieldQhawax(qhawax_name):
     """
     Check qhawax in field
@@ -1029,46 +999,4 @@ def updateQhawaxInstallation(data):
     else:
         raise Exception("The qhawax installation fields have to have data")
 
-def queryAllObservationByQhawax(qhawax_id):
-    """
-    Get all qHAWAXs observation
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    """
-    columns = (Bitacora.id, Bitacora.timestamp, Bitacora.observation_type,Bitacora.description, Bitacora.solution, Bitacora.person_in_charge, Bitacora.end_date)
-    return session.query(*columns).filter_by(qhawax_id=qhawax_id).order_by(Bitacora.timestamp).all()
-
-def storeNewObservation(data):
-    """
-    Binnacle helper function to record observations in field
-    
-    Json input of following fields:
-    
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type initial_timestamp: timestamp
-    :param initial_timestamp: start observation
-
-    :type end_timestamp: timestamp
-    :param end_timestamp: end observation
-
-    :type description: string
-    :param description: description of the observation
-
-    :type solution: string
-    :param solution: solution of the observation
-
-    :type person_in_charge: string
-    :param person_in_charge: person in charge
-    """
-    qhawax_mode = session.query(Qhawax.mode).filter_by(id=data['qhawax_id']).one()[0]
-    if(qhawax_mode=='Cliente'):
-        observation = {'qhawax_id': data['qhawax_id'], 'timestamp': data['initial_timestamp'], 'end_date': data['end_timestamp'], 
-                     'description': data['description'], 'solution': data['solution'],'person_in_charge': data['person_in_charge'],'observation_type':'Externa'}
-        binnacle_observation = Bitacora(**observation)
-        session.add(binnacle_observation)
-        session.commit()
 

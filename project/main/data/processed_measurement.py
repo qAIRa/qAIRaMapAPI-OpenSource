@@ -15,6 +15,16 @@ import csv
 
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
+    """
+    To get processed data
+
+    :type name: string
+    :param name: qHAWAX name
+
+    :type interval_minutes: integer
+    :param interval_minutes: period of time in minutes
+
+    """
     qhawax_name = request.args.get('name')
     interval_minutes = int(request.args.get('interval_minutes')) \
         if request.args.get('interval_minutes') is not None else 60
@@ -31,6 +41,12 @@ def getProcessedData():
 
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
+    """
+    To get processed data
+
+    Json data to store processed measurement and valid processed measurement
+
+    """
     try:
         flag_email = False
         data_json = request.get_json()
@@ -82,6 +98,19 @@ def handleProcessedData():
 
 @app.route('/api/average_processed_measurements_period/', methods=['GET'])
 def getAverageProcessedMeasurementsTimePeriod():
+    """
+    To get average processed data in a period of time
+
+    :type name: string
+    :param name: qHAWAX name
+
+    :type initial_timestamp: timestamp
+    :param initial_timestamp: initial time
+
+    :type final_timestamp: timestamp
+    :param final_timestamp: last time
+
+    """
     qhawax_name = request.args.get('name')
     initial_timestamp = dateutil.parser.parse(request.args.get('initial_timestamp'))
     final_timestamp = dateutil.parser.parse(request.args.get('final_timestamp'))
