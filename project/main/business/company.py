@@ -4,19 +4,6 @@ from project import app
 from project.database.models import Company
 import project.main.business.business_helper as helper
 
-@app.route('/api/get_all_company/', methods=['GET'])
-def getAllCompany():
-    """
-    To list all companies in a combo box
-
-    No parameters required
-
-    """
-    allCompanies = helper.queryGetCompanies()
-    if allCompanies is not None:
-        allCompanies_list = [company._asdict() for company in allCompanies]
-        return make_response(jsonify(allCompanies_list), 200)
-    return make_response(jsonify('Companies not found'), 404)
 
 @app.route('/api/create_company/', methods=['POST'])
 def createCompany():

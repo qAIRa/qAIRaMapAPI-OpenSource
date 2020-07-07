@@ -6,17 +6,10 @@ import os
 
 from project import app, db, socketio
 import project.main.data.data_helper as helper
-from sqlalchemy import or_
 
 
 @app.route('/api/air_daily_quality_measurements/', methods=['POST'])
 def storeAirDailyData():
-	"""
-    To record daily valid processed data
-
-    Json data to store daily data
-
-    """
     try:
         data_json = request.get_json()
         helper.storeAirDailyQualityDataInDB(data_json)

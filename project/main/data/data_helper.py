@@ -6,14 +6,6 @@ from project import app, db, socketio
 
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise,AirDailyMeasurement
 
-from project.database.utils import Location
-
-elapsed_time = None
-data_storage = []
-qhawax_storage = {}
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
-MAX_SECONDS_DATA_STORAGE = 30
-MAX_LEN_DATA_STORAGE = 30
 pollutant=['SO2','NO2','O3','CO','H2S']
 pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
@@ -321,12 +313,6 @@ def queryDBProcessedByQhawaxByCompany(qhawax_id, initial_timestamp, final_timest
                                     order_by(ProcessedMeasurement.timestamp).all()
     return measurement_list
 
-def handleTimestampInData(data):
-    if 'timestamp' not in data:
-        data['timestamp'] = datetime.datetime.now()
-    else:
-        data['timestamp'] = dateutil.parser.parse(data['timestamp'])
-    return data
 
 def getInstallationId(qhawax_id):
     installation_id = session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
@@ -560,5 +546,61 @@ def checkNegatives(data_json):
         data_json["PM10"] = 0
 
     return data_json
+
+def checkNumberValues(data_json):
+    """
+    Helper Processed Measurement function to check number values
+
+    :type data_json: json
+    :param data_json: json of measurement
+
+    """
+    if(data_json["temperature"]=="Nan"):
+        data_json["temperature"] = 0
+
+    if(data_json["pressure"]=="Nan"):
+        data_json["pressure"] = 0
+
+    if(data_json["humidity"]=="Nan"):
+        data_json["humidity"] = 0
+
+    if(data_json["spl"]=="Nan"):
+        data_json["spl"] = 0
+
+    if(data_json["UV"]=="Nan"):
+        data_json["UV"] = 0
+
+    if(data_json["UVA"]=="Nan"):
+        data_json["UVA"] = 0
+
+    if(data_json["UVB"]=="Nan"):
+        data_json["UVB"] = 0
+
+    if(data_json["CO"]=="Nan"):
+        data_json["CO"] = 0
+
+    if(data_json["H2S"]=="Nan"):
+        data_json["H2S"] = 0
+
+    if(data_json["NO2"]=="Nan"):
+        data_json["NO2"] = 0
+
+    if(data_json["O3"]=="Nan"):
+        data_json["O3"] = 0
+
+    if(data_json["SO2"]=="Nan"):
+        data_json["SO2"] = 0
+
+    if(data_json["PM1"]=="Nan"):
+        data_json["PM1"] = 0
+
+    if(data_json["PM25"]=="Nan"):
+        data_json["PM25"] = 0
+
+    if(data_json["PM10"]=="Nan"):
+        data_json["PM10"] = 0
+
+    return data_json
+
 
 

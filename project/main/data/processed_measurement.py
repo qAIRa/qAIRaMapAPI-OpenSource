@@ -1,30 +1,15 @@
-from flask import jsonify, make_response, redirect, request
-from flask_socketio import join_room
+from flask import jsonify, make_response, request
 import datetime
 import dateutil.parser
 import dateutil.tz
-import os
-from passlib.hash import bcrypt
 
 from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
 import project.main.business.business_helper as business_helper
-from sqlalchemy import or_
-import csv
 
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
-    """
-    To get processed data
-
-    :type name: string
-    :param name: qHAWAX name
-
-    :type interval_minutes: integer
-    :param interval_minutes: period of time in minutes
-
-    """
     qhawax_name = request.args.get('name')
     interval_minutes = int(request.args.get('interval_minutes')) \
         if request.args.get('interval_minutes') is not None else 60
@@ -41,15 +26,10 @@ def getProcessedData():
 
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
-    """
-    To get processed data
-
-    Json data to store processed measurement and valid processed measurement
-
-    """
     try:
         flag_email = False
         data_json = request.get_json()
+        data_json = helper.checkNumberValues(data_json)
         product_id = data_json['ID']
         arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
         data_json = helper.gasConversionPPBtoMG(data_json, arr_season)
@@ -98,19 +78,6 @@ def handleProcessedData():
 
 @app.route('/api/average_processed_measurements_period/', methods=['GET'])
 def getAverageProcessedMeasurementsTimePeriod():
-    """
-    To get average processed data in a period of time
-
-    :type name: string
-    :param name: qHAWAX name
-
-    :type initial_timestamp: timestamp
-    :param initial_timestamp: initial time
-
-    :type final_timestamp: timestamp
-    :param final_timestamp: last time
-
-    """
     qhawax_name = request.args.get('name')
     initial_timestamp = dateutil.parser.parse(request.args.get('initial_timestamp'))
     final_timestamp = dateutil.parser.parse(request.args.get('final_timestamp'))
@@ -153,28 +120,4 @@ def getProcessedMeasurementsTimePeriodByCompany():
         return make_response(jsonify(processed_measurements_list), 200)
     return make_response(jsonify('Measurements not found'), 404)
 
-
-@app.route('/api/importProcessedData/', methods=['POST'])
-def importProcessedData():
-    try:
-        file = request.args.get('csv_file')
-        with open(file, 'r') as f:
-            reader = csv.reader(f)
-            next(reader) # Skip the header row.
-            for row in reader:
-                data_json = {"ID": row[0], "timestamp": row[1], "temperature": float(row[2]), "pressure": float(row[3]), "humidity": float(row[4]), "spl": float(row[5]),
-                        "UV": float(row[6]), "UVA": float(row[7]), "UVB": float(row[8]),"CO": float(row[9]), "H2S": float(row[10]), "NO2": float(row[11]), "O3": float(row[12]), 
-                        "SO2": float(row[13]),"PM1": float(row[14]), "PM25": float(row[15]), "PM10": float(row[16]), "lat": float(row[17]), "lon": float(row[18]),"VOC": 0.0 }
-                data_json = helper.checkNegatives(data_json)
-                product_id = data_json['ID']
-                arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
-                data_json = helper.gasConversionPPBtoMG(data_json, arr_season)
-                data_json = helper.roundUpThree(data_json)
-                qhawax_id = helper.getQhawaxId(product_id)
-                helper.storeProcessedDataInDB(data_json)
-                helper.storeValidProcessedDataInDB(data_json, qhawax_id, product_id)
-        return make_response('OK', 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
 

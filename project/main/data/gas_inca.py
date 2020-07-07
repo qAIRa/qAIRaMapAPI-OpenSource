@@ -11,12 +11,6 @@ from sqlalchemy import or_
 
 @app.route('/api/saveGasInca/', methods=['POST'])
 def handleGasInca():
-    """
-    To record average of each gas every hour
-
-    Json data to store hourly gas and main inca
-
-    """
     try:
         data_json = request.get_json()
         helper.storeGasIncaInDB(data_json)
@@ -28,12 +22,6 @@ def handleGasInca():
 
 @app.route('/api/last_gas_inca_data/', methods=['GET'])
 def getLastGasIncaData():
-    """
-    To get average of each gas every hour
-
-    No parameters required
-
-    """
     final_timestamp_gases = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=5)
     initial_timestamp_gases = final_timestamp_gases - datetime.timedelta(hours=1)
     gas_inca_last_data = helper.queryDBGasInca(initial_timestamp_gases, final_timestamp_gases)

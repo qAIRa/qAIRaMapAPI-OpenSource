@@ -1,14 +1,11 @@
 from flask import jsonify, make_response, request
-from flask_socketio import join_room
 import datetime
 import dateutil.parser
 import dateutil.tz
-import os
 
 from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
-from sqlalchemy import or_
 
 
 @app.route('/api/valid_processed_measurements_period/', methods=['GET'])
