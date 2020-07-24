@@ -1,21 +1,37 @@
 from flask import jsonify, make_response, request
-from flask_socketio import join_room
 import datetime
 import dateutil.parser
 import dateutil.tz
+import os
 
 from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement, AirQualityMeasurement
 import project.main.data.data_helper as helper
+from sqlalchemy import or_
 
 
 @app.route('/api/air_quality_measurements/', methods=['GET', 'POST'])
 def storeAirQualityData():
+    """
+    GET: To list all measurement in ppb of air quality measurement table
+    This is an hourly average measurement
+
+    :type name: string
+    :param name: qHAWAX name
+
+    :type interval_hours: integer
+    :param interval_hours: the last N hours we want it 
+
+    POST: To record processed measurement and valid processed measurement every five seconds
+    
+    Json input of Air Quality Measurement
+
+    """
     if request.method == 'GET':
         qhawax_name = request.args.get('name')
         interval_hours = int(request.args.get('interval_hours')) \
             if request.args.get('interval_hours') is not None else 1
-        final_timestamp = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=5)
+        final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
         initial_timestamp = final_timestamp - datetime.timedelta(hours=interval_hours)
         air_quality_measurements = helper.queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp)
 
@@ -28,6 +44,8 @@ def storeAirQualityData():
     if request.method == 'POST':
         try:
             data_json = request.get_json()
+            print("Entre a air_quality_measurements y todo bien")
+            print(data_json)
             helper.storeAirQualityDataInDB(data_json)
             return make_response('OK', 200)
         except Exception as e:
@@ -36,10 +54,24 @@ def storeAirQualityData():
 
 @app.route('/api/air_quality_measurements_period/', methods=['GET'])
 def getAirQualityMeasurementsTimePeriod():
+    """
+    To list all measurement in ppb of air quality measurement table in a define period of time
+    This is an hourly average measurement
+
+    :type name: string
+    :param name: qHAWAX name
+
+    :type initial_timestamp: timestamp without timezone
+    :param initial_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
+
+    :type final_timestamp: timestamp without timezone
+    :param final_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
+
+    """
     qhawax_name = request.args.get('name')
-    initial_timestamp = dateutil.parser.parse(request.args.get('initial_timestamp'))
-    final_timestamp = dateutil.parser.parse(request.args.get('final_timestamp'))
-    air_quality_measurements = helper.queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp)
+    initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+    final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+    air_quality_measurements = helper.queryDBAirQuality(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
 
     if air_quality_measurements is not None:
         air_quality_measurements_list = [measurement._asdict() for measurement in air_quality_measurements]
@@ -49,6 +81,16 @@ def getAirQualityMeasurementsTimePeriod():
 
 @app.route('/api/gas_average_measurement/', methods=['GET'])
 def getGasAverageMeasurementsEvery24():
+    """
+    To list all values by a define gas or dust in ug/m3 of air quality measurement table of the last 24 hours
+
+    :type qhawax: string
+    :param qhawax: qHAWAX name
+
+    :type gas: string
+    :param gas: gas or dust name (CO,H2S,O3,NO2,SO2,PM25,PM10)
+
+    """
     qhawax_name = request.args.get('qhawax')
     gas_name = request.args.get('gas')
     installation_id = helper.getInstallationIdBaseName(qhawax_name)
@@ -61,14 +103,13 @@ def getGasAverageMeasurementsEvery24():
         for measurement in gas_average_measurement:
             gas_measurement = measurement._asdict() 
             hour = gas_measurement["timestamp"].hour
-
             if(next_hour == -1): 
                 gas_average_measurement_list.append(gas_measurement)
                 next_hour = hour + 1
             else:
+                last_date = gas_measurement["timestamp"]
                 if(hour == next_hour): 
-                    gas_average_measurement_list.append(gas_measurement)
-                    last_date = gas_measurement["timestamp"]
+                    gas_average_measurement_list.append(gas_measurement)                   
                 else:
                     diff = hour - next_hour
                     for i in range(1,diff+2):
@@ -84,10 +125,26 @@ def getGasAverageMeasurementsEvery24():
 
 @app.route('/api/average_valid_processed_period/', methods=['GET'])
 def getAverageValidProcessedMeasurementsTimePeriodByCompany():
+    """
+    To list all average measurement of valid processed measurement table in a define period of time and company
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type company_id: integer
+    :param company_id: company ID
+
+    :type initial_timestamp: timestamp without timezone
+    :param initial_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
+
+    :type final_timestamp: timestamp without timezone
+    :param final_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
+    """
     qhawax_id = request.args.get('qhawax_id')
     company_id = request.args.get('company_id')
-    initial_timestamp = dateutil.parser.parse(request.args.get('initial_timestamp'))
-    final_timestamp = dateutil.parser.parse(request.args.get('final_timestamp'))
+    initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+
     average_valid_processed_measurements=[]
     if(int(company_id)!=1):
         if (helper.qhawaxBelongsCompany(qhawax_id,company_id)):   
@@ -98,12 +155,6 @@ def getAverageValidProcessedMeasurementsTimePeriodByCompany():
     average_valid_processed_measurements_list = []
 
     if average_valid_processed_measurements is not None:
-        for valid_measurement in average_valid_processed_measurements:
-            valid_measurement = valid_measurement._asdict() 
-            dict_valid={'CO_ug_m3': valid_measurement['CO_ug_m3'], 'H2S_ug_m3': valid_measurement['H2S_ug_m3'],'NO2_ug_m3': valid_measurement['NO2_ug_m3'],'O3_ug_m3': valid_measurement['O3_ug_m3'],'PM10': valid_measurement['PM10'],
-                'PM25': valid_measurement['PM25'],'SO2_ug_m3': valid_measurement['SO2_ug_m3'],'SPL': valid_measurement['spl'],'UV': valid_measurement['uv'],
-                'humidity': valid_measurement['humidity'],'lat':valid_measurement['lat'],'lon':valid_measurement['lon'],
-                'pressure': valid_measurement['pressure'],'temperature': valid_measurement['temperature'],'timestamp': valid_measurement['timestamp']}
-            average_valid_processed_measurements_list.append(dict_valid)
+        average_valid_processed_measurements_list = [measurement._asdict() for measurement in average_valid_processed_measurements]
         return make_response(jsonify(average_valid_processed_measurements_list), 200)
     return make_response(jsonify('Valid Measurements not found'), 404)

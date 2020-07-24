@@ -1,11 +1,22 @@
 import datetime
+from datetime import timedelta
 import dateutil
 import dateutil.parser
 import time
+import pytz
 from project import app, db, socketio
 
-from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise,AirDailyMeasurement
+from project.database.models import AirQualityMeasurement, ProcessedMeasurement, RawMeasurement, GasInca, ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise,AirDailyMeasurement
 
+from project.database.utils import Location
+import project.main.business.business_helper as business_helper
+
+elapsed_time = None
+data_storage = []
+qhawax_storage = {}
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
+MAX_SECONDS_DATA_STORAGE = 30
+MAX_LEN_DATA_STORAGE = 30
 pollutant=['SO2','NO2','O3','CO','H2S']
 pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
@@ -21,23 +32,23 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp):
     sensors = (AirQualityMeasurement.CO, AirQualityMeasurement.H2S, AirQualityMeasurement.NO2,
                 AirQualityMeasurement.O3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
                 AirQualityMeasurement.SO2, AirQualityMeasurement.lat, AirQualityMeasurement.lon, 
-                AirQualityMeasurement.alt, AirQualityMeasurement.timestamp)
+                AirQualityMeasurement.alt, AirQualityMeasurement.timestamp_zone)
     
     return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                    filter(AirQualityMeasurement.timestamp >= initial_timestamp). \
-                                    filter(AirQualityMeasurement.timestamp <= final_timestamp). \
-                                    order_by(AirQualityMeasurement.timestamp).all()
+                                    filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
+                                    filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
+                                    order_by(AirQualityMeasurement.timestamp_zone).all()
 
 #$ esto es del script
 def storeAirQualityDataInDB(data):
     qhawax_name = data.pop('ID', None)
+    print(qhawax_name)
     qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
-    
     air_quality_data = {'CO': data['CO'], 'CO_ug_m3': data['CO_ug_m3'],'H2S': data['H2S'], 'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],
                         'SO2_ug_m3': data['SO2_ug_m3'], 'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'], 
                         'PM25': data['PM25'], 'PM10': data['PM10'], 'lat': data['lat'],'lon': data['lon'], 'alt': data['alt'], 
                         'timestamp': data['timestamp'], 'uv':data['UV'],'spl':data['SPL'], 'humidity':data['humidity'],
-                        'pressure':data['pressure'],'temperature':data['temperature']}
+                        'pressure':data['pressure'],'temperature':data['temperature'],'timestamp_zone': data['timestamp']}
 
     air_quality_measurement = AirQualityMeasurement(**air_quality_data, qhawax_id=qhawax_id)
     session.add(air_quality_measurement)
@@ -61,6 +72,9 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp):
 
 
 def getInstallationIdBaseName(qhawax_name):
+    qhawax_list = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).all()
+    if(qhawax_list == []):
+        raise TypeError("The qHAWAX name could not be found")
     qhawax_id = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).one()
     installation_id = getInstallationId(qhawax_id)
     return installation_id
@@ -75,6 +89,19 @@ def getTimeQhawaxHistory(installation_id):
 
 #$
 def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
+    """
+    Helper function to get gas average measurement
+
+    :type qhawax_name: string
+    :param qhawax_name: qHAWAX name
+
+    :type gas_name: string
+    :param gas_name: gas or dust name
+
+    :type values_list: array
+    :param values_list: array of last time on and last time registration
+
+    """
     qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
     if qhawax_id is None:
         return None
@@ -106,43 +133,93 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
                                order_by(AirQualityMeasurement.timestamp.asc()).all()
 
 def qhawaxBelongsCompany(qhawax_id,company_id):
+    """
+    Helper function to valid if qHAWAX belongs to company and it is active in field
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type company_id: integer
+    :param company_id: company ID
+
+    """
     company_id_result = session.query(QhawaxInstallationHistory.company_id).filter(QhawaxInstallationHistory.qhawax_id == qhawax_id). \
-                                       filter(QhawaxInstallationHistory.end_date == None).first()[0]
+                                       filter(QhawaxInstallationHistory.end_date_zone == None).first()[0]
     if(int(company_id_result)==int(company_id)):
         return True
     else:
         return False
 
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp):
+    """
+    Helper function to get Air Quality measurement
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type initial_timestamp: timestamp with time zone
+    :param initial_timestamp: initial date with time
+
+    type final_timestamp: timestamp with time zone
+    :param final_timestamp: final date with time
+
+    """
     sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3,
                 AirQualityMeasurement.O3_ug_m3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
                 AirQualityMeasurement.SO2_ug_m3, AirQualityMeasurement.uv,AirQualityMeasurement.uva, 
                 AirQualityMeasurement.uvb, AirQualityMeasurement.spl,AirQualityMeasurement.humidity, 
                 AirQualityMeasurement.pressure, AirQualityMeasurement.temperature, AirQualityMeasurement.lat, 
-                AirQualityMeasurement.lon, AirQualityMeasurement.timestamp)
+                AirQualityMeasurement.lon, AirQualityMeasurement.timestamp_zone)
     
     return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                    filter(AirQualityMeasurement.timestamp >= initial_timestamp). \
-                                    filter(AirQualityMeasurement.timestamp <= final_timestamp). \
-                                    order_by(AirQualityMeasurement.timestamp).all()
+                                    filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
+                                    filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
+                                    order_by(AirQualityMeasurement.timestamp_zone).all()
 
 def storeGasIncaInDB(data):
+    """
+    Helper function to record GAS INCA measurement
+
+    :type data: json
+    :param data: gas inca measurement
+
+    """
     qhawax_name = data.pop('ID', None)
     qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
     gas_inca_data = {'CO': data['CO'], 'H2S': data['H2S'], 'SO2': data['SO2'], 'NO2': data['NO2'],'O3': data['O3'],
-             'PM25': data['PM25'], 'PM10': data['PM10'],'timestamp': data['timestamp'],'main_inca':data['main_inca']}
+             'PM25': data['PM25'], 'PM10': data['PM10'],'main_inca':data['main_inca'],'timestamp_zone': data['timestamp']}
     gas_inca_processed = GasInca(**gas_inca_data, qhawax_id=qhawax_id)
     session.add(gas_inca_processed)
     session.commit()
 
 def queryDBGasInca(initial_timestamp, final_timestamp):
+    """
+    Helper function to get GAS INCA measurement
+
+    :type initial_timestamp: timestamp with time zone
+    :param initial_timestamp: initial date with time
+
+    type final_timestamp: timestamp with time zone
+    :param final_timestamp: final date with time
+
+    """
     sensors = (GasInca.CO, GasInca.H2S, GasInca.SO2, GasInca.NO2,GasInca.O3, 
-                GasInca.PM25, GasInca.PM10, GasInca.SO2,GasInca.timestamp, GasInca.qhawax_id, GasInca.main_inca)
+                GasInca.PM25, GasInca.PM10, GasInca.SO2,GasInca.timestamp_zone, GasInca.qhawax_id, GasInca.main_inca)
     
-    return session.query(*sensors).filter(GasInca.timestamp >= initial_timestamp). \
-                                    filter(GasInca.timestamp <= final_timestamp).all()
+    return session.query(*sensors).filter(GasInca.timestamp_zone >= initial_timestamp). \
+                                    filter(GasInca.timestamp_zone <= final_timestamp).all()
 
 def getQhawaxName(qhawax_id):
+    """
+    Helper function to get qHAWAX name base on qHAWAX ID
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    """
+    qhawax_list = session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).all()
+    if(qhawax_list == []):
+        raise TypeError("The qHAWAX name could not be found")
     return session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).one()                                     
 
 def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
@@ -155,12 +232,12 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
                 ProcessedMeasurement.PM10, ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
                 ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
                 ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
-                ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp)
+                ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
 
     return session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
-                                    filter(ProcessedMeasurement.timestamp > initial_timestamp). \
-                                    filter(ProcessedMeasurement.timestamp < final_timestamp). \
-                                    order_by(ProcessedMeasurement.timestamp).all()
+                                    filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                    filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                    order_by(ProcessedMeasurement.timestamp_zone).all()
 
 def gasConversionPPBtoMG(data_json,season):
     data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': 0,'H2S': data_json['H2S'],'H2S_ug_m3': 0,'NO2': data_json['NO2'],'NO2_ug_m3': 0,'O3': data_json['O3'],
@@ -248,7 +325,7 @@ def getHoursDifference(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on, QhawaxInstallationHistory.last_registration_time).filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
+    values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, QhawaxInstallationHistory.last_registration_time_zone).filter(QhawaxInstallationHistory.qhawax_id == qhawax_id, QhawaxInstallationHistory.end_date_zone==None).first()
     if (values[0]!=None and values[1]!=None):
         minutes_difference = int((values[0] - values[1]).total_seconds() / 60)
         return minutes_difference, values[0]
@@ -292,7 +369,8 @@ def storeValidProcessedDataInDB(data, qhawax_id, product_id):
         valid_data = {'timestamp': data['timestamp'],'CO': data['CO'],'CO_ug_m3': data['CO_ug_m3'], 'H2S': data['H2S'],'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],
                     'SO2_ug_m3': data['SO2_ug_m3'],'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'],'PM25': data['PM25'],
                     'lat':data['lat'],'lon':data['lon'],'PM1': data['PM1'],'PM10': data['PM10'],'UV': data['UV'],'UVA': data['UVA'],'UVB': data['UVB'],
-                    'SPL': data['spl'],'humidity': data['humidity'],'pressure': data['pressure'],'temperature': data['temperature']}
+                    'SPL': data['spl'],'humidity': data['humidity'],'pressure': data['pressure'],'temperature': data['temperature'],
+                    'timestamp_zone': data['timestamp_zone'],'time_zone': data['time_zone']}
         valid_processed_measurement = ValidProcessedMeasurement(**valid_data, qhawax_installation_id=installation_id)
         session.add(valid_processed_measurement)
         session.commit()
@@ -305,19 +383,62 @@ def queryDBProcessedByQhawaxByCompany(qhawax_id, initial_timestamp, final_timest
                 ProcessedMeasurement.PM10, ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
                 ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
                 ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
-                ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp)
+                ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
 
     measurement_list =session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == int(qhawax_id)). \
-                                    filter(ProcessedMeasurement.timestamp > initial_timestamp). \
-                                    filter(ProcessedMeasurement.timestamp < final_timestamp). \
-                                    order_by(ProcessedMeasurement.timestamp).all()
+                                    filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                    filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                    order_by(ProcessedMeasurement.timestamp_zone).all()
     return measurement_list
 
+def handleTimestampInData(data):
+    if 'timestamp' not in data:
+        data['timestamp'] = datetime.datetime.now()
+    else:
+        data['timestamp'] = dateutil.parser.parse(data['timestamp'])
+    return data
+
+def storeRawDataInDB(data):
+    global elapsed_time, data_storage, qhawax_storage
+    if elapsed_time is None:
+        elapsed_time = time.time()
+    if time.time() - elapsed_time >= MAX_SECONDS_DATA_STORAGE or len(data_storage) >= MAX_LEN_DATA_STORAGE:
+        for raw_measurement in data_storage:
+            session.add(raw_measurement)
+        session.commit()
+
+        data_storage = []
+        elapsed_time = time.time()  
+    qhawax_name = data.pop('ID', None)
+    if qhawax_name not in qhawax_storage:
+        qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()
+        qhawax_storage[qhawax_name] = qhawax_id[0]
+    raw_measurement = RawMeasurement(**data, qhawax_id=qhawax_storage[qhawax_name])
+    data_storage.append(raw_measurement)
+
+
+def queryDBRaw(qhawax_name, initial_timestamp, final_timestamp):
+    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
+    if qhawax_id is None:
+        return None
+
+    sensors = (RawMeasurement.CO_OP1, RawMeasurement.CO_OP2, RawMeasurement.CO2, RawMeasurement.H2S_OP1, 
+                RawMeasurement.H2S_OP2, RawMeasurement.NO_OP1, RawMeasurement.NO_OP2, RawMeasurement.NO2_OP1, 
+                RawMeasurement.NO2_OP2, RawMeasurement.O3_OP1, RawMeasurement.O3_OP2, RawMeasurement.PM1, 
+                RawMeasurement.PM25, RawMeasurement.PM10, RawMeasurement.SO2_OP1, RawMeasurement.SO2_OP2, 
+                RawMeasurement.VOC_OP1, RawMeasurement.VOC_OP2, RawMeasurement.UV, RawMeasurement.UVA, 
+                RawMeasurement.UVB, RawMeasurement.spl, RawMeasurement.humidity, RawMeasurement.pressure, 
+                RawMeasurement.temperature, RawMeasurement.lat, RawMeasurement.lon, RawMeasurement.alt, 
+                RawMeasurement.timestamp)
+    return session.query(*sensors).filter(RawMeasurement.qhawax_id == qhawax_id). \
+                                    filter(RawMeasurement.timestamp > initial_timestamp). \
+                                    filter(RawMeasurement.timestamp < final_timestamp). \
+                                    order_by(RawMeasurement.timestamp).all()
 
 def getInstallationId(qhawax_id):
     installation_id = session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).first()[0]
+                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
+                                    order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0]
     return installation_id                                   
 
 def queryDBValidProcessedByQhawax(installation_id, initial_timestamp, final_timestamp):
@@ -326,12 +447,12 @@ def queryDBValidProcessedByQhawax(installation_id, initial_timestamp, final_time
                 ValidProcessedMeasurement.PM25,ValidProcessedMeasurement.PM10, ValidProcessedMeasurement.SO2_ug_m3,
                 ValidProcessedMeasurement.UV, ValidProcessedMeasurement.SPL, ValidProcessedMeasurement.humidity,
                 ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.lat,
-                ValidProcessedMeasurement.lon, ValidProcessedMeasurement.timestamp)
+                ValidProcessedMeasurement.lon, ValidProcessedMeasurement.timestamp_zone)
 
     valid_measurement_list =session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                    filter(ValidProcessedMeasurement.timestamp > initial_timestamp). \
-                                    filter(ValidProcessedMeasurement.timestamp < final_timestamp). \
-                                    order_by(ValidProcessedMeasurement.timestamp).all()
+                                    filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                    filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                    order_by(ValidProcessedMeasurement.timestamp_zone).all()
     return valid_measurement_list
 
 def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp):
@@ -340,60 +461,60 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
                 ValidProcessedMeasurement.PM25,ValidProcessedMeasurement.PM10, ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.SO2_ug_m3,
                 ValidProcessedMeasurement.UV, ValidProcessedMeasurement.UVA,ValidProcessedMeasurement.UVB,ValidProcessedMeasurement.SPL, ValidProcessedMeasurement.humidity,
                 ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.lat,
-                ValidProcessedMeasurement.lon, ValidProcessedMeasurement.timestamp)
+                ValidProcessedMeasurement.lon, ValidProcessedMeasurement.timestamp_zone)
 
     valid_measurement_list =session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                    filter(ValidProcessedMeasurement.timestamp > initial_timestamp). \
-                                    filter(ValidProcessedMeasurement.timestamp < final_timestamp). \
-                                    order_by(ValidProcessedMeasurement.timestamp).all()
+                                    filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                    filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                    order_by(ValidProcessedMeasurement.timestamp_zone).all()
     return valid_measurement_list
 
 def getLatestTimestampValidProcessed(qhawax_name):
     installation_id=getInstallationIdBaseName(qhawax_name)
-    time_valid_data = session.query(ValidProcessedMeasurement.timestamp).filter_by(qhawax_installation_id=installation_id).first()
+    time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).filter_by(qhawax_installation_id=installation_id).first()
     valid_measurement_timestamp=""
+    valid_processed_measurement_timestamp = []
     if(time_valid_data!=None):
-        valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp).filter_by(qhawax_installation_id=installation_id) \
-            .order_by(ValidProcessedMeasurement.id.desc()).first().timestamp
+        valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).filter_by(qhawax_installation_id=installation_id) \
+            .order_by(ValidProcessedMeasurement.id.desc()).first().timestamp_zone
     return valid_processed_measurement_timestamp
 
 
 def averageMeasurementsInHours(measurements, initial_timestamp, final_timestamp, interval_hours):
-    initial_hour_utc = initial_timestamp.astimezone(tz=dateutil.tz.tzutc()).replace(tzinfo=None)
-    final_hour_utc = final_timestamp.astimezone(tz=dateutil.tz.tzutc()).replace(tzinfo=None)
+    utc=pytz.UTC
+    initial_hour_utc = utc.localize(initial_timestamp)
+    final_hour_utc = utc.localize(final_timestamp)
     initial_hour = initial_hour_utc.replace(minute=0, second=0, microsecond=0)
     final_hour = final_hour_utc.replace(minute=0, second=0, microsecond=0)
-
-    current_hour = initial_hour
+    current_hour = initial_hour_utc
     ind = 0
     measurements_in_timestamp = []
     averaged_measurements = []
-    while current_hour < final_hour:
+    while current_hour < final_hour_utc:
         if ind > len(measurements) - 1:
             break
-        
-        timestamp = measurements[ind]['timestamp']
+        timestamp = measurements[ind]['timestamp_zone']
         if timestamp >= current_hour and timestamp <= current_hour + datetime.timedelta(hours=interval_hours):
             measurements_in_timestamp.append(measurements[ind])
             ind += 1
         else:
             if len(measurements_in_timestamp) != 0:
                 averaged_measurement = averageMeasurements(measurements_in_timestamp)
-                averaged_measurement['timestamp'] = current_hour
+                averaged_measurement['timestamp_zone'] = current_hour
                 averaged_measurements.append(averaged_measurement)
             measurements_in_timestamp = []
             current_hour += datetime.timedelta(hours=interval_hours)
     
     if len(measurements_in_timestamp) != 0:
         averaged_measurement = averageMeasurements(measurements_in_timestamp)
-        averaged_measurement['timestamp'] = current_hour
+        averaged_measurement['timestamp_zone'] = current_hour
         averaged_measurements.append(averaged_measurement)
 
     return averaged_measurements
 
 
 def averageMeasurements(measurements):
-    SKIP_KEYS = ['timestamp', 'lat', 'lon']
+    SKIP_KEYS = ['timestamp_zone', 'lat', 'lon']
 
     average_measurement = {}
 
@@ -408,7 +529,7 @@ def averageMeasurements(measurements):
             sensor_values_without_none = [value for value in sensor_values if value is not None]
             average_measurement[sensor_name] = sum(sensor_values_without_none)/len(sensor_values_without_none)
 
-    average_measurement['timestamp'] = measurements[-1]['timestamp']
+    average_measurement['timestamp_zone'] = measurements[-1]['timestamp_zone']
     average_measurement['lat'] = measurements[-1]['lat']
     average_measurement['lon'] = measurements[-1]['lon']
 
@@ -448,12 +569,12 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
     sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.CO_ug_m3,ValidProcessedMeasurement.H2S,ValidProcessedMeasurement.H2S_ug_m3,
                 ValidProcessedMeasurement.NO2, ValidProcessedMeasurement.NO2_ug_m3, ValidProcessedMeasurement.O3,ValidProcessedMeasurement.O3_ug_m3, 
                 ValidProcessedMeasurement.PM25,ValidProcessedMeasurement.PM10, ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.SO2_ug_m3,
-                ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.timestamp)
+                ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.timestamp_zone)
 
     daily_valid_measurement_list =session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                    filter(ValidProcessedMeasurement.timestamp > initial_timestamp). \
-                                    filter(ValidProcessedMeasurement.timestamp < final_timestamp). \
-                                    order_by(ValidProcessedMeasurement.timestamp).all()
+                                    filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                    filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                    order_by(ValidProcessedMeasurement.timestamp_zone).all()
     return daily_valid_measurement_list
 
 def storeAirDailyQualityDataInDB(data):
@@ -602,5 +723,70 @@ def checkNumberValues(data_json):
 
     return data_json
 
+def validAndBeautyJsonProcessed(data_json):
+    arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
+    data_json = checkNumberValues(data_json)
+    data_json = gasConversionPPBtoMG(data_json, arr_season)
+    data_json = roundUpThree(data_json)   
+    timestamp_zone = dateutil.parser.parse(data_json["timestamp"])
+    utc = timestamp_zone.utcoffset().total_seconds()/3600
+    data_json["timestamp_zone"] = data_json["timestamp"]
+    data_json["time_zone"] = utc
 
+    return data_json
+
+
+def validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value):
+    storeValidProcessedDataInDB(data_json, qhawax_id, product_id)
+    if(inca_value==0.0):
+        business_helper.updateMainIncaInDB(1,product_id)
+
+def getDateRangeFromWeek(p_year,p_week):
+    """
+    Helper to get date range from week
+
+    :type p_year: integer
+    :param p_year: year 
+
+    :type p_week: integer
+    :param p_week: week number
+
+    """
+    d = str(p_year)+'-W'+str((int(p_week)- 1))+'-1'
+
+    firstdayofweek = datetime.datetime.strptime(d, "%Y-W%W-%w").date()
+    lastdayofweek = firstdayofweek + datetime.timedelta(days=6.9)
+    return firstdayofweek, lastdayofweek
+
+def queryDBAirDailyQuality(qhawax_id, init_week, init_year,end_week, end_year):
+    """
+    Air Daily Measurement function helper to get daily average measurement based on week number and year 
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type init_week: integer
+    :param init_week: initial week number
+
+    :type init_year: integer
+    :param init_year: initial year
+
+    :type end_week: integer
+    :param end_week: last week number
+
+    :type end_year: integer
+    :param end_year: end year
+
+    """
+    init_firstdate, init_lastdate =  getDateRangeFromWeek(init_year,init_week)
+    end_firstdate, end_lastdate =  getDateRangeFromWeek(end_year,end_week)
+
+    sensors = (AirDailyMeasurement.CO, AirDailyMeasurement.H2S, AirDailyMeasurement.NO2,
+                AirDailyMeasurement.O3, AirDailyMeasurement.PM25, AirDailyMeasurement.PM10, 
+                AirDailyMeasurement.SO2, AirDailyMeasurement.timestamp)
+    
+    return session.query(*sensors).filter(AirDailyMeasurement.qhawax_id == qhawax_id). \
+                                    filter(AirDailyMeasurement.timestamp >= init_firstdate). \
+                                    filter(AirDailyMeasurement.timestamp <= end_lastdate). \
+                                    order_by(AirDailyMeasurement.timestamp).all()
 
