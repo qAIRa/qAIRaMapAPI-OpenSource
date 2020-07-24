@@ -32,39 +32,6 @@ class Company(db.Model):
     def serialize(self):
         return {'name': self.name, 'email_group': self.email_group,'ruc':self.ruc,'address':self.address,'phone':self.phone,'contact_person':self.contact_person}
 
-class User(db.Model):
-    __tablename__ = 'user'
-
-    id = db.Column(db.Integer, primary_key=True)
-    authenticated = db.Column(db.Boolean, default=False) # Flask-Login
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
-    confirmed = db.Column(db.Boolean, default=False)
-    email = db.Column(db.String(300), nullable=False, unique=True)
-    password_hash = db.Column(db.String(300), nullable=False)
-
-    def changePassword(self, new_password):
-        self.password_hash = bcrypt.encrypt(new_password)
-    
-    def validatePassword(self, password):
-        return bcrypt.verify(password, self.password_hash)
-
-    # Methods required for Flask-Login
-
-    def is_active(self):
-        return True
-
-    def get_id(self):
-        return self.id
-
-    def is_authenticated(self):
-        return self.authenticated
-
-    def is_anonymous(self):
-        return False
-    
-    @property
-    def serialize(self):
-        return {'email': self.email}
 
 class Qhawax(db.Model):
     __tablename__ = 'qhawax'
@@ -78,8 +45,6 @@ class Qhawax(db.Model):
     state = db.Column(db.String(5), nullable=False, unique=True)
     availability = db.Column(db.String(100), nullable=False, unique=True)
     mode = db.Column(db.String(100), nullable=False, unique=True)
-    raw_measurements = db.relationship('RawMeasurement', backref='qhawax', lazy='subquery',
-                                        cascade='delete, delete-orphan')
     processed_measurements = db.relationship('ProcessedMeasurement', backref='qhawax', lazy='subquery',
                                                 cascade='delete, delete-orphan')
     air_quality_measurements = db.relationship('AirQualityMeasurement', backref='qhawax', lazy='subquery',
@@ -149,77 +114,6 @@ class GasSensor(db.Model):
             'sensitivity': self.sensitivity,
             'sensitivity_2': self.sensitivit_2
         }
-
-class RawMeasurement(db.Model):
-    __tablename__ = 'raw_measurement'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
-    CO_OP1 = db.Column(db.Float)
-    CO_OP2 = db.Column(db.Float)
-    CO2 = db.Column(db.Float)
-    H2S_OP1 = db.Column(db.Float)
-    H2S_OP2 = db.Column(db.Float)
-    NO_OP1 = db.Column(db.Float)
-    NO_OP2 = db.Column(db.Float)
-    NO2_OP1 = db.Column(db.Float)
-    NO2_OP2 = db.Column(db.Float)
-    O3_OP1 = db.Column(db.Float)
-    O3_OP2 = db.Column(db.Float)
-    PM1 = db.Column(db.Float)
-    PM25 = db.Column(db.Float)
-    PM10 = db.Column(db.Float)
-    SO2_OP1 = db.Column(db.Float)
-    SO2_OP2 = db.Column(db.Float)
-    VOC_OP1 = db.Column(db.Float)
-    VOC_OP2 = db.Column(db.Float)
-    UV = db.Column(db.Float)
-    UVA = db.Column(db.Float)
-    UVB = db.Column(db.Float)
-    spl = db.Column(db.Float)
-    humidity = db.Column(db.Float)
-    pressure = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    lat = db.Column(db.Float)
-    lon = db.Column(db.Float)
-    alt = db.Column(db.Float)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
-    @property
-    def serialize(self):
-        return {
-            'ID': self.qhawax.name,
-            'timestamp': str(self.timestamp),
-            'CO_OP1': self.CO_OP1,
-            'CO_OP2': self.CO_OP2,
-            'CO2': self.CO2,
-            'H2S_OP1': self.H2S_OP1,
-            'H2S_OP2': self.H2S_OP2,
-            'NO_OP1': self.NO_OP1,
-            'NO_OP2': self.NO_OP2,
-            'NO2_OP1': self.NO2_OP1,
-            'NO2_OP2': self.NO2_OP2,
-            'O3_OP1': self.O3_OP1,
-            'O3_OP2': self.O3_OP2,
-            'PM1': self.PM1,
-            'PM25': self.PM25,
-            'PM10': self.PM10,
-            'SO2_OP1': self.SO2_OP1,
-            'SO2_OP2': self.SO2_OP2,
-            'VOC_OP1': self.VOC_OP1,
-            'VOC_OP2': self.VOC_OP2,
-            'UV': self.UV,
-            'UVA': self.UVA,
-            'UVB': self.UVB,
-            'spl': self.spl,
-            'humidity': self.humidity,
-            'pressure': self.pressure,
-            'temperature': self.temperature,
-            'lat': self.lat,
-            'lon': self.lon,
-            'alt': self.alt}
-
 
 class ProcessedMeasurement(db.Model):
     __tablename__ = 'processed_measurement'
@@ -377,6 +271,34 @@ class QhawaxInstallationHistory(db.Model):
                                                 cascade='delete, delete-orphan')
 
 
+class QhawaxCleaningArea(db.Model):
+    __tablename__ = 'qhawax_cleaning_area'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    installation_id = db.Column(db.Integer, db.ForeignKey('installation.id'))
+    cleaning_area_date = db.Column(db.DateTime, nullable=False)
+    comments = db.Column(db.String(500), nullable=False, unique=True)
+
+
+class QhawaxCleaningEquipment(db.Model):
+    __tablename__ = 'qhawax_cleaning_equipment'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    installation_id = db.Column(db.Integer, db.ForeignKey('installation.id'))
+    cleaning_equipment_date = db.Column(db.DateTime, nullable=False)
+    comments = db.Column(db.String(500), nullable=False, unique=True)
+
+class QhawaxMaintenance(db.Model):
+    __tablename__ = 'qhawax_maintenance'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    installation_id = db.Column(db.Integer, db.ForeignKey('installation.id'))
+    maintenance_date = db.Column(db.DateTime, nullable=False)
+    comments = db.Column(db.String(500), nullable=False, unique=True)
+
 class ValidProcessedMeasurement(db.Model):
     __tablename__ = 'valid_processed_measurement'
 
@@ -412,6 +334,34 @@ class ValidProcessedMeasurement(db.Model):
     qhawax_installation_id = db.Column(db.Integer, db.ForeignKey('qhawax_installation_history.id'))
 
 
+class FirmwareUpdate(db.Model):
+    __tablename__ = 'firmware_update'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    date_of_update = db.Column(db.DateTime, nullable=False)
+    url_of_bif_file = db.Column(db.String(1000), nullable=False, unique=True)
+    number_of_frames = db.Column(db.Integer)
+    frames = db.relationship('Frame', backref='firmware_update', lazy='subquery',
+                                                cascade='delete, delete-orphan')
+
+class Frame(db.Model):
+    __tablename__ = 'frame'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    firmware_update_id = db.Column(db.Integer, db.ForeignKey('firmware_update.id'))
+    numbering_by_frame = db.Column(db.Integer)
+    frame_lenght = db.Column(db.Integer)
+    address = db.Column(db.String(100), nullable=False, unique=True)
+    data_lenght = db.Column(db.Integer)
+    data = db.Column(db.String(1000), nullable=False, unique=True)
+    crc1 = db.Column(db.Integer)
+    crc2 = db.Column(db.Integer)
+    crc3 = db.Column(db.Integer)
+    crc4 = db.Column(db.Integer)
+
 class AirDailyMeasurement(db.Model):
     __tablename__ = 'air_daily_measurement'
 
@@ -435,6 +385,18 @@ class AirDailyMeasurement(db.Model):
     temperature = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
+class Bitacora(db.Model):
+    __tablename__ = 'bitacora'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    observation_type = db.Column(db.String(100))
+    description = db.Column(db.String(100))
+    solution = db.Column(db.String(100))
+    person_in_charge = db.Column(db.String(100))
+    end_date = db.Column(db.DateTime, nullable=False)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
     
 
 

@@ -8,8 +8,9 @@ import os
 from project import app, db, socketio
 from project.database.models import Qhawax
 import project.main.business.business_helper as helper
+import project.main.maintenance.maintenance_helper as helper_maintenance
+
 from sqlalchemy import or_
-from flask_socketio import join_room
 
 from passlib.hash import bcrypt
 from project.response_codes import RESPONSE_CODES
@@ -197,7 +198,7 @@ def sendQhawaxStatusOff():
     :param qhawax_name: qHAWAX name
 
     :type qhawax_lost_timestamp: string
-    :param qhawax_lost_timestamp: the last time qHAWAX send measurement
+    :param qhawax_lost_timestamp: the last time qHAWAX send measurement with timezone
 
     """
     req_json = request.get_json()   
@@ -207,8 +208,9 @@ def sendQhawaxStatusOff():
     description="Se apagó el qHAWAX"
     solution = None
     person_in_charge = None
+    start_date = None
     end_date = None
-    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
     return make_response('Success', 200)
 
 
@@ -232,8 +234,9 @@ def sendQhawaxStatusOn():
     description="Se prendió el qHAWAX"
     solution = None
     person_in_charge = None
+    start_date = None
     end_date = None
-    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
     return make_response('Success', 200)
 
 
@@ -281,7 +284,8 @@ def createQhawax():
             solution = None
             person_in_charge = req_json['person_in_charge']
             end_date = None
-            helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+            start_date = None
+            helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
             last_gas_sensor_id = helper.queryGetLastGasSensor()
             if(last_gas_sensor_id ==None):
                 helper.insertDefaultOffsets(0,qhawax_name)
@@ -342,7 +346,7 @@ def getLastQhawax():
 @app.route('/api/change_to_calibration/', methods=['POST'])
 def qhawaxChangeToCalibration():
     """
-    qHAWAX update to Calibration mode
+    qHAWAX update to Calibration mode, set main inca -2 value
 
     Json input of following fields:
     
@@ -353,7 +357,10 @@ def qhawaxChangeToCalibration():
     try:
         req_json = request.get_json()
         qhawax_name = str(req_json['qhawax_name']).strip()
-        #actualizar los incas en qhawax y qhawax installation
+
+        flag_costumer = helper.isItFieldQhawax(qhawax_name)
+        if(flag_costumer == True):
+            helper.saveTimeQhawaxOff(qhawax_name)
         helper.updateMainIncaInDB(-2,qhawax_name)
         helper.changeMode(qhawax_name,"Calibracion")
         observation_type="Interna"
@@ -361,7 +368,8 @@ def qhawaxChangeToCalibration():
         solution = None
         person_in_charge = req_json['person_in_charge']
         end_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+        start_date = None
+        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
@@ -370,7 +378,7 @@ def qhawaxChangeToCalibration():
 @app.route('/api/end_calibration/', methods=['POST'])
 def qhawaxEndCalibration():
     """
-    qHAWAX update end calibration mode
+    qHAWAX update end calibration mode, set main inca original, depends of mode (customer or stand by)
 
     Json input of following fields:
     
@@ -383,6 +391,7 @@ def qhawaxEndCalibration():
         qhawax_name = str(req_json['qhawax_name']).strip()
         flag_costumer = helper.isItFieldQhawax(qhawax_name)
         if(flag_costumer == True):
+            helper.saveTimeQhawaxOn(qhawax_name)
             helper.changeMode(qhawax_name,"Cliente")
             description="Se cambió a modo cliente"
             helper.updateMainIncaInDB(0,qhawax_name)
@@ -394,10 +403,44 @@ def qhawaxEndCalibration():
         solution = None
         person_in_charge = req_json['person_in_charge']
         end_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+        start_date = None
+        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
         return make_response('Invalid format', 400)
 
 
+@app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
+def getQhawaxValidProcessedLatestTimestamp():
+    """
+    To get qHAWAX Valid Processed Measurement latest timestamp
+
+    :type qhawax_name: string
+    :param qhawax_name: qHAWAX name
+
+    """
+    qhawax_name = request.args.get('qhawax_name')
+    return str(helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
+
+
+@app.route('/api/get_qhawax_mode/', methods=['GET'])
+def getQhawaxMode():
+    """
+    Get qHAWAX Mode  
+
+    :type qhawax_name: string
+    :param qhawax_name: qHAWAX name
+
+    """
+    qhawax_name = request.args.get('qhawax_name')
+    mode = helper.getQhawaxMode(qhawax_name)
+    output = {}
+    mode = mode[0]
+    output['mode'] = mode
+    if(mode == 'Firmware Update'):
+        output['firmware_update_id']= helper_maintenance.queryFirmwareUpdate(qhawax_name)
+    else:
+        output['firmware_update_id']= 0
+
+    return make_response(jsonify(output), 200)

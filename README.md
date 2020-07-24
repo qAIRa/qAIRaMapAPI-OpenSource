@@ -33,7 +33,7 @@ py -3 -m pip install virtualenv
 
 py -3 -m virtualenv venv
 
-venv\Scripts\activate
+source venv\Scripts\activate
 
 ```
 
@@ -49,15 +49,9 @@ Also, to set environment variables you need to run this command:
 
 
 ```
-export MAIL_DEFAULT_RECEIVER=********
 
 export SQLALCHEMY_DATABASE_URI='******'
 
-export SECRET_KEY=*******
-
-export MAIL_USERNAME=*******
-
-export MAIL_PASSWORD=*******
 ```
 Now you are ready to run the main code
 

@@ -11,6 +11,41 @@ from sqlalchemy import or_
 
 @app.route('/api/saveGasInca/', methods=['POST'])
 def handleGasInca():
+    """
+    POST: To record gas and dust measurement in gas inca table
+    
+    Json input of Air Quality Measurement
+
+    Json input of Air Measurement
+
+    :type timestamp: string
+    :param timestamp: timestamp with time zone
+
+    :type CO: double
+    :param CO: value of CO measurement
+
+    :type H2S: double
+    :param H2S: value of H2S measurement
+
+    :type SO2: double
+    :param SO2: value of SO2 measurement
+
+    :type NO2: double
+    :param NO2: value of NO2 measurement
+
+    :type O3: double
+    :param O3: value of O3 measurement
+
+    :type PM25: double
+    :param PM25: value of PM25 measurement
+
+    :type PM1: double
+    :param PM1: value of PM1 measurement
+
+    :type PM10: double
+    :param PM10: value of PM10 measurement
+
+    """
     try:
         data_json = request.get_json()
         helper.storeGasIncaInDB(data_json)
@@ -22,7 +57,13 @@ def handleGasInca():
 
 @app.route('/api/last_gas_inca_data/', methods=['GET'])
 def getLastGasIncaData():
-    final_timestamp_gases = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=5)
+    """
+    To list all measurement of the last hour from the gas inca table
+
+    No parameters required
+
+    """
+    final_timestamp_gases = datetime.datetime.now(dateutil.tz.tzutc())
     initial_timestamp_gases = final_timestamp_gases - datetime.timedelta(hours=1)
     gas_inca_last_data = helper.queryDBGasInca(initial_timestamp_gases, final_timestamp_gases)
     gas_inca_last_data_list = []

@@ -9,7 +9,6 @@ from project import app, db, socketio
 from project.database.models import Qhawax
 import project.main.business.business_helper as helper
 from sqlalchemy import or_
-from flask_socketio import join_room
 
 @app.route('/api/newQhawaxInstallation/', methods=['POST'])
 def newQhawaxInstallation():
@@ -79,7 +78,8 @@ def newQhawaxInstallation():
         solution = None
         person_in_charge = data_json['person_in_charge']
         end_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+        start_date = None
+        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
@@ -112,7 +112,8 @@ def saveEndWorkField():
         solution = None
         person_in_charge = data_json['person_in_charge']
         end_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+        start_date = None
+        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
@@ -156,7 +157,7 @@ def getQhawaxByCompany():
             qhawax_list= helper.getAllQhawaxDetail(qhawax_list)
             return make_response(jsonify(qhawax_list), 200)
     else: 
-        qhawax_in_field_by_company = helper.queryQhawaxInFieldByCompany(company_id)
+        qhawax_in_field_by_company = helper.queryQhawaxInFieldByCompanyInPublicMode(company_id)
         if qhawax_in_field_by_company is not None:
             qhawax_in_field_by_company_list = [installation._asdict() for installation in qhawax_in_field_by_company]
             return make_response(jsonify(qhawax_in_field_by_company_list), 200)
@@ -254,6 +255,7 @@ def getQhawaxInstallationDetail():
     qhawax_detail = helper.queryQhawaxInstallationDetail(installation_id)
     if qhawax_detail is not None:
         detail_list = [detail._asdict() for detail in qhawax_detail]
+        detail_list = detail_list[0]
         return make_response(jsonify(detail_list), 200)
     else:
         return make_response(jsonify('Qhawax Detail not found'), 404)
@@ -319,9 +321,30 @@ def updateQhawaxInstallation():
         solution = None
         person_in_charge = data_json['person_in_charge']
         end_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date)
+        start_date = None
+        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
         return make_response('Invalid format', 400)
+
+@app.route('/api/AllCustomerQhawax/', methods=['GET'])
+def getAllCustomerQhawax():
+    """
+    Get a list of Customer qHAWAXs filter by company ID
+
+    It does not care if it is public or private
+
+    :type  company_id: integer
+    :param company_id: company ID
+
+    """
+    company_id = request.args.get('company_id')
+    
+    qhawax_in_field_by_company = helper.queryQhawaxInFieldByCompany(company_id)
+    if qhawax_in_field_by_company is not None:
+        qhawax_in_field_by_company_list = [installation._asdict() for installation in qhawax_in_field_by_company]
+        return make_response(jsonify(qhawax_in_field_by_company_list), 200)
+    else:
+        return make_response(jsonify('qHAWAXs not found'), 404)
 
