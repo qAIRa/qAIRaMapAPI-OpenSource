@@ -121,6 +121,8 @@ class ProcessedMeasurement(db.Model):
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    time_zone = db.Column(db.Float)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     CO2 = db.Column(db.Float)
@@ -181,6 +183,7 @@ class GasInca(db.Model):
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO2 = db.Column(db.Float)
     H2S = db.Column(db.Float)
@@ -201,6 +204,8 @@ class AirQualityMeasurement(db.Model):
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    time_zone = db.Column(db.Float)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     H2S = db.Column(db.Float)
@@ -305,6 +310,8 @@ class ValidProcessedMeasurement(db.Model):
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    time_zone = db.Column(db.Float)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     CO2 = db.Column(db.Float)
@@ -333,41 +340,14 @@ class ValidProcessedMeasurement(db.Model):
     alt = db.Column(db.Float)
     qhawax_installation_id = db.Column(db.Integer, db.ForeignKey('qhawax_installation_history.id'))
 
-
-class FirmwareUpdate(db.Model):
-    __tablename__ = 'firmware_update'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-    date_of_update = db.Column(db.DateTime, nullable=False)
-    url_of_bif_file = db.Column(db.String(1000), nullable=False, unique=True)
-    number_of_frames = db.Column(db.Integer)
-    frames = db.relationship('Frame', backref='firmware_update', lazy='subquery',
-                                                cascade='delete, delete-orphan')
-
-class Frame(db.Model):
-    __tablename__ = 'frame'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    firmware_update_id = db.Column(db.Integer, db.ForeignKey('firmware_update.id'))
-    numbering_by_frame = db.Column(db.Integer)
-    frame_lenght = db.Column(db.Integer)
-    address = db.Column(db.String(100), nullable=False, unique=True)
-    data_lenght = db.Column(db.Integer)
-    data = db.Column(db.String(1000), nullable=False, unique=True)
-    crc1 = db.Column(db.Integer)
-    crc2 = db.Column(db.Integer)
-    crc3 = db.Column(db.Integer)
-    crc4 = db.Column(db.Integer)
-
 class AirDailyMeasurement(db.Model):
     __tablename__ = 'air_daily_measurement'
 
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    time_zone = db.Column(db.Float)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     H2S = db.Column(db.Float)
@@ -385,18 +365,24 @@ class AirDailyMeasurement(db.Model):
     temperature = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
+
 class Bitacora(db.Model):
     __tablename__ = 'bitacora'
 
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
     observation_type = db.Column(db.String(100))
-    description = db.Column(db.String(100))
-    solution = db.Column(db.String(100))
+    description = db.Column(db.String(800))
+    solution = db.Column(db.String(800))
     person_in_charge = db.Column(db.String(100))
+    start_date = db.Column(db.DateTime, nullable=False)
+    start_date_zone = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
+    end_date_zone = db.Column(db.DateTime, nullable=False)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+
     
 
 
