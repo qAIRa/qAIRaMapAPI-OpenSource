@@ -8,7 +8,6 @@ import os
 from project import app, db, socketio
 from project.database.models import Qhawax
 import project.main.business.business_helper as helper
-import project.main.maintenance.maintenance_helper as helper_maintenance
 
 from sqlalchemy import or_
 
@@ -424,23 +423,3 @@ def getQhawaxValidProcessedLatestTimestamp():
     return str(helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
 
 
-@app.route('/api/get_qhawax_mode/', methods=['GET'])
-def getQhawaxMode():
-    """
-    Get qHAWAX Mode  
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    qhawax_name = request.args.get('qhawax_name')
-    mode = helper.getQhawaxMode(qhawax_name)
-    output = {}
-    mode = mode[0]
-    output['mode'] = mode
-    if(mode == 'Firmware Update'):
-        output['firmware_update_id']= helper_maintenance.queryFirmwareUpdate(qhawax_name)
-    else:
-        output['firmware_update_id']= 0
-
-    return make_response(jsonify(output), 200)
