@@ -6,7 +6,7 @@ import time
 import pytz
 from project import app, db, socketio
 
-from project.database.models import AirQualityMeasurement, ProcessedMeasurement, RawMeasurement, GasInca, ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise,AirDailyMeasurement
+from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise,AirDailyMeasurement
 
 from project.database.utils import Location
 import project.main.business.business_helper as business_helper
@@ -390,50 +390,6 @@ def queryDBProcessedByQhawaxByCompany(qhawax_id, initial_timestamp, final_timest
                                     filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
                                     order_by(ProcessedMeasurement.timestamp_zone).all()
     return measurement_list
-
-def handleTimestampInData(data):
-    if 'timestamp' not in data:
-        data['timestamp'] = datetime.datetime.now()
-    else:
-        data['timestamp'] = dateutil.parser.parse(data['timestamp'])
-    return data
-
-def storeRawDataInDB(data):
-    global elapsed_time, data_storage, qhawax_storage
-    if elapsed_time is None:
-        elapsed_time = time.time()
-    if time.time() - elapsed_time >= MAX_SECONDS_DATA_STORAGE or len(data_storage) >= MAX_LEN_DATA_STORAGE:
-        for raw_measurement in data_storage:
-            session.add(raw_measurement)
-        session.commit()
-
-        data_storage = []
-        elapsed_time = time.time()  
-    qhawax_name = data.pop('ID', None)
-    if qhawax_name not in qhawax_storage:
-        qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()
-        qhawax_storage[qhawax_name] = qhawax_id[0]
-    raw_measurement = RawMeasurement(**data, qhawax_id=qhawax_storage[qhawax_name])
-    data_storage.append(raw_measurement)
-
-
-def queryDBRaw(qhawax_name, initial_timestamp, final_timestamp):
-    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
-    if qhawax_id is None:
-        return None
-
-    sensors = (RawMeasurement.CO_OP1, RawMeasurement.CO_OP2, RawMeasurement.CO2, RawMeasurement.H2S_OP1, 
-                RawMeasurement.H2S_OP2, RawMeasurement.NO_OP1, RawMeasurement.NO_OP2, RawMeasurement.NO2_OP1, 
-                RawMeasurement.NO2_OP2, RawMeasurement.O3_OP1, RawMeasurement.O3_OP2, RawMeasurement.PM1, 
-                RawMeasurement.PM25, RawMeasurement.PM10, RawMeasurement.SO2_OP1, RawMeasurement.SO2_OP2, 
-                RawMeasurement.VOC_OP1, RawMeasurement.VOC_OP2, RawMeasurement.UV, RawMeasurement.UVA, 
-                RawMeasurement.UVB, RawMeasurement.spl, RawMeasurement.humidity, RawMeasurement.pressure, 
-                RawMeasurement.temperature, RawMeasurement.lat, RawMeasurement.lon, RawMeasurement.alt, 
-                RawMeasurement.timestamp)
-    return session.query(*sensors).filter(RawMeasurement.qhawax_id == qhawax_id). \
-                                    filter(RawMeasurement.timestamp > initial_timestamp). \
-                                    filter(RawMeasurement.timestamp < final_timestamp). \
-                                    order_by(RawMeasurement.timestamp).all()
 
 def getInstallationId(qhawax_id):
     installation_id = session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
