@@ -767,3 +767,40 @@ def queryAllQhawax():
     columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
     return session.query(*columns).order_by(Qhawax.id).all()
 
+def queryQhawaxInField():
+    """
+    Get All qHAWAXs in field
+
+    No parameters required
+
+    """
+    sensors = (QhawaxInstallationHistory.id, QhawaxInstallationHistory.qhawax_id, QhawaxInstallationHistory.district,
+             QhawaxInstallationHistory.comercial_name,QhawaxInstallationHistory.instalation_date,
+            Company.name, QhawaxInstallationHistory.is_public,QhawaxInstallationHistory.main_inca)
+
+    return session.query(*sensors).join(Company, QhawaxInstallationHistory.company_id == Company.id). \
+                                   group_by(Company.id, QhawaxInstallationHistory.id). \
+                                   filter(QhawaxInstallationHistory.end_date == None). \
+                                   order_by(QhawaxInstallationHistory.instalation_date.desc()).all()
+
+def queryQhawaxInFieldByCompanyInPublicMode(company_id):
+    """
+    Get list of qHAWAXs in field filter by company ID
+
+    Filter by COMPANY ID, the response will refer to the modules of that company
+
+    :type  company_id: integer
+    :param company_id: company ID
+
+    """
+    columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, QhawaxInstallationHistory.id, QhawaxInstallationHistory.qhawax_id,
+        QhawaxInstallationHistory.eca_noise_id, QhawaxInstallationHistory.comercial_name, QhawaxInstallationHistory.lat, QhawaxInstallationHistory.lon, EcaNoise.area_name)
+    
+    return session.query(*columns).join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                                   join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                                   group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                                   filter(QhawaxInstallationHistory.is_public == 'si'). \
+                                   filter(QhawaxInstallationHistory.company_id == company_id). \
+                                   filter(QhawaxInstallationHistory.end_date == None). \
+                                   order_by(Qhawax.id).all() 
+

@@ -101,74 +101,6 @@ def getQhawaxProcessedLatestTimestamp():
     qhawax_name = request.args.get('qhawax_name')
     return str(helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name))
 
-@app.route('/api/qhawax_critical_timestamp_alert/', methods=['POST'])
-def sendQhawaxTimestamp():
-    """
-    Send Email When qHAWAX is not send raw measurement data 
-
-    Json input of following fields:
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type secret_key: string
-    :param secret_key: key to verify that we can send email
-
-    """
-    req_json = request.get_json(cache=False)
-    try:
-        qhawax_name = str(req_json['qhawax_name']).strip()
-        secret_key_hashed = str(req_json['secret_key']).strip()
-    except KeyError as e:
-        return helper.makeMissingParameterResponse(e.message)
-
-    #qhawax = helper.getQhawaxLatestCoordinatesFromName(db.session, qhawax_name)
-    timestamp = helper.getQhawaxLatestTimestamp(qhawax_name)
-    lessfive = str(timestamp - datetime.timedelta(hours=5))
-    subject = 'Qhawax %s no se encuentra activo' % (qhawax_name)
-    content = 'Ultima vez que se mostró activo: %s' % (lessfive)
-    if(helper.setEmailBody(secret_key_hashed, subject, content, "")):
-        json_message = jsonify({'OK': 'Email sent for active qhawax: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['OK'])
-    else:
-        json_message = jsonify({'error': 'Qhawax not found with name: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['NOT_FOUND'])
-
-@app.route('/api/qhawax_critical_processed_data_timestamp_alert/', methods=['POST'])
-def sendQhawaxProcessedDataTimestamp():
-    """
-    Send Email When qHAWAX is not send processed data 
-
-    Json input of following fields:
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type comercial_name: string
-    :param comercial_name: company name
-
-    :type secret_key: string
-    :param secret_key: key to verify that we can send email
-
-    """
-    req_json = request.get_json(cache=False)
-    try:
-        qhawax_name = str(req_json['qhawax_name']).strip()
-        comercial_name = str(req_json['comercial_name']).strip()
-        secret_key_hashed = str(req_json['secret_key']).strip()
-        lessfive = str(req_json['qhawax_lost_timestamp']).strip()
-    except KeyError as e:
-        return print(e)
-    subject = 'qHAWAX: %s Inactivo' % (comercial_name)
-    content1 = 'qHAWAX %s' % (qhawax_name)
-    content2 = '\nUltima vez que se mostró activo: %s' % (lessfive)
-    if(helper.setEmailBody(secret_key_hashed, subject, content1, content2)):
-        json_message = jsonify({'OK': 'Email sent for active qhawax: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['OK'])
-    else:
-        json_message = jsonify({'error': 'Qhawax not found with name: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['NOT_FOUND'])
-
 @app.route('/api/qhawax_status/', methods=['GET'])
 def getQhawaxStatus():
     """
@@ -327,20 +259,6 @@ def getAllQhawaxByMode():
     else:
         return make_response(jsonify('qHAWAXs in this mode not found'), 404)
 
-@app.route('/api/get_last_qhawax/', methods=['GET'])
-def getLastQhawax():
-    """
-    Get All qHAWAXs   
-
-    No parameters required
-
-    """
-    qhawax = helper.queryLastQhawax()
-    if qhawax is not None:
-        qhawax = qhawax[0]._asdict()
-        return make_response(qhawax, 200)
-    else:
-        return make_response(jsonify('qHAWAXs not found'), 404)
 
 @app.route('/api/change_to_calibration/', methods=['POST'])
 def qhawaxChangeToCalibration():
