@@ -633,7 +633,7 @@ def setQhawaxName(qhawax_in_field_list):
     return qhawax_in_field_list
 
 
-def writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date):
+def writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date):
     """
     Write Bitacora
 
@@ -657,7 +657,7 @@ def writeBitacora(qhawax_name,observation_type,description,solution,person_in_ch
 
     """
     qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
-    bitacora = {'timestamp': datetime.datetime.now()-datetime.timedelta(hours=5),'observation_type': observation_type,'description': description, 'qhawax_id':qhawax_id,'solution':solution,'person_in_charge':person_in_charge,'end_date':end_date}
+    bitacora = {'timestamp': datetime.datetime.now(dateutil.tz.tzutc()),'observation_type': observation_type,'description': description, 'qhawax_id':qhawax_id,'solution':solution,'person_in_charge':person_in_charge,'end_date':end_date,'start_date':end_date}
     bitacora_update = Bitacora(**bitacora)
     session.add(bitacora_update)
     session.commit()
