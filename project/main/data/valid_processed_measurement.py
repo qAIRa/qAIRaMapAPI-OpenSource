@@ -7,6 +7,7 @@ import os
 from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
+import project.main.util_helper as util_helper
 from sqlalchemy import or_
 
 
@@ -39,10 +40,10 @@ def getValidProcessedMeasurementsTimePeriodByCompany():
             print("Entre aqui porque soy san miguel")   
             installation_id = helper.getInstallationId(qhawax_id)
             print(str(installation_id))
-            valid_processed_measurements = helper.queryDBValidProcessedByQhawax(installation_id, initial_timestamp_utc, final_timestamp_utc)
+            valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
     elif (int(company_id)==1):
         installation_id = helper.getInstallationId(qhawax_id)
-        valid_processed_measurements = helper.queryDBValidProcessedByQhawax(installation_id, initial_timestamp_utc, final_timestamp_utc)
+        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
     
     if valid_processed_measurements is not None:
         valid_processed_measurements_list = [measurement._asdict() for measurement in valid_processed_measurements]

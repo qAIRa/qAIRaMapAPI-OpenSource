@@ -5,11 +5,11 @@ import pytz
 import dateutil.parser
 import dateutil.tz
 import os
-from passlib.hash import bcrypt
 from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
 import project.main.business.business_helper as business_helper
+import project.main.util_helper as util_helper
 from sqlalchemy import or_
 import csv
 
@@ -97,17 +97,14 @@ def handleProcessedData():
         flag_email = False
         data_json = request.get_json()
         product_id = data_json['ID']
-        data_json = helper.validAndBeautyJsonProcessed(data_json)
+        data_json = util_helper.validAndBeautyJsonProcessed(data_json)
         helper.storeProcessedDataInDB(data_json)
-        qhawax_id = helper.getQhawaxId(product_id)
+        qhawax_id = helper.getQhawaxID(product_id)
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
         mode = helper.getQhawaxMode(qhawax_id)
         inca_value = helper.getMainIncaQhawaxTable(product_id)
-        if(inca_value == -1):
-            if(mode=="Cliente"): 
-                flag_email = True
-                print("Recupere señal " + str(product_id)) 
+        if(inca_value == -1): 
             business_helper.saveStatusOn(product_id)
             business_helper.saveTurnOnLastTime(product_id)
             business_helper.updateMainIncaInDB(0,product_id)
@@ -115,13 +112,6 @@ def handleProcessedData():
             observation_type="Interna"
             business_helper.writeBitacora(product_id,observation_type,description,None,None,None)
         if(mode == "Cliente"):
-            if(flag_email == True):
-                comercial_name = helper.getComercialName(qhawax_id)
-                subject = 'qHAWAX: %s Recuperó Señal' % (comercial_name)
-                content1 = 'qHAWAX %s' % (product_id)
-                content2 = '\nRecuperó señal: %s' % (data_json['timestamp'])
-                response = business_helper.setEmailBody(bcrypt.hash(app.config['SECRET_KEY']), subject, content1, content2)
-                print("Despues de enviar señal por correo: " + str(product_id)) 
             qhawax_zone = helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone
             minutes_difference,last_time_turn_on = helper.getHoursDifference(qhawax_id)
@@ -163,7 +153,7 @@ def getAverageProcessedMeasurementsTimePeriod():
 
     if processed_measurements is not None:
         processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
-        averaged_measurements_list = helper.averageMeasurementsInHours(processed_measurements_list, initial_timestamp_utc, final_timestamp_utc, 1)
+        averaged_measurements_list = util_helper.averageMeasurementsInHours(processed_measurements_list, initial_timestamp_utc, final_timestamp_utc, 1)
         return make_response(jsonify(averaged_measurements_list), 200)
     return make_response(jsonify('Measurements not found'), 404)
 
@@ -194,43 +184,6 @@ def getProcessedMeasurementsTimePeriod():
         return make_response(jsonify(processed_measurements_list), 200)
     return make_response(jsonify('Measurements not found'), 404)
 
-
-@app.route('/api/processed_measurements_period_byCompany/', methods=['GET'])
-def getProcessedMeasurementsTimePeriodByCompany():
-    """
-    To list all measurement of processed measurement table in a define period of time and company
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type company_id: integer
-    :param company_id: company ID
-
-    :type initial_timestamp: timestamp without timezone
-    :param initial_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
-
-    :type final_timestamp: timestamp without timezone
-    :param final_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
-    """
-    qhawax_id = request.args.get('qhawax_id')
-    company_id = request.args.get('company_id')
-    #Recibiendo las horas indicadas a formato UTC 00:00
-    initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
-    final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
-
-    processed_measurements=[]
-    if(int(company_id)!=1):
-        if (helper.qhawaxBelongsCompany(qhawax_id,company_id)):   
-            processed_measurements = helper.queryDBProcessedByQhawaxByCompany(qhawax_id, initial_timestamp_utc, final_timestamp_utc)
-    elif (int(company_id)==1):
-        processed_measurements = helper.queryDBProcessedByQhawaxByCompany(qhawax_id, initial_timestamp_utc, final_timestamp_utc)
-
-    if processed_measurements is not None:
-        processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
-        return make_response(jsonify(processed_measurements_list), 200)
-    return make_response(jsonify('Measurements not found'), 404)
-
-
 @app.route('/api/importProcessedData/', methods=['POST'])
 def importProcessedData():
     """
@@ -249,12 +202,12 @@ def importProcessedData():
                 data_json = {"ID": row[0], "timestamp": row[1], "temperature": float(row[2]), "pressure": float(row[3]), "humidity": float(row[4]), "spl": float(row[5]),
                         "UV": float(row[6]), "UVA": float(row[7]), "UVB": float(row[8]),"CO": float(row[9]), "H2S": float(row[10]), "NO2": float(row[11]), "O3": float(row[12]), 
                         "SO2": float(row[13]),"PM1": float(row[14]), "PM25": float(row[15]), "PM10": float(row[16]), "lat": float(row[17]), "lon": float(row[18]),"VOC": 0.0 }
-                data_json = helper.checkNegatives(data_json)
+                data_json = util_helper.checkNegatives(data_json)
                 product_id = data_json['ID']
                 arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
-                data_json = helper.gasConversionPPBtoMG(data_json, arr_season)
-                data_json = helper.roundUpThree(data_json)
-                qhawax_id = helper.getQhawaxId(product_id)
+                data_json = util_helper.gasConversionPPBtoMG(data_json, arr_season)
+                data_json = util_helper.roundUpThree(data_json)
+                qhawax_id = helper.getQhawaxID(product_id)
                 helper.storeProcessedDataInDB(data_json)
                 helper.storeValidProcessedDataInDB(data_json, qhawax_id, product_id)
         return make_response('OK', 200)

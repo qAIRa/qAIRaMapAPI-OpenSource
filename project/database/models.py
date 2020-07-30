@@ -14,8 +14,6 @@ class Company(db.Model):
     address = db.Column(db.String(300), nullable=False, unique=True)
     phone = db.Column(db.String(15), nullable=False, unique=True)
     contact_person = db.Column(db.String(100), nullable=False, unique=True)
-    users = db.relationship('User', backref='company', lazy='subquery',
-                            cascade='delete, delete-orphan')
     installations = db.relationship('QhawaxInstallationHistory', backref='company', lazy='subquery',
                              cascade='delete, delete-orphan')
 
@@ -54,11 +52,6 @@ class Qhawax(db.Model):
     gas_inca = db.relationship('GasInca', backref='qhawax', lazy='subquery',
                                                 cascade='delete, delete-orphan')
     qhawax_installation_historys = db.relationship('QhawaxInstallationHistory', backref='qhawax', lazy='subquery',
-                                                cascade='delete, delete-orphan')
-
-    firmware_updates = db.relationship('FirmwareUpdate', backref='qhawax', lazy='subquery',
-                                                cascade='delete, delete-orphan')
-    air_daily_measurements = db.relationship('AirDailyMeasurement', backref='qhawax', lazy='subquery',
                                                 cascade='delete, delete-orphan')
     bitacoras = db.relationship('Bitacora', backref='qhawax', lazy='subquery',
                                                 cascade='delete, delete-orphan')
@@ -275,35 +268,6 @@ class QhawaxInstallationHistory(db.Model):
     valid_processed_measurements = db.relationship('ValidProcessedMeasurement', backref='qhawax_installation_history', lazy='subquery',
                                                 cascade='delete, delete-orphan')
 
-
-class QhawaxCleaningArea(db.Model):
-    __tablename__ = 'qhawax_cleaning_area'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    installation_id = db.Column(db.Integer, db.ForeignKey('installation.id'))
-    cleaning_area_date = db.Column(db.DateTime, nullable=False)
-    comments = db.Column(db.String(500), nullable=False, unique=True)
-
-
-class QhawaxCleaningEquipment(db.Model):
-    __tablename__ = 'qhawax_cleaning_equipment'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    installation_id = db.Column(db.Integer, db.ForeignKey('installation.id'))
-    cleaning_equipment_date = db.Column(db.DateTime, nullable=False)
-    comments = db.Column(db.String(500), nullable=False, unique=True)
-
-class QhawaxMaintenance(db.Model):
-    __tablename__ = 'qhawax_maintenance'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    installation_id = db.Column(db.Integer, db.ForeignKey('installation.id'))
-    maintenance_date = db.Column(db.DateTime, nullable=False)
-    comments = db.Column(db.String(500), nullable=False, unique=True)
-
 class ValidProcessedMeasurement(db.Model):
     __tablename__ = 'valid_processed_measurement'
 
@@ -339,32 +303,6 @@ class ValidProcessedMeasurement(db.Model):
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
     qhawax_installation_id = db.Column(db.Integer, db.ForeignKey('qhawax_installation_history.id'))
-
-class AirDailyMeasurement(db.Model):
-    __tablename__ = 'air_daily_measurement'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
-    timestamp_zone = db.Column(db.DateTime, nullable=False)
-    time_zone = db.Column(db.Float)
-    CO = db.Column(db.Float)
-    CO_ug_m3 = db.Column(db.Float)
-    H2S = db.Column(db.Float)
-    H2S_ug_m3 = db.Column(db.Float)
-    NO2 = db.Column(db.Float)
-    NO2_ug_m3 = db.Column(db.Float)
-    O3 = db.Column(db.Float)
-    O3_ug_m3 = db.Column(db.Float)
-    PM25 = db.Column(db.Float)
-    PM10 = db.Column(db.Float)
-    SO2 = db.Column(db.Float)
-    SO2_ug_m3 = db.Column(db.Float)
-    humidity = db.Column(db.Float)
-    pressure = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
 
 class Bitacora(db.Model):
     __tablename__ = 'bitacora'
