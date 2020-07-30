@@ -29,7 +29,7 @@ class TestBusinessData(unittest.TestCase):
 		self.assertRaises(TypeError,helper.queryGetEcaNoise,"PUCP")
 
 	def test_query_get_areas(self):
-		area_list = [(2, 'Zona Residencial'), (1, 'Zona de Protección Especial')]
+		area_list = [(4, 'Zona Industrial'),(3, 'Zona Comercial'),(2, 'Zona Residencial'), (1, 'Zona de Protección Especial')]
 		self.assertAlmostEqual(helper.queryGetAreas(),area_list)
 
 	def test_query_get_offsets_from_productID(self):
@@ -48,13 +48,14 @@ class TestBusinessData(unittest.TestCase):
 		self.assertRaises(TypeError,helper.getOffsetsFromProductID,"342")
 
 	def test_query_get_controlled_offsets_from_productID(self):
-		qhawax_name= 'qH001'
-		offset_sensor ={'CO': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
+		qhawax_name= 'qH004'
+		offset_sensor ={'CO': {'C2': 0.0, 'C1': 0.0, 'C0': 1.0}, 
 		                'SO2': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
-		                'H2S': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
+		                'H2S': {'C2': 0.0, 'C1': 0.0, 'C0': 2.0}, 
 		                'O3': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
-		                'NO': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
-		                'NO2': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}}
+		                'NO': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}, 
+		                'NO2': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}}
+		print(helper.getControlledOffsetsFromProductID(qhawax_name))
 		self.assertAlmostEqual(helper.getControlledOffsetsFromProductID(qhawax_name),offset_sensor)
 
 	def test_query_get_controlled_offsets_from_productID_not_valid(self):
@@ -65,11 +66,12 @@ class TestBusinessData(unittest.TestCase):
 	def test_query_get_non_controlled_offsets_from_productID(self):
 		qhawax_name= 'qH001'
 		offset_sensor ={'CO': {'NC1': 0.0, 'NC0': 0.0}, 
-		               'SO2': {'NC1': 0.0, 'NC0': 0.0}, 
+		               'SO2': {'NC1': 0.0, 'NC0': 1.0}, 
 		               'H2S': {'NC1': 0.0, 'NC0': 0.0}, 
 		                'O3': {'NC1': 0.0, 'NC0': 0.0}, 
 		                'NO': {'NC1': 0.0, 'NC0': 0.0}, 
 		               'NO2': {'NC1': 0.0, 'NC0': 0.0}}
+		print(helper.getNonControlledOffsetsFromProductID(qhawax_name))
 		self.assertAlmostEqual(helper.getNonControlledOffsetsFromProductID(qhawax_name),offset_sensor)
 
 	def test_query_get_non_controlled_offsets_from_productID_not_valid(self):
@@ -77,18 +79,6 @@ class TestBusinessData(unittest.TestCase):
 		self.assertRaises(TypeError,helper.getNonControlledOffsetsFromProductID,None)
 		self.assertRaises(TypeError,helper.getNonControlledOffsetsFromProductID,"342")
 
-	def test_update_offsets_from_qhawax_name(self):
-		qhawax_json= {"product_id": "qH002", 
-					  "offsets": {"CO":{"AE":356.0,"WE":337.0,"sensitivity":0.45,"sensitivity_2":0.0}, 
-					             "H2S":{"AE":346.0,"WE":350.0,"sensitivity":1.724,"sensitivity_2":0.0}, 
-					             "NO":{"AE":300.0,"WE":300.0,"sensitivity":0.3,"sensitivity_2":0.0}, 
-					             "NO2":{"AE":235.0,"WE":228.0,"sensitivity":0.234,"sensitivity_2":0.0},	
-					             "O3":{"AE":234.0,"WE":224.0,"sensitivity":0.326,"sensitivity_2":0.0},	
-					             "SO2":{"AE":360.0,"WE":346.0,"sensitivity":0.37,"sensitivity_2":0.0}}}
-		self.assertRaises(TypeError,helper.createCompany,4,None)
-		self.assertRaises(TypeError,helper.createCompany,None,4)
-		self.assertRaises(TypeError,helper.createCompany,"PUCP",None)
-		self.assertRaises(TypeError,helper.createCompany,None,"pucp.edu.pe")
 
 
 if __name__ == '__main__':

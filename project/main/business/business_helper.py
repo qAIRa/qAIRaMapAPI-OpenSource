@@ -16,6 +16,19 @@ var_gases=['CO','H2S','NO','NO2','O3','SO2']
 
 session = db.session
 
+def queryGetCompanies():
+    """
+    Helper Company function to list all companies 
+
+    No parameters required
+
+    """
+    sensors = (Company.id, Company.name, Company.email_group, Company.ruc, Company.address, Company.phone, Company.contact_person)
+    companies = session.query(*sensors).all()
+    if(companies == []):
+        return None
+    return session.query(*sensors).order_by(Company.id.desc()).all()
+
 def queryGetEcaNoise(eca_noise_id):
     """
     Helper Eca Noise function to get zone description
@@ -31,6 +44,16 @@ def queryGetEcaNoise(eca_noise_id):
     if (area_list == []):
         return area_list
     return session.query(*fields).filter(EcaNoise.id == eca_noise_id).one()
+
+def queryGetAreas():
+    """
+    Helper Eca Noise function to list all zones 
+
+    No parameters required
+
+    """
+    sensors = (EcaNoise.id, EcaNoise.area_name)
+    return session.query(*sensors).order_by(EcaNoise.id.desc()).all()
 
 
 def getOffsetsFromProductID(qhawax_name):
