@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource)
+
 #  qAIRa Map API
 
 qAIRa Map API is an API to connect our [web](https://qairamap.qairadrones.com/), our qHAWAX and our database.
