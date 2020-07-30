@@ -9,6 +9,7 @@ install:
 
 script:
   - pytest -v --cov
+  - coverage run -m pytest test/
 
 after_success: coveralls
 
