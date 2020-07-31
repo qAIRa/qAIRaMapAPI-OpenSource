@@ -83,7 +83,7 @@ def getOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, GasSensor.sensitivity, GasSensor.sensitivity_2)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -110,7 +110,7 @@ def getControlledOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -138,7 +138,7 @@ def getNonControlledOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -167,7 +167,7 @@ def updateOffsetsFromProductID(qhawax_name, offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         for sensor_type in offsets:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=offsets[sensor_type])
@@ -189,7 +189,7 @@ def updateControlledOffsetsFromProductID(qhawax_id, controlled_offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         for sensor_type in controlled_offsets:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=controlled_offsets[sensor_type])
@@ -211,7 +211,7 @@ def updateNonControlledOffsetsFromProductID(qhawax_id, non_controlled_offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         for sensor_type in non_controlled_offsets:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=non_controlled_offsets[sensor_type])
