@@ -8,6 +8,7 @@ from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
 import project.main.util_helper as util_helper
+import project.main.same_function_helper as same_helper
 from sqlalchemy import or_
 
 
@@ -37,12 +38,10 @@ def getValidProcessedMeasurementsTimePeriodByCompany():
     valid_processed_measurements=[]
     if(int(company_id)!=1):
         if (helper.qhawaxBelongsCompany(qhawax_id,company_id)):
-            print("Entre aqui porque soy san miguel")   
-            installation_id = helper.getInstallationId(qhawax_id)
-            print(str(installation_id))
+            installation_id = same_helper.getInstallationId(qhawax_id)
             valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
     elif (int(company_id)==1):
-        installation_id = helper.getInstallationId(qhawax_id)
+        installation_id = same_helper.getInstallationId(qhawax_id)
         valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
     
     if valid_processed_measurements is not None:
@@ -72,7 +71,7 @@ def getValidProcessedData():
     valid_processed_measurements={}
     
     if(qhawax_id!=None):
-        installation_id = helper.getInstallationId(qhawax_id)
+        installation_id = same_helper.getInstallationId(qhawax_id)
         valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp)
 
     if valid_processed_measurements is not None:

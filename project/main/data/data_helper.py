@@ -6,35 +6,9 @@ from project import app, db, socketio
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise
 from project.database.utils import Location
 import project.main.util_helper as util_helper
+import project.main.same_function_helper as same_helper
 
 session = db.session
-
-def getQhawaxID(qhawax_name):
-    """
-    Helper function to get qHAWAX ID base on qHAWAX name
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    qhawax_list = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).all()
-    if(qhawax_list == []):
-        raise TypeError("The qHAWAX name could not be found")
-    qhawax_id = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).one()
-    return qhawax_id
-
-def getQhawaxName(qhawax_id):
-    """
-    Helper function to get qHAWAX name base on qHAWAX ID
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    """
-    qhawax_list = session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).all()
-    if(qhawax_list == []):
-        raise TypeError("The qHAWAX ID could not be found")
-    return session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).one()  
 
 def getMainIncaQhawaxTable(name):
     """
@@ -54,15 +28,9 @@ def getMainIncaQhawaxTable(name):
     return qhawax_inca 
 
 
-def getInstallationId(qhawax_id):
-    installation_id = session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).first()[0]
-    return installation_id  
-
 def getInstallationIdBaseName(qhawax_name):
-    qhawax_id = getQhawaxID(qhawax_name)
-    installation_id = getInstallationId(qhawax_id)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    installation_id = same_helper.getInstallationId(qhawax_id)
     return installation_id
 
 def getQhawaxMode(qhawax_id):
@@ -97,7 +65,7 @@ def getComercialName(qhawax_id):
     return comercial_name
 
 def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp):
-    qhawax_id = getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id!=None):
         sensors = (AirQualityMeasurement.CO, AirQualityMeasurement.H2S, AirQualityMeasurement.NO2,
                     AirQualityMeasurement.O3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
@@ -111,7 +79,7 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp):
 
 def storeAirQualityDataInDB(data):
     qhawax_name = data.pop('ID', None)
-    qhawax_id = getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
     air_quality_data = {'CO': data['CO'], 'CO_ug_m3': data['CO_ug_m3'],'H2S': data['H2S'], 'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],
                         'SO2_ug_m3': data['SO2_ug_m3'], 'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'], 
                         'PM25': data['PM25'], 'PM10': data['PM10'], 'lat': data['lat'],'lon': data['lon'], 'alt': data['alt'], 
@@ -144,7 +112,7 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
     :param values_list: array of last time on and last time registration
 
     """
-    qhawax_id = getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
     initial_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
     last_timestamp = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=24)
@@ -225,7 +193,7 @@ def storeGasIncaInDB(data):
 
     """
     qhawax_name = data.pop('ID', None)
-    qhawax_id = getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
     gas_inca_data = {'CO': data['CO'], 'H2S': data['H2S'], 'SO2': data['SO2'], 'NO2': data['NO2'],'O3': data['O3'],
              'PM25': data['PM25'], 'PM10': data['PM10'],'timestamp_zone': data['timestamp'],'main_inca':data['main_inca']}
     gas_inca_processed = GasInca(**gas_inca_data, qhawax_id=qhawax_id)
@@ -251,7 +219,7 @@ def queryDBGasInca(initial_timestamp, final_timestamp):
                                   
 
 def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
-    qhawax_id = getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
     sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S, ProcessedMeasurement.NO,
                 ProcessedMeasurement.NO2, ProcessedMeasurement.O3, ProcessedMeasurement.PM1, ProcessedMeasurement.PM25,
@@ -274,7 +242,7 @@ def storeProcessedDataInDB(data):
 
     """
     qhawax_name = data.pop('ID', None)
-    qhawax_id = getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
     processed_measurement = ProcessedMeasurement(**data, qhawax_id=qhawax_id)
     session.add(processed_measurement)
     session.commit()
@@ -287,7 +255,7 @@ def getNoiseData(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    qhawax_id = getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
     eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).filter_by(qhawax_id=qhawax_id,end_date=None).first()
     zone = session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
     return zone
@@ -321,7 +289,7 @@ def storeValidProcessedDataInDB(data, qhawax_id, product_id):
     :param product_id: qHAWAX name
 
     """
-    installation_id = getInstallationId(qhawax_id)
+    installation_id = same_helper.getInstallationId(qhawax_id)
     if(installation_id!=None):
         valid_data = {'timestamp_zone': data['timestamp'],'CO': data['CO'],'CO_ug_m3': data['CO_ug_m3'], 'H2S': data['H2S'],'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],
                     'SO2_ug_m3': data['SO2_ug_m3'],'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'],'PM25': data['PM25'],

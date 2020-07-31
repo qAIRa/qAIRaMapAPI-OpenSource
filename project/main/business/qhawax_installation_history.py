@@ -8,6 +8,7 @@ import os
 from project import app, db, socketio
 from project.database.models import Qhawax
 import project.main.business.business_helper as helper
+import project.main.same_function_helper as same_helper
 from sqlalchemy import or_
 
 @app.route('/api/newQhawaxInstallation/', methods=['POST'])
@@ -72,7 +73,7 @@ def newQhawaxInstallation():
         helper.storeNewQhawaxInstallation(data_json)
         helper.setOccupiedQhawax(qhawax_id)
         helper.setModeCustomer(qhawax_id)
-        qhawax_name = helper.getQhawaxName(qhawax_id)
+        qhawax_name = same_helper.getQhawaxName(qhawax_id)
         description="Se registró qHAWAX en campo"
         observation_type="Interna"
         person_in_charge = data_json['person_in_charge']
@@ -103,7 +104,7 @@ def saveEndWorkField():
         installation_id = helper.getInstallationId(qhawax_id)
         helper.saveEndWorkFieldDate(installation_id, data_json['end_date'])
         helper.setAvailableQhawax(qhawax_id)
-        qhawax_name = helper.getQhawaxName(qhawax_id)
+        qhawax_name = same_helper.getQhawaxName(qhawax_id)
         helper.changeMode(qhawax_name, "Stand By")
         description="Se registró fin de trabajo en campo"
         observation_type="Interna"
@@ -160,7 +161,6 @@ def getInstallationDate():
                 return str(installation_date)
         else:
             return make_response(jsonify("qHAWAX is not in field"), 200)
-
     except Exception as e:
         print(e)
         return make_response('No Installation Date', 400)

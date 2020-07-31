@@ -10,6 +10,7 @@ from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
 import project.main.business.business_helper as business_helper
 import project.main.util_helper as util_helper
+import project.main.same_function_helper as same_helper
 from sqlalchemy import or_
 import csv
 
@@ -99,7 +100,7 @@ def handleProcessedData():
         product_id = data_json['ID']
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
         helper.storeProcessedDataInDB(data_json)
-        qhawax_id = helper.getQhawaxID(product_id)
+        qhawax_id = same_helper.getQhawaxID(product_id)
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
         mode = helper.getQhawaxMode(qhawax_id)
@@ -207,7 +208,7 @@ def importProcessedData():
                 arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
                 data_json = util_helper.gasConversionPPBtoMG(data_json, arr_season)
                 data_json = util_helper.roundUpThree(data_json)
-                qhawax_id = helper.getQhawaxID(product_id)
+                qhawax_id = same_helper.getQhawaxID(product_id)
                 helper.storeProcessedDataInDB(data_json)
                 helper.storeValidProcessedDataInDB(data_json, qhawax_id, product_id)
         return make_response('OK', 200)
