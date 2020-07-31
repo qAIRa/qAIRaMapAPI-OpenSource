@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource) [![Coverage Status](https://coveralls.io/repos/github/qAIRa/qairamapAPI-OpenSource/badge.svg?branch=development)](https://coveralls.io/github/qAIRa/qairamapAPI-OpenSource?branch=development) [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability)
+[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource) [![Coverage Status](https://coveralls.io/repos/github/qAIRa/qairamapAPI-OpenSource/badge.svg?branch=development)](https://coveralls.io/github/qAIRa/qairamapAPI-OpenSource?branch=development) [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability) [![Documentation Status](https://readthedocs.org/projects/qairamapapi-opensource/badge/?version=latest)](https://qairamapapi-opensource.readthedocs.io/en/latest/?badge=latest)
+
 
 #  qAIRa Map API
 
