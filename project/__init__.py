@@ -22,7 +22,7 @@ login_manager.init_app(app)
 migrate = Migrate(app, db)
 mail = Mail(app)
 
-from project.main.business import binnacle, company, eca_noise, gas_sensor, qhawax, eca_noise, qhawax_installation_history
+from project.main.business import company, eca_noise, gas_sensor, qhawax, eca_noise, qhawax_installation_history
 from project.main.data import processed_measurement, air_quality,gas_inca, valid_processed_measurement
 from project.main import util_helper
 import project.database.models as models

@@ -4,7 +4,6 @@ import dateutil.parser
 import time
 from project import app
 
-
 pollutant=['SO2','NO2','O3','CO','H2S']
 pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
@@ -18,7 +17,6 @@ def validAndBeautyJsonProcessed(data_json):
     timestamp_zone = dateutil.parser.parse(data_json["timestamp"])
     utc = timestamp_zone.utcoffset().total_seconds()/3600
     data_json["timestamp_zone"] = data_json["timestamp"]
-    data_json["time_zone"] = utc
 
     return data_json
 
@@ -227,3 +225,36 @@ def checkNegatives(data_json):
         data_json["PM10"] = 0
 
     return data_json
+
+def areFieldsValid(data):
+    if(data['lat']=='' or data['lat']==None):
+        return False
+
+    if(data['lon']=='' or data['lon']==None):
+        return False
+
+    if(data['comercial_name']=='' or data['comercial_name']==None):
+        return False
+
+    if(data['company_id']=='' or data['company_id']==None):
+        return False
+
+    if(data['eca_noise_id']=='' or data['eca_noise_id']==None):
+        return False
+
+    if(data['qhawax_id']=='' or data['qhawax_id']==None):
+        return False
+
+    if(data['connection_type']=='' or data['connection_type']==None):
+        return False
+
+    if(data['season']=='' or data['season']==None):
+        return False
+
+    if(data['is_public']=='' or data['is_public']==None):
+        return False
+
+    if(data['person_in_charge']=='' or data['person_in_charge']==None):
+        return False
+
+    return True

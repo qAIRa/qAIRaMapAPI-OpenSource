@@ -10,21 +10,110 @@ from project.database.models import Qhawax
 import project.main.business.business_helper as helper
 from sqlalchemy import or_
 
-@app.route('/api/AllQhawaxInField/', methods=['GET'])
-def getAllQhawaxInField():
+@app.route('/api/newQhawaxInstallation/', methods=['POST'])
+def newQhawaxInstallation():
     """
-    Get all qHAWAX in field
+    To create a qHAWAX in Field 
+    
+    Json input of following fields:
+    
+    :type  qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
 
-    No parameters required
+    :type  lat: double
+    :param lat: latitude of qHAWAX location
+
+    :type  lon: double
+    :param lon: longitude of qHAWAX location
+
+    :type  instalation_date: timestamp
+    :param instalation_date: qHAWAX Installation Date
+
+    :type  link_report: string
+    :param link_report: link of installation report
+
+    :type  observations: string
+    :param observations: installation detail
+
+    :type  district: string
+    :param district: district where qHAWAX is located
+
+    :type  comercial_name: string
+    :param comercial_name: qHAWAX comercial name
+
+    :type  address: string
+    :param address: address where qHAWAX is located
+
+    :type  company_id: integer
+    :param company_id: company ID to which qHAWAX belongs
+
+    :type  eca_noise_id: integer
+    :param eca_noise_id: ID of type of qHAWAX zone
+
+    :type  qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type  connection_type: string
+    :param connection_type: Type of qHAWAX connection
+
+    :type  index_type: string
+    :param index_type: Type of qHAWAX index
+
+    :type  measuring_height: integer
+    :param measuring_height: Height of qHAWAX in field
+
+    :type  season: string
+    :param season: season of the year when the module was deployed
 
     """
-    qhawax_in_field = helper.queryQhawaxInField()
-    if qhawax_in_field is not None:
-        qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
-        qhawax_in_field_list = helper.setQhawaxName(qhawax_in_field_list)
-        return make_response(jsonify(qhawax_in_field_list), 200)
-    else:
-        return make_response(jsonify('Measurements not found'), 404)
+    try:
+        data_json = request.get_json()
+        qhawax_id = data_json['qhawax_id']
+        helper.storeNewQhawaxInstallation(data_json)
+        helper.setOccupiedQhawax(qhawax_id)
+        helper.setModeCustomer(qhawax_id)
+        qhawax_name = helper.getQhawaxName(qhawax_id)
+        description="Se registró qHAWAX en campo"
+        observation_type="Interna"
+        person_in_charge = data_json['person_in_charge']
+        helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        return make_response('OK', 200)
+    except Exception as e:
+        print(e)
+        return make_response('Invalid format', 400)
+
+
+@app.route('/api/saveEndWorkField/', methods=['POST'])
+def saveEndWorkField():
+    """
+    Save last date of qHAWAX in field
+    
+    Json input of following fields:
+
+    :type  qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type  end_date: timestamp
+    :param end_date: end date of qHAWAX installation
+
+    """
+    try:
+        data_json = request.get_json()
+        qhawax_id = data_json['qhawax_id']
+        installation_id = helper.getInstallationId(qhawax_id)
+        helper.saveEndWorkFieldDate(installation_id, data_json['end_date'])
+        helper.setAvailableQhawax(qhawax_id)
+        qhawax_name = helper.getQhawaxName(qhawax_id)
+        helper.changeMode(qhawax_name, "Stand By")
+        description="Se registró fin de trabajo en campo"
+        observation_type="Interna"
+        person_in_charge = data_json['person_in_charge']
+        helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        return make_response('OK', 200)
+    except Exception as e:
+        print(e)
+        return make_response('Invalid format', 400)
+
 
 @app.route('/api/AllQhawaxByCompany/', methods=['GET'])
 def getQhawaxByCompany():
@@ -75,25 +164,4 @@ def getInstallationDate():
     except Exception as e:
         print(e)
         return make_response('No Installation Date', 400)
-
-
-@app.route('/api/AllCustomerQhawax/', methods=['GET'])
-def getAllCustomerQhawax():
-    """
-    Get a list of Customer qHAWAXs filter by company ID
-
-    It does not care if it is public or private
-
-    :type  company_id: integer
-    :param company_id: company ID
-
-    """
-    company_id = request.args.get('company_id')
-    
-    qhawax_in_field_by_company = helper.queryQhawaxInFieldByCompany(company_id)
-    if qhawax_in_field_by_company is not None:
-        qhawax_in_field_by_company_list = [installation._asdict() for installation in qhawax_in_field_by_company]
-        return make_response(jsonify(qhawax_in_field_by_company_list), 200)
-    else:
-        return make_response(jsonify('qHAWAXs not found'), 404)
 

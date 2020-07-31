@@ -137,11 +137,8 @@ def sendQhawaxStatusOff():
     qhawax_name = str(req_json['qhawax_name']).strip()
     observation_type="Interna"
     description="Se apagó el qHAWAX"
-    solution = None
     person_in_charge = None
-    start_date = None
-    end_date = None
-    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
@@ -163,11 +160,8 @@ def sendQhawaxStatusOn():
     helper.updateMainIncaInDB(0,qhawax_name)
     observation_type="Interna"
     description="Se prendió el qHAWAX"
-    solution = None
     person_in_charge = None
-    start_date = None
-    end_date = None
-    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
@@ -212,11 +206,8 @@ def createQhawax():
                 helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
             description="Se registró qHAWAX"
             observation_type="Interna"
-            solution = None
             person_in_charge = req_json['person_in_charge']
-            end_date = None
-            start_date = None
-            helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+            helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
             last_gas_sensor_id = helper.queryGetLastGasSensor()
             if(last_gas_sensor_id ==None):
                 helper.insertDefaultOffsets(0,qhawax_name)
@@ -243,23 +234,6 @@ def getAllQhawax():
     else:
         return make_response(jsonify('qHAWAXs not found'), 404)
 
-@app.route('/api/get_qhawaxs_by_mode/', methods=['GET'])
-def getAllQhawaxByMode():
-    """
-    Get All qHAWAXs Filter by mode  
-
-    No parameters required
-
-    """
-    mode = request.args.get('mode')
-    qhawaxs_by_mode = helper.queryAllQhawaxByMode(mode)
-    if qhawaxs_by_mode is not None:
-        qhawax_list = [qhawax._asdict() for qhawax in qhawaxs_by_mode]
-        return make_response(jsonify(qhawax_list), 200)
-    else:
-        return make_response(jsonify('qHAWAXs in this mode not found'), 404)
-
-
 @app.route('/api/change_to_calibration/', methods=['POST'])
 def qhawaxChangeToCalibration():
     """
@@ -282,11 +256,8 @@ def qhawaxChangeToCalibration():
         helper.changeMode(qhawax_name,"Calibracion")
         observation_type="Interna"
         description="Se cambió a modo calibracion"
-        solution = None
         person_in_charge = req_json['person_in_charge']
-        end_date = None
-        start_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+        helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
@@ -317,11 +288,8 @@ def qhawaxEndCalibration():
             description="Se cambió a modo stand by"
             helper.updateMainIncaInDB(-1,qhawax_name)
         observation_type="Interna"
-        solution = None
         person_in_charge = req_json['person_in_charge']
-        end_date = None
-        start_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+        helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)

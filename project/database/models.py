@@ -1,5 +1,4 @@
 from project import db
-
 from passlib.hash import bcrypt
 from sqlalchemy_json import NestedMutableJson
 
@@ -25,11 +24,6 @@ class Company(db.Model):
         self.address = address
         self.phone = phone
         self.contact_person = contact_person
-
-    @property
-    def serialize(self):
-        return {'name': self.name, 'email_group': self.email_group,'ruc':self.ruc,'address':self.address,'phone':self.phone,'contact_person':self.contact_person}
-
 
 class Qhawax(db.Model):
     __tablename__ = 'qhawax'
@@ -66,17 +60,6 @@ class Qhawax(db.Model):
         self.main_aqi = main_aqi
         self.mode = mode
 
-    @property
-    def serialize(self):
-        return {
-            'name'          : self.name,
-            'main_aqi'      : self.main_aqi,
-            'main_inca'     : self.main_inca,
-            'qhawax_type'   : self.qhawax_type,
-            'state'         : self.state,
-            'availability'  : self.availability,
-            'mode'          : self.mode}
-
 class GasSensor(db.Model):
     __tablename__ = 'gas_sensor'
 
@@ -96,18 +79,6 @@ class GasSensor(db.Model):
     NC0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
-    @property
-    def serialize(self):
-        return {
-            'serial_number': self.serial_number,
-            'purchase_date': str(self.timestamp),
-            'type': self.type,
-            'WE': self.WE,
-            'AE': self.AE,
-            'sensitivity': self.sensitivity,
-            'sensitivity_2': self.sensitivit_2
-        }
-
 class ProcessedMeasurement(db.Model):
     __tablename__ = 'processed_measurement'
 
@@ -115,7 +86,6 @@ class ProcessedMeasurement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
-    time_zone = db.Column(db.Float)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     CO2 = db.Column(db.Float)
@@ -143,32 +113,6 @@ class ProcessedMeasurement(db.Model):
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
-    @property
-    def serialize(self):
-        return {
-            'timestamp': str(self.timestamp),
-            'CO': self.CO,
-            'CO2': self.CO2,
-            'H2S': self.H2S,
-            'NO': self.NO,
-            'NO2': self.NO2,
-            'O3': self.O3,
-            'PM1': self.PM1,
-            'PM25': self.PM25,
-            'PM10': self.PM10,
-            'SO2': self.SO2,
-            'VOC': self.VOC,
-            'UV': self.UV,
-            'UVA': self.UVA,
-            'UVB': self.UVB,
-            'spl': self.spl,
-            'humidity': self.humidity,
-            'pressure': self.pressure,
-            'temperature': self.temperature,
-            'lat': self.lat,
-            'lon': self.lon,
-            'alt': self.alt}
 
 class GasInca(db.Model):
     __tablename__ = 'gas_inca'
@@ -198,7 +142,6 @@ class AirQualityMeasurement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
-    time_zone = db.Column(db.Float)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     H2S = db.Column(db.Float)
@@ -223,8 +166,6 @@ class AirQualityMeasurement(db.Model):
     alt = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
     
-
-
 class EcaNoise(db.Model):
     __tablename__ = 'eca_noise'
 
@@ -244,7 +185,9 @@ class QhawaxInstallationHistory(db.Model):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
     instalation_date = db.Column(db.DateTime, nullable=False)
+    installation_date_zone = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
+    end_date_zone = db.Column(db.DateTime, nullable=False)
     link_report = db.Column(db.String(500), nullable=False, unique=True)
     observations = db.Column(db.String(300), nullable=False, unique=True)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
@@ -257,13 +200,12 @@ class QhawaxInstallationHistory(db.Model):
     index_type = db.Column(db.String(100), nullable=False, unique=True)
     measuring_height = db.Column(db.Integer)
     season = db.Column(db.String(300), nullable=False, unique=True)
-    last_maintenance_date = db.Column(db.DateTime, nullable=False)
-    last_cleaning_area_date = db.Column(db.DateTime, nullable=False)
-    last_cleaning_equipment_date = db.Column(db.DateTime, nullable=False)
     last_time_physically_turn_on = db.Column(db.DateTime, nullable=False)
+    last_time_physically_turn_on_zone = db.Column(db.DateTime, nullable=False)
     person_in_charge = db.Column(db.String(300), nullable=False, unique=True)
     is_public  = db.Column(db.String(10), nullable=False, unique=True)
     last_registration_time = db.Column(db.DateTime, nullable=False)
+    last_registration_time_zone = db.Column(db.DateTime, nullable=False)
     main_inca = db.Column(db.Float) 
     valid_processed_measurements = db.relationship('ValidProcessedMeasurement', backref='qhawax_installation_history', lazy='subquery',
                                                 cascade='delete, delete-orphan')
@@ -275,7 +217,6 @@ class ValidProcessedMeasurement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
-    time_zone = db.Column(db.Float)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     CO2 = db.Column(db.Float)
@@ -320,8 +261,6 @@ class Bitacora(db.Model):
     end_date = db.Column(db.DateTime, nullable=False)
     end_date_zone = db.Column(db.DateTime, nullable=False)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
-    
 
 
 import project.database.utils as utils
