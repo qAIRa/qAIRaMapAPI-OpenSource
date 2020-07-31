@@ -11,7 +11,7 @@ We work with modules, called qHAWAX, that capture data from gases, dust and envi
 Clone or download the project to the device where it will be used.
 
 ```
-git clone https://github.com/qAIRa/qairamapAPI.git
+git clone https://github.com/qAIRa/qAIRaMapAPI-OpenSource.git
 ```
 
 ### Prerequisites Ubuntu & Mac
