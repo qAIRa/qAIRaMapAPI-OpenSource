@@ -9,13 +9,21 @@ Welcome to qAIRaMap-OpenSource's documentation!
 qAIRa Map API is an API to connect our web, our qHAWAXs and our database. We work with modules, called qHAWAXs, that capture data from gases, dust and environmental sensors (temperature, pressure, ultraviolet and noise).
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :name: content
     :caption: Content:
     :glob:
 
     modules
 
+
+Guide
+=======
+
+.. toctree::
+    :maxdepth: 2
+
+    license
 
 
 ***********************************************************
