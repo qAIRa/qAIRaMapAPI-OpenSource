@@ -9,55 +9,19 @@ import string
 
 import project.database.utils as utils
 import project.main.util_helper as util_helper
+import project.main.same_function_helper as same_helper
 
 from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallationHistory, Company, AirQualityMeasurement, ProcessedMeasurement, ValidProcessedMeasurement, Bitacora
-
 
 var_gases=['CO','H2S','NO','NO2','O3','SO2']
 
 session = db.session
 
 
-def getQhawaxID(qhawax_name): 
-    """
-    Get qHAWAX ID base on qHAWAX name
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    qhawax_list = session.query(Qhawax.id).filter_by(name=qhawax_name).all()
-    if(qhawax_list == []):
-        raise TypeError("The qHAWAX name could not be found")
-    return session.query(Qhawax.id).filter_by(name=qhawax_name).one()[0]
-
-
 def getInstallationIdBaseName(qhawax_name):
-    qhawax_id = getQhawaxID(qhawax_name)
-    installation_id = getInstallationId(qhawax_id)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    installation_id = same_helper.getInstallationId(qhawax_id)
     return installation_id
-
-def getInstallationId(qhawax_id):
-    installation_id= session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).all()
-    if(installation_id == []):
-        return None
-
-    return session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).first()[0]
-
-def getQhawaxName(qhawax_id):
-    """
-    Get qHAWAX Name
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    """
-    return session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).one()   
-
 
 def getMainIncaQhawaxTable(qhawax_id):
     """
@@ -119,7 +83,7 @@ def getOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, GasSensor.sensitivity, GasSensor.sensitivity_2)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -146,7 +110,7 @@ def getControlledOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -174,7 +138,7 @@ def getNonControlledOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -203,7 +167,7 @@ def updateOffsetsFromProductID(qhawax_name, offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         for sensor_type in offsets:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=offsets[sensor_type])
@@ -225,7 +189,7 @@ def updateControlledOffsetsFromProductID(qhawax_id, controlled_offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         for sensor_type in controlled_offsets:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=controlled_offsets[sensor_type])
@@ -247,7 +211,7 @@ def updateNonControlledOffsetsFromProductID(qhawax_id, non_controlled_offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = getQhawaxID(qhawax_name)
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
         for sensor_type in non_controlled_offsets:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=non_controlled_offsets[sensor_type])
@@ -332,7 +296,7 @@ def saveStatusOn(qhawax_name):
 def saveTurnOnLastTime(qhawax_name):
     qhawax_id, mode = session.query(Qhawax.id, Qhawax.mode).filter_by(name=qhawax_name).first()
     if(mode=='Cliente'):
-        installation_id = getInstallationId(qhawax_id)
+        installation_id = same_helper.getInstallationId(qhawax_id)
         if(installation_id!=None):
             now = datetime.datetime.now(dateutil.tz.tzutc())
             session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
