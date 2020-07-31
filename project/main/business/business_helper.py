@@ -8,6 +8,7 @@ import random
 import string
 
 import project.database.utils as utils
+import project.main.util_helper as util_helper
 
 from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallationHistory, Company, AirQualityMeasurement, ProcessedMeasurement, ValidProcessedMeasurement, Bitacora
 
@@ -15,6 +16,72 @@ from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallat
 var_gases=['CO','H2S','NO','NO2','O3','SO2']
 
 session = db.session
+
+
+def getQhawaxID(qhawax_name): 
+    """
+    Get qHAWAX ID base on qHAWAX name
+
+    :type qhawax_name: string
+    :param qhawax_name: qHAWAX name
+
+    """
+    qhawax_list = session.query(Qhawax.id).filter_by(name=qhawax_name).all()
+    if(qhawax_list == []):
+        raise TypeError("The qHAWAX name could not be found")
+    return session.query(Qhawax.id).filter_by(name=qhawax_name).one()[0]
+
+
+def getInstallationIdBaseName(qhawax_name):
+    qhawax_id = getQhawaxID(qhawax_name)
+    installation_id = getInstallationId(qhawax_id)
+    return installation_id
+
+def getInstallationId(qhawax_id):
+    installation_id= session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
+                                    filter(QhawaxInstallationHistory.end_date == None). \
+                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).all()
+    if(installation_id == []):
+        return None
+
+    return session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
+                                    filter(QhawaxInstallationHistory.end_date == None). \
+                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).first()[0]
+
+def getQhawaxName(qhawax_id):
+    """
+    Get qHAWAX Name
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    """
+    return session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).one()   
+
+
+def getMainIncaQhawaxTable(qhawax_id):
+    """
+    Get qHAWAX Main Inca
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    """
+    main_inca = session.query(Qhawax.main_inca).filter_by(id=qhawax_id).one()[0]
+    return main_inca
+
+def queryGetCompanies():
+    """
+    Helper Company function to list all companies 
+
+    No parameters required
+
+    """
+    sensors = (Company.id, Company.name, Company.email_group, Company.ruc, Company.address, Company.phone, Company.contact_person)
+    companies = session.query(*sensors).all()
+    if(companies == []):
+        return None
+    return session.query(*sensors).order_by(Company.id.desc()).all()
 
 def queryGetEcaNoise(eca_noise_id):
     """
@@ -32,6 +99,16 @@ def queryGetEcaNoise(eca_noise_id):
         return area_list
     return session.query(*fields).filter(EcaNoise.id == eca_noise_id).one()
 
+def queryGetAreas():
+    """
+    Helper Eca Noise function to list all zones 
+
+    No parameters required
+
+    """
+    sensors = (EcaNoise.id, EcaNoise.area_name)
+    return session.query(*sensors).order_by(EcaNoise.id.desc()).all()
+
 
 def getOffsetsFromProductID(qhawax_name):
     """
@@ -42,10 +119,7 @@ def getOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_list = session.query(Qhawax.id).filter_by(name=qhawax_name).all()
-        if(qhawax_list == []):
-            raise TypeError("The qHAWAX name could not be found")
-        qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).one()[0]
+        qhawax_id = getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, GasSensor.sensitivity, GasSensor.sensitivity_2)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -72,10 +146,7 @@ def getControlledOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_list = session.query(Qhawax.id).filter_by(name=qhawax_name).all()
-        if(qhawax_list == []):
-            raise TypeError("The qHAWAX name could not be found")
-        qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).one()[0]
+        qhawax_id = getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -103,10 +174,7 @@ def getNonControlledOffsetsFromProductID(qhawax_name):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_list = session.query(Qhawax.id).filter_by(name=qhawax_name).all()
-        if(qhawax_list == []):
-            raise TypeError("The qHAWAX name could not be found")
-        qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).one()[0]
+        qhawax_id = getQhawaxID(qhawax_name)
 
         attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
         sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
@@ -135,10 +203,7 @@ def updateOffsetsFromProductID(qhawax_name, offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_list = session.query(Qhawax.id).filter_by(name=qhawax_name).all()
-        if(qhawax_list == []):
-            raise TypeError("The qHAWAX name could not be found")
-        qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).one()[0]
+        qhawax_id = getQhawaxID(qhawax_name)
 
         for sensor_type in offsets:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=offsets[sensor_type])
@@ -159,12 +224,16 @@ def updateControlledOffsetsFromProductID(qhawax_id, controlled_offsets):
     :param offsets: Json of offset variable of qHAWAX
 
     """
-    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_id).one()[0]
+    if(isinstance(qhawax_name, str)):
+        qhawax_id = getQhawaxID(qhawax_name)
 
-    for sensor_type in controlled_offsets:
-        session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=controlled_offsets[sensor_type])
+        for sensor_type in controlled_offsets:
+            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=controlled_offsets[sensor_type])
     
-    session.commit()
+        session.commit()
+    else:
+        raise TypeError("The qHAWAX name should be string")
+
 
 def updateNonControlledOffsetsFromProductID(qhawax_id, non_controlled_offsets):
     """
@@ -177,12 +246,15 @@ def updateNonControlledOffsetsFromProductID(qhawax_id, non_controlled_offsets):
     :param offsets: Json of offset variable of qHAWAX
 
     """
-    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_id).one()[0]
+    if(isinstance(qhawax_name, str)):
+        qhawax_id = getQhawaxID(qhawax_name)
 
-    for sensor_type in non_controlled_offsets:
-        session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=non_controlled_offsets[sensor_type])
+        for sensor_type in non_controlled_offsets:
+            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).update(values=non_controlled_offsets[sensor_type])
     
-    session.commit()
+        session.commit()
+    else:
+        raise TypeError("The qHAWAX name should be string")
 
 def queryIncaQhawax(name):
     """
@@ -242,7 +314,7 @@ def saveStatusOff(json):
         qhawax_mode = session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
         if(qhawax_mode=='Cliente'):
             installation_id=getInstallationIdBaseName(qhawax_name)
-            session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'main_inca': -1, 'last_registration_time':qhawax_lost_timestamp})
+            session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'main_inca': -1, 'last_registration_time_zone':qhawax_lost_timestamp})
             session.commit()
         jsonsend['main_inca'] = -1
         jsonsend['name'] = qhawax_name 
@@ -262,15 +334,9 @@ def saveTurnOnLastTime(qhawax_name):
     if(mode=='Cliente'):
         installation_id = getInstallationId(qhawax_id)
         if(installation_id!=None):
-            now = datetime.datetime.now()-datetime.timedelta(hours=5)
-            session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_time_physically_turn_on': now.replace(tzinfo=None)})
+            now = datetime.datetime.now(dateutil.tz.tzutc())
+            session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
             session.commit()
-
-def getInstallationIdBaseName(qhawax_name):
-    qhawax_id = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).one()
-    installation_id = getInstallationId(qhawax_id)
-    return installation_id
-
 
 def storeNewQhawaxInstallation(data):
     """
@@ -280,13 +346,13 @@ def storeNewQhawaxInstallation(data):
     :param data: qHAWAX Installation detail
 
     """
-    if(areFieldsValid(data)==True):
+    if(util_helper.areFieldsValid(data)==True):
         main_inca = getMainIncaQhawaxTable(data['qhawax_id'])
-        installation_data = {'lat': data['lat'], 'lon': data['lon'], 'instalation_date': str(dateutil.parser.parse(data['instalation_date']) - datetime.timedelta(hours=5)), 'link_report': data['link_report'], 
+        installation_data = {'lat': data['lat'], 'lon': data['lon'], 'instalation_date_zone': datetime.datetime.now(dateutil.tz.tzutc()), 'link_report': data['link_report'], 
                  'observations': data['observations'], 'district': data['district'],'comercial_name': data['comercial_name'],'address':data['address'],
                  'company_id': data['company_id'],'eca_noise_id':data['eca_noise_id'], 'qhawax_id':data['qhawax_id'],'connection_type':data['connection_type'],
-                 'index_type':data['index_type'],'measuring_height':data['measuring_height'], 'season':data['season'], 'last_time_physically_turn_on':data['instalation_date'],
-                 'last_registration_time': data['instalation_date'], 'main_inca':main_inca, 'is_public':data['is_public'],'person_in_charge':data['person_in_charge']}
+                 'index_type':data['index_type'],'measuring_height':data['measuring_height'], 'season':data['season'], 'last_time_physically_turn_on_zone':datetime.datetime.now(dateutil.tz.tzutc()),
+                 'last_registration_time_zone': datetime.datetime.now(dateutil.tz.tzutc()), 'main_inca':main_inca, 'is_public':data['is_public'],'person_in_charge':data['person_in_charge']}
         qhawax_installation = QhawaxInstallationHistory(**installation_data)
         session.add(qhawax_installation)
         session.commit()
@@ -316,7 +382,7 @@ def saveEndWorkFieldDate(installation_id,end_date):
     :param end_date: qHAWAX installation end date
 
     """
-    session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'end_date': end_date})
+    session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'end_date_zone': end_date})
     session.commit()
 
 def setAvailableQhawax(qhawax_id):
@@ -330,95 +396,15 @@ def setAvailableQhawax(qhawax_id):
     session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': 'Available'})
     session.commit()
 
-def queryQhawaxInFieldByCompany(company_id):
-    """
-    Get list of qHAWAXs in field filter by company ID
-
-    If company_id is 0, the response will be all public qHAWAX
-    If company_id is other valid number, the response will refer to the modules of that company
-
-    :type  company_id: integer
-    :param company_id: company ID
-
-    """
-    columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, QhawaxInstallationHistory.id, QhawaxInstallationHistory.qhawax_id,
-        QhawaxInstallationHistory.eca_noise_id, QhawaxInstallationHistory.comercial_name, QhawaxInstallationHistory.lat, QhawaxInstallationHistory.lon, EcaNoise.area_name)
-    
-    if(int(company_id)==0): #Qhawax instalados publicos activos
-        return session.query(*columns).join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
-                                      join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
-                                      group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                                      filter(QhawaxInstallationHistory.is_public== 'si'). \
-                                       filter(QhawaxInstallationHistory.end_date == None). \
-                                        order_by(Qhawax.id).all() 
-    return session.query(*columns).join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
-                                   join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
-                                   group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                                   filter(QhawaxInstallationHistory.company_id == company_id). \
-                                   filter(QhawaxInstallationHistory.end_date == None). \
-                                   order_by(Qhawax.id).all() 
-
-def getAllQhawaxDetail(qhawax_list):
-    """
-    Get list of qHAWAXs in field
-
-    :type  qhawax_list: json array
-    :param qhawax_list: qHAWAX list
-
-    """
-    for qhawax_detail in qhawax_list:
-        qhawax_detail['qhawax_id'] = qhawax_detail['id']
-
-        qhawax_detail['id'] = session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_detail['qhawax_id'],end_date=None).all()
-        if(qhawax_detail['id'] == []):
-            qhawax_detail['id'] = 0
-        else: qhawax_detail['id'] = session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_detail['qhawax_id'],end_date=None).first()[0]
-        
-        qhawax_detail['eca_noise_id'] = session.query(QhawaxInstallationHistory.eca_noise_id).filter_by(id=qhawax_detail['id']).all()
-        if(qhawax_detail['eca_noise_id'] == []):
-            qhawax_detail['eca_noise_id'] = 0
-        else: qhawax_detail['eca_noise_id'] = session.query(QhawaxInstallationHistory.eca_noise_id).filter_by(id=qhawax_detail['id']).first()[0]
-        
-        qhawax_detail['area_name'] = session.query(EcaNoise.area_name).filter_by(id=qhawax_detail['eca_noise_id']).all()
-        if(qhawax_detail['area_name'] == []):
-            qhawax_detail['area_name'] = "Zona No Definida"
-        else: qhawax_detail['area_name'] = session.query(EcaNoise.area_name).filter_by(id=qhawax_detail['eca_noise_id']).first()[0]
-        
-        qhawax_detail['comercial_name']  = session.query(QhawaxInstallationHistory.comercial_name).filter_by(id=qhawax_detail['id']).all()
-        if(qhawax_detail['comercial_name']  == []):
-            qhawax_detail['comercial_name']  = "Qhawax en " + qhawax_detail['mode']
-        else: qhawax_detail['comercial_name']  = session.query(QhawaxInstallationHistory.comercial_name).filter_by(id=qhawax_detail['id']).first()[0]
-        
-        qhawax_detail['lat']  = session.query(QhawaxInstallationHistory.lat).filter_by(id=qhawax_detail['id']).all()
-        if(qhawax_detail['lat']  == []):
-            qhawax_detail['lat']  = 0
-        else: qhawax_detail['lat'] = session.query(QhawaxInstallationHistory.lat).filter_by(id=qhawax_detail['id']).first()[0]
-
-        qhawax_detail['lon'] = session.query(QhawaxInstallationHistory.lon).filter_by(id=qhawax_detail['id']).all()
-        if(qhawax_detail['lon']  == []):
-            qhawax_detail['lon']  = 0
-        else: qhawax_detail['lon'] = session.query(QhawaxInstallationHistory.lon).filter_by(id=qhawax_detail['id']).first()[0]
-
-    return qhawax_list
 
 def getInstallationDateByQhawaxID(qhawax_id):
     installation_date = session.query(QhawaxInstallationHistory.instalation_date).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).first()
+                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
+                                    order_by(QhawaxInstallationHistory.instalation_date_zone.desc()).first()
     if (installation_date==None):
         return installation_date
     return installation_date[0]
 
-def getInstallationId(qhawax_id):
-    installation_id= session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).all()
-    if(installation_id == []):
-        return None
-
-    return session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).first()[0]
 
 def getFirstTimestampValidProcessed(qhawax_installation_id):
 
@@ -500,17 +486,6 @@ def createCompany(json):
     session.commit()
 
 
-def getQhawaxId(qhawax_name):
-    """
-    Get qHAWAX ID base on qHAWAX name
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
-    return qhawax_id
-
 def setModeCustomer(qhawax_id):
     """
     Update qHAWAX mode to Customer
@@ -521,29 +496,6 @@ def setModeCustomer(qhawax_id):
     """
     session.query(Qhawax).filter_by(id=qhawax_id).update(values={'mode': "Cliente"})
     session.commit()
-
-def getMainIncaQhawaxTable(qhawax_id):
-    """
-    Get qHAWAX Main Inca
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    """
-    main_inca = session.query(Qhawax.main_inca).filter_by(id=qhawax_id).one()[0]
-    return main_inca
-
-def queryAllQhawaxByMode(qhawax_mode):
-    """
-    Get all qHAWAXs
-
-    :type qhawax_mode: string
-    :param qhawax_mode: qHAWAX mode
-
-    """
-    columns = (Qhawax.name, Qhawax.id)
-    return session.query(*columns).filter_by(mode=qhawax_mode).order_by(Qhawax.id).all()
-
 
 def qhawaxNameIsNew(name):
     """
@@ -584,7 +536,6 @@ def companyRucIsNew(ruc):
         return True
     return False
 
-
 def changeMode(qhawax_name, mode):
     """
     Change To Other Mode
@@ -596,21 +547,8 @@ def changeMode(qhawax_name, mode):
     session.query(Qhawax).filter_by(name=qhawax_name).update(values={'mode': mode})
     session.commit()
 
-def setQhawaxName(qhawax_in_field_list):
-    """
-    Get qhawax name in this json list
 
-    :type qhawax_in_field_list: json
-    :param qhawax_in_field_list: json of qHAWAX detail in mode customer
-
-    """
-    for qhawax in qhawax_in_field_list:
-        qhawax['qhawax_name']= session.query(Qhawax.name).filter_by(id=qhawax['qhawax_id']).one()[0]
-
-    return qhawax_in_field_list
-
-
-def writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,end_date):
+def writeBitacora(qhawax_id,observation_type,description,person_in_charge):
     """
     Write Bitacora
 
@@ -623,18 +561,12 @@ def writeBitacora(qhawax_name,observation_type,description,solution,person_in_ch
     :type description: string
     :param description: Bitacora description
 
-    :type solution: string
-    :param solution: Bitacora Solution
-
     :type person_in_charge: string
     :param person_in_charge: Person in Charge
 
-    :type end_date: string
-    :param end_date: End date
-
     """
     qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
-    bitacora = {'timestamp': datetime.datetime.now()-datetime.timedelta(hours=5),'observation_type': observation_type,'description': description, 'qhawax_id':qhawax_id,'solution':solution,'person_in_charge':person_in_charge,'end_date':end_date}
+    bitacora = {'timestamp': datetime.datetime.now(dateutil.tz.tzutc()),'observation_type': observation_type,'description': description, 'qhawax_id':qhawax_id,'solution':None,'person_in_charge':person_in_charge,'end_date':None,'start_date':None}
     bitacora_update = Bitacora(**bitacora)
     session.add(bitacora_update)
     session.commit()
@@ -654,50 +586,6 @@ def isItFieldQhawax(qhawax_name):
     return False
 
 
-def getQhawaxName(qhawax_id):
-    """
-    Get qHAWAX Name
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    """
-    return session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).one()   
-
-
-def areFieldsValid(data):
-    if(data['lat']=='' or data['lat']==None):
-        return False
-
-    if(data['lon']=='' or data['lon']==None):
-        return False
-
-    if(data['comercial_name']=='' or data['comercial_name']==None):
-        return False
-
-    if(data['company_id']=='' or data['company_id']==None):
-        return False
-
-    if(data['eca_noise_id']=='' or data['eca_noise_id']==None):
-        return False
-
-    if(data['qhawax_id']=='' or data['qhawax_id']==None):
-        return False
-
-    if(data['connection_type']=='' or data['connection_type']==None):
-        return False
-
-    if(data['season']=='' or data['season']==None):
-        return False
-
-    if(data['is_public']=='' or data['is_public']==None):
-        return False
-
-    if(data['person_in_charge']=='' or data['person_in_charge']==None):
-        return False
-
-    return True
-
 def updateQhawaxInstallation(data):
     """
     Update qHAWAX in Field 
@@ -706,56 +594,13 @@ def updateQhawaxInstallation(data):
     :param data: qHAWAX Installation detail
 
     """
-    if(areFieldsValid(data)==True):
+    if(util_helper.areFieldsValid(data)==True):
         session.query(QhawaxInstallationHistory).filter_by(qhawax_id=data['qhawax_id'],company_id=data['company_id'],end_date=None).update(values={'lat':data['lat'],'lon':data['lon'],'link_report': data['link_report'], 
                  'observations':data['observations'],'district':data['district'],'comercial_name':data['comercial_name'],'address':data['address'],'eca_noise_id':data['eca_noise_id'],'connection_type':data['connection_type'],
                  'measuring_height':data['measuring_height'],'season':data['season'], 'is_public':data['is_public'],'person_in_charge':data['person_in_charge']})
         session.commit()
     else:
         raise Exception("The qhawax installation fields have to have data")
-
-def queryAllObservationByQhawax(qhawax_id):
-    """
-    Get all qHAWAXs observation
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    """
-    columns = (Bitacora.id, Bitacora.timestamp, Bitacora.observation_type,Bitacora.description, Bitacora.solution, Bitacora.person_in_charge, Bitacora.end_date)
-    return session.query(*columns).filter_by(qhawax_id=qhawax_id).order_by(Bitacora.timestamp).all()
-
-def storeNewObservation(data):
-    """
-    Binnacle helper function to record observations in field
-    
-    Json input of following fields:
-    
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type initial_timestamp: timestamp
-    :param initial_timestamp: start observation
-
-    :type end_timestamp: timestamp
-    :param end_timestamp: end observation
-
-    :type description: string
-    :param description: description of the observation
-
-    :type solution: string
-    :param solution: solution of the observation
-
-    :type person_in_charge: string
-    :param person_in_charge: person in charge
-    """
-    qhawax_mode = session.query(Qhawax.mode).filter_by(id=data['qhawax_id']).one()[0]
-    if(qhawax_mode=='Cliente'):
-        observation = {'qhawax_id': data['qhawax_id'], 'timestamp': data['initial_timestamp'], 'end_date': data['end_timestamp'], 
-                     'description': data['description'], 'solution': data['solution'],'person_in_charge': data['person_in_charge'],'observation_type':'Externa'}
-        binnacle_observation = Bitacora(**observation)
-        session.add(binnacle_observation)
-        session.commit()
 
 def queryAllQhawax():
     """
@@ -766,4 +611,26 @@ def queryAllQhawax():
     """
     columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
     return session.query(*columns).order_by(Qhawax.id).all()
+
+
+def queryQhawaxInFieldByCompanyInPublicMode(company_id):
+    """
+    Get list of qHAWAXs in field filter by company ID
+
+    Filter by COMPANY ID, the response will refer to the modules of that company
+
+    :type  company_id: integer
+    :param company_id: company ID
+
+    """
+    columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, QhawaxInstallationHistory.id, QhawaxInstallationHistory.qhawax_id,
+        QhawaxInstallationHistory.eca_noise_id, QhawaxInstallationHistory.comercial_name, QhawaxInstallationHistory.lat, QhawaxInstallationHistory.lon, EcaNoise.area_name)
+    
+    return session.query(*columns).join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                                   join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                                   group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                                   filter(QhawaxInstallationHistory.is_public == 'si'). \
+                                   filter(QhawaxInstallationHistory.company_id == company_id). \
+                                   filter(QhawaxInstallationHistory.end_date == None). \
+                                   order_by(Qhawax.id).all() 
 

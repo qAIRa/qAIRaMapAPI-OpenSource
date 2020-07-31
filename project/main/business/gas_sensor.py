@@ -79,10 +79,8 @@ def saveOffsets():
             helper.updateOffsetsFromProductID(qhawax_id, offsets)
             description="Se actualizaron constantes offsets"
             observation_type="Interna"
-            solution = None
             person_in_charge = req_json['person_in_charge']
-            end_date = None
-            helper.writeBitacora(qhawax_id,observation_type,description,solution,person_in_charge,end_date)
+            helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
             return make_response('Success', 200)
         except TypeError as e:
             json_message = jsonify({'error': '\'%s\'' % (e)})
@@ -114,10 +112,8 @@ def saveControlledOffsets():
     helper.updateControlledOffsetsFromProductID(qhawax_id, controlled_offsets)
     description="Se actualizaron constantes controladas"
     observation_type="Interna"
-    solution = None
     person_in_charge = req_json['person_in_charge']
-    end_date = None
-    helper.writeBitacora(qhawax_id,observation_type,description,solution,person_in_charge,end_date)
+    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 @app.route('/api/save_non_controlled_offsets/', methods=['POST'])
@@ -143,9 +139,7 @@ def saveNonControlledOffsets():
     helper.updateNonControlledOffsetsFromProductID(qhawax_id, non_controlled_offsets)
     description="Se actualizaron constantes no controladas"
     observation_type="Interna"
-    solution = None
     person_in_charge = req_json['person_in_charge']
-    end_date = None
-    helper.writeBitacora(qhawax_id,observation_type,description,solution,person_in_charge,end_date)
+    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 

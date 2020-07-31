@@ -7,6 +7,7 @@ import os
 from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
+import project.main.util_helper as util_helper
 from sqlalchemy import or_
 
 
@@ -39,10 +40,10 @@ def getValidProcessedMeasurementsTimePeriodByCompany():
             print("Entre aqui porque soy san miguel")   
             installation_id = helper.getInstallationId(qhawax_id)
             print(str(installation_id))
-            valid_processed_measurements = helper.queryDBValidProcessedByQhawax(installation_id, initial_timestamp_utc, final_timestamp_utc)
+            valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
     elif (int(company_id)==1):
         installation_id = helper.getInstallationId(qhawax_id)
-        valid_processed_measurements = helper.queryDBValidProcessedByQhawax(installation_id, initial_timestamp_utc, final_timestamp_utc)
+        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
     
     if valid_processed_measurements is not None:
         valid_processed_measurements_list = [measurement._asdict() for measurement in valid_processed_measurements]
@@ -93,31 +94,3 @@ def getTimeOfValidProcessed():
     qhawax_name = request.args.get('name')
     return str(helper.getLatestTimestampValidProcessed(qhawax_name))
 
-@app.route('/api/daily_valid_processed_measurements/', methods=['GET'])
-def getDailyValidProcessedData():
-    """
-    To list all measurement of valid processed measurement table in a define period of time
-
-    :type id: integer
-    :param id: qHAWAX ID
-
-    :type start_date: timestamp without timezone
-    :param start_date: initial timestamp day-month-year hour:minute:second (UTC OO)
-
-    :type end_date: timestamp without timezone
-    :param end_date: final timestamp day-month-year hour:minute:second (UTC OO)
-    
-
-    """
-    qhawax_id = request.args.get('id')
-    initial_timestamp_utc = datetime.datetime.strptime(request.args.get('start_date'), '%d-%m-%Y %H:%M:%S')
-    final_timestamp_utc = datetime.datetime.strptime(request.args.get('end_date'), '%d-%m-%Y %H:%M:%S')
-
-    installation_id = helper.getInstallationId(qhawax_id)
-    valid_processed_measurements = helper.queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
-
-    if valid_processed_measurements is not None:
-        valid_processed_measurements_list = [daily_valid_measurement._asdict() for daily_valid_measurement in valid_processed_measurements]
-        return make_response(jsonify(valid_processed_measurements_list), 200)
-    else:
-        return make_response(jsonify('Daily Valid Measurements not found'), 404)

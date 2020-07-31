@@ -8,7 +8,6 @@ import os
 from project import app, db, socketio
 from project.database.models import Qhawax
 import project.main.business.business_helper as helper
-import project.main.maintenance.maintenance_helper as helper_maintenance
 
 from sqlalchemy import or_
 
@@ -102,74 +101,6 @@ def getQhawaxProcessedLatestTimestamp():
     qhawax_name = request.args.get('qhawax_name')
     return str(helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name))
 
-@app.route('/api/qhawax_critical_timestamp_alert/', methods=['POST'])
-def sendQhawaxTimestamp():
-    """
-    Send Email When qHAWAX is not send raw measurement data 
-
-    Json input of following fields:
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type secret_key: string
-    :param secret_key: key to verify that we can send email
-
-    """
-    req_json = request.get_json(cache=False)
-    try:
-        qhawax_name = str(req_json['qhawax_name']).strip()
-        secret_key_hashed = str(req_json['secret_key']).strip()
-    except KeyError as e:
-        return helper.makeMissingParameterResponse(e.message)
-
-    #qhawax = helper.getQhawaxLatestCoordinatesFromName(db.session, qhawax_name)
-    timestamp = helper.getQhawaxLatestTimestamp(qhawax_name)
-    lessfive = str(timestamp - datetime.timedelta(hours=5))
-    subject = 'Qhawax %s no se encuentra activo' % (qhawax_name)
-    content = 'Ultima vez que se mostró activo: %s' % (lessfive)
-    if(helper.setEmailBody(secret_key_hashed, subject, content, "")):
-        json_message = jsonify({'OK': 'Email sent for active qhawax: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['OK'])
-    else:
-        json_message = jsonify({'error': 'Qhawax not found with name: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['NOT_FOUND'])
-
-@app.route('/api/qhawax_critical_processed_data_timestamp_alert/', methods=['POST'])
-def sendQhawaxProcessedDataTimestamp():
-    """
-    Send Email When qHAWAX is not send processed data 
-
-    Json input of following fields:
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type comercial_name: string
-    :param comercial_name: company name
-
-    :type secret_key: string
-    :param secret_key: key to verify that we can send email
-
-    """
-    req_json = request.get_json(cache=False)
-    try:
-        qhawax_name = str(req_json['qhawax_name']).strip()
-        comercial_name = str(req_json['comercial_name']).strip()
-        secret_key_hashed = str(req_json['secret_key']).strip()
-        lessfive = str(req_json['qhawax_lost_timestamp']).strip()
-    except KeyError as e:
-        return print(e)
-    subject = 'qHAWAX: %s Inactivo' % (comercial_name)
-    content1 = 'qHAWAX %s' % (qhawax_name)
-    content2 = '\nUltima vez que se mostró activo: %s' % (lessfive)
-    if(helper.setEmailBody(secret_key_hashed, subject, content1, content2)):
-        json_message = jsonify({'OK': 'Email sent for active qhawax: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['OK'])
-    else:
-        json_message = jsonify({'error': 'Qhawax not found with name: %s' % (qhawax_name)})
-        return make_response(json_message, RESPONSE_CODES['NOT_FOUND'])
-
 @app.route('/api/qhawax_status/', methods=['GET'])
 def getQhawaxStatus():
     """
@@ -206,11 +137,8 @@ def sendQhawaxStatusOff():
     qhawax_name = str(req_json['qhawax_name']).strip()
     observation_type="Interna"
     description="Se apagó el qHAWAX"
-    solution = None
     person_in_charge = None
-    start_date = None
-    end_date = None
-    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
@@ -232,11 +160,8 @@ def sendQhawaxStatusOn():
     helper.updateMainIncaInDB(0,qhawax_name)
     observation_type="Interna"
     description="Se prendió el qHAWAX"
-    solution = None
     person_in_charge = None
-    start_date = None
-    end_date = None
-    helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
@@ -281,11 +206,8 @@ def createQhawax():
                 helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
             description="Se registró qHAWAX"
             observation_type="Interna"
-            solution = None
             person_in_charge = req_json['person_in_charge']
-            end_date = None
-            start_date = None
-            helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+            helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
             last_gas_sensor_id = helper.queryGetLastGasSensor()
             if(last_gas_sensor_id ==None):
                 helper.insertDefaultOffsets(0,qhawax_name)
@@ -312,37 +234,6 @@ def getAllQhawax():
     else:
         return make_response(jsonify('qHAWAXs not found'), 404)
 
-@app.route('/api/get_qhawaxs_by_mode/', methods=['GET'])
-def getAllQhawaxByMode():
-    """
-    Get All qHAWAXs Filter by mode  
-
-    No parameters required
-
-    """
-    mode = request.args.get('mode')
-    qhawaxs_by_mode = helper.queryAllQhawaxByMode(mode)
-    if qhawaxs_by_mode is not None:
-        qhawax_list = [qhawax._asdict() for qhawax in qhawaxs_by_mode]
-        return make_response(jsonify(qhawax_list), 200)
-    else:
-        return make_response(jsonify('qHAWAXs in this mode not found'), 404)
-
-@app.route('/api/get_last_qhawax/', methods=['GET'])
-def getLastQhawax():
-    """
-    Get All qHAWAXs   
-
-    No parameters required
-
-    """
-    qhawax = helper.queryLastQhawax()
-    if qhawax is not None:
-        qhawax = qhawax[0]._asdict()
-        return make_response(qhawax, 200)
-    else:
-        return make_response(jsonify('qHAWAXs not found'), 404)
-
 @app.route('/api/change_to_calibration/', methods=['POST'])
 def qhawaxChangeToCalibration():
     """
@@ -365,11 +256,8 @@ def qhawaxChangeToCalibration():
         helper.changeMode(qhawax_name,"Calibracion")
         observation_type="Interna"
         description="Se cambió a modo calibracion"
-        solution = None
         person_in_charge = req_json['person_in_charge']
-        end_date = None
-        start_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+        helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
@@ -400,11 +288,8 @@ def qhawaxEndCalibration():
             description="Se cambió a modo stand by"
             helper.updateMainIncaInDB(-1,qhawax_name)
         observation_type="Interna"
-        solution = None
         person_in_charge = req_json['person_in_charge']
-        end_date = None
-        start_date = None
-        helper.writeBitacora(qhawax_name,observation_type,description,solution,person_in_charge,start_date,end_date)
+        helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
@@ -424,23 +309,3 @@ def getQhawaxValidProcessedLatestTimestamp():
     return str(helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
 
 
-@app.route('/api/get_qhawax_mode/', methods=['GET'])
-def getQhawaxMode():
-    """
-    Get qHAWAX Mode  
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    qhawax_name = request.args.get('qhawax_name')
-    mode = helper.getQhawaxMode(qhawax_name)
-    output = {}
-    mode = mode[0]
-    output['mode'] = mode
-    if(mode == 'Firmware Update'):
-        output['firmware_update_id']= helper_maintenance.queryFirmwareUpdate(qhawax_name)
-    else:
-        output['firmware_update_id']= 0
-
-    return make_response(jsonify(output), 200)
