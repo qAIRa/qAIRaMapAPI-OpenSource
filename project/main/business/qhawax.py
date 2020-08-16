@@ -79,7 +79,7 @@ def sendQhawaxStatusOff():
     observation_type="Interna"
     description="Se apagó el qHAWAX"
     person_in_charge = None
-    post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
@@ -102,7 +102,7 @@ def sendQhawaxStatusOn():
     observation_type="Interna"
     description="Se prendió el qHAWAX"
     person_in_charge = None
-    post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
@@ -148,7 +148,7 @@ def createQhawax():
             description="Se registró qHAWAX"
             observation_type="Interna"
             person_in_charge = req_json['person_in_charge']
-            post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+            post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
             last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
             if(last_gas_sensor_id ==None):
                 post_business_helper.insertDefaultOffsets(0,qhawax_name)
@@ -184,7 +184,7 @@ def qhawaxChangeToCalibration():
         observation_type="Interna"
         description="Se cambió a modo calibracion"
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
@@ -216,7 +216,7 @@ def qhawaxEndCalibration():
             post_business_helper.updateMainIncaInDB(-1,qhawax_name)
         observation_type="Interna"
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)

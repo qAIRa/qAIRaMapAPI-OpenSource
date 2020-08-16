@@ -16,11 +16,14 @@ def getQhawaxID(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    qhawax_list = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).all()
-    if(qhawax_list == []):
-        raise TypeError("The qHAWAX name could not be found")
-    qhawax_id = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).one()
-    return qhawax_id
+    if(isinstance(qhawax_name, str)):
+        qhawax_list = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).all()
+        if(qhawax_list == []):
+            raise TypeError("The qHAWAX name could not be found")
+        qhawax_id = session.query(Qhawax.id).filter(Qhawax.name == qhawax_name).one()
+        return qhawax_id
+    else:
+        raise TypeError("The qHAWAX name should be string")
 
 def getQhawaxName(qhawax_id):
     """
@@ -30,6 +33,8 @@ def getQhawaxName(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
+    if(type(qhawax_id) not in [int]):
+        raise TypeError("The qHAWAX id should be int")
     qhawax_list = session.query(Qhawax.name).filter(Qhawax.id == qhawax_id).all()
     if(qhawax_list == []):
         raise TypeError("The qHAWAX ID could not be found")
@@ -37,6 +42,8 @@ def getQhawaxName(qhawax_id):
 
 
 def getInstallationId(qhawax_id):
+    if(type(qhawax_id) not in [int]):
+        raise TypeError("The qHAWAX id should be int")
     installation_id= session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
                                     filter(QhawaxInstallationHistory.end_date_zone == None). \
                                     order_by(QhawaxInstallationHistory.installation_date_zone.desc()).all()

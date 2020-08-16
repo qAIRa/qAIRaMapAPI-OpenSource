@@ -38,7 +38,7 @@ def updateOffsetsFromProductID(qhawax_name, offsets):
     else:
         raise TypeError("The qHAWAX name should be string")
 
-def updateControlledOffsetsFromProductID(qhawax_id, controlled_offsets):
+def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
     """
     Helper Gas Sensor function to save controlled offsets from qHAWAX ID
 
@@ -61,7 +61,7 @@ def updateControlledOffsetsFromProductID(qhawax_id, controlled_offsets):
         raise TypeError("The qHAWAX name should be string")
 
 
-def updateNonControlledOffsetsFromProductID(qhawax_id, non_controlled_offsets):
+def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets):
     """
     Helper Gas Sensor function to save non controlled offsets from qHAWAX ID
 
@@ -310,9 +310,9 @@ def storeNewQhawaxInstallation(data):
         raise Exception("The qhawax installation fields have to have data")
 
 
-def writeBitacora(qhawax_name,observation_type,description,person_in_charge):
+def writeBinnacle(qhawax_name,observation_type,description,person_in_charge):
     """
-    Write Bitacora
+    Write Binnacle
 
     :type qhawax_name: string
     :param qhawax_name: qHAWAX name

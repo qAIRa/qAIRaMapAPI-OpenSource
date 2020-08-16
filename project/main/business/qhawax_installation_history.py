@@ -71,7 +71,7 @@ def newQhawaxInstallation():
         description="Se registró qHAWAX en campo"
         observation_type="Interna"
         person_in_charge = data_json['person_in_charge']
-        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
@@ -103,7 +103,7 @@ def saveEndWorkField():
         description="Se registró fin de trabajo en campo"
         observation_type="Interna"
         person_in_charge = data_json['person_in_charge']
-        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('OK', 200)
     except Exception as e:
         print(e)

@@ -77,7 +77,7 @@ def saveOffsets():
             description="Se actualizaron constantes offsets"
             observation_type="Interna"
             person_in_charge = req_json['person_in_charge']
-            post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+            post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
             return make_response('Success', 200)
         except TypeError as e:
             json_message = jsonify({'error': '\'%s\'' % (e)})
@@ -110,7 +110,7 @@ def saveControlledOffsets():
     description="Se actualizaron constantes controladas"
     observation_type="Interna"
     person_in_charge = req_json['person_in_charge']
-    post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 @app.route('/api/save_non_controlled_offsets/', methods=['POST'])
@@ -137,6 +137,6 @@ def saveNonControlledOffsets():
     description="Se actualizaron constantes no controladas"
     observation_type="Interna"
     person_in_charge = req_json['person_in_charge']
-    post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
