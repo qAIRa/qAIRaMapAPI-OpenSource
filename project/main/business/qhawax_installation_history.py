@@ -1,15 +1,9 @@
 from flask import jsonify, make_response, request
-
-import datetime
-import dateutil.parser
-import dateutil.tz
-import os
-
-from project import app, db, socketio
 from project.database.models import Qhawax
-import project.main.business.business_helper as helper
 import project.main.same_function_helper as same_helper
-from sqlalchemy import or_
+import project.main.business.get_business_helper as get_business_helper
+import project.main.business.post_business_helper as post_business_helper
+from project import app
 
 @app.route('/api/newQhawaxInstallation/', methods=['POST'])
 def newQhawaxInstallation():
@@ -70,14 +64,14 @@ def newQhawaxInstallation():
     try:
         data_json = request.get_json()
         qhawax_id = data_json['qhawax_id']
-        helper.storeNewQhawaxInstallation(data_json)
-        helper.setOccupiedQhawax(qhawax_id)
-        helper.setModeCustomer(qhawax_id)
+        post_business_helper.storeNewQhawaxInstallation(data_json)
+        post_business_helper.setOccupiedQhawax(qhawax_id)
+        post_business_helper.setModeCustomer(qhawax_id)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
         description="Se registró qHAWAX en campo"
         observation_type="Interna"
         person_in_charge = data_json['person_in_charge']
-        helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
@@ -102,22 +96,22 @@ def saveEndWorkField():
         data_json = request.get_json()
         qhawax_id = data_json['qhawax_id']
         installation_id = helper.getInstallationId(qhawax_id)
-        helper.saveEndWorkFieldDate(installation_id, data_json['end_date'])
-        helper.setAvailableQhawax(qhawax_id)
+        post_business_helper.saveEndWorkFieldDate(installation_id, data_json['end_date'])
+        post_business_helper.setAvailableQhawax(qhawax_id)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
-        helper.changeMode(qhawax_name, "Stand By")
+        post_business_helper.changeMode(qhawax_name, "Stand By")
         description="Se registró fin de trabajo en campo"
         observation_type="Interna"
         person_in_charge = data_json['person_in_charge']
-        helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
         return make_response('Invalid format', 400)
 
 
-@app.route('/api/AllQhawaxByCompany/', methods=['GET'])
-def getQhawaxByCompany():
+@app.route('/api/AllQhawaxInMap/', methods=['GET'])
+def getQhawaxInMap():
     """
     Get list of qHAWAXs filter by company ID
 
@@ -127,12 +121,11 @@ def getQhawaxByCompany():
     :param company_id: company ID
 
     """
-    company_id = request.args.get('company_id')
      
-    qhawax_in_field_by_company = helper.queryQhawaxInFieldByCompanyInPublicMode(company_id)
-    if qhawax_in_field_by_company is not None:
-        qhawax_in_field_by_company_list = [installation._asdict() for installation in qhawax_in_field_by_company]
-        return make_response(jsonify(qhawax_in_field_by_company_list), 200)
+    qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
+    if qhawax_in_field is not None:
+        qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
+        return make_response(jsonify(qhawax_in_field_list), 200)
     else:
         return make_response(jsonify('qHAWAXs not found'), 404)
 
@@ -148,17 +141,17 @@ def getInstallationDate():
     """
     try:
         qhawax_id = request.args.get('qhawax_id')
-        installation_date = helper.getInstallationDateByQhawaxID(qhawax_id)
+        installation_date = get_business_helper.getInstallationDateByQhawaxID(qhawax_id)
         if installation_date != None:
-            installation_id = helper.getInstallationId(qhawax_id)
-            first_timestamp = helper.getFirstTimestampValidProcessed(installation_id)
+            installation_id = same_helper.getInstallationId(qhawax_id)
+            first_timestamp = get_business_helper.getFirstTimestampValidProcessed(installation_id)
             if(first_timestamp!=None):
                 if(first_timestamp>installation_date):
-                    return str(first_timestamp)
+                    return first_timestamp
                 else:
-                    return str(installation_date)
+                    return installation_date
             else:
-                return str(installation_date)
+                return installation_date
         else:
             return make_response(jsonify("qHAWAX is not in field"), 200)
     except Exception as e:

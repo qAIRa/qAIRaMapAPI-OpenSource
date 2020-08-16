@@ -26,6 +26,7 @@ from project.main.business import company, eca_noise, gas_sensor, qhawax, eca_no
 from project.main.data import processed_measurement, air_quality,gas_inca, valid_processed_measurement
 from project.main import util_helper
 import project.database.models as models
-from project.database.models import Company,GasSensor, Qhawax ,ProcessedMeasurement, AirQualityMeasurement, EcaNoise, GasInca, QhawaxInstallationHistory, ValidProcessedMeasurement
+from project.database.models import Company,GasSensor, Qhawax ,ProcessedMeasurement, AirQualityMeasurement, \
+									EcaNoise, GasInca, QhawaxInstallationHistory, ValidProcessedMeasurement
 
 db.create_all()

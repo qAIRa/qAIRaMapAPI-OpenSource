@@ -8,7 +8,8 @@ import os
 from project import app, db, socketio
 from project.database.models import Qhawax, ProcessedMeasurement
 import project.main.data.data_helper as helper
-import project.main.business.business_helper as business_helper
+import project.main.business.get_business_helper as get_business_helper
+import project.main.business.post_business_helper as post_business_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 from sqlalchemy import or_
@@ -106,12 +107,12 @@ def handleProcessedData():
         mode = helper.getQhawaxMode(qhawax_id)
         inca_value = helper.getMainIncaQhawaxTable(product_id)
         if(inca_value == -1): 
-            business_helper.saveStatusOn(product_id)
-            business_helper.saveTurnOnLastTime(product_id)
-            business_helper.updateMainIncaInDB(0,product_id)
+            post_business_helper.saveStatusOn(product_id)
+            post_business_helper.saveTurnOnLastTime(product_id)
+            post_business_helper.updateMainIncaInDB(0,product_id)
             description="Se prendió el qHAWAX"
             observation_type="Interna"
-            business_helper.writeBitacora(product_id,observation_type,description,None,None,None)
+            post_business_helper.writeBitacora(product_id,observation_type,description,None,None,None)
         if(mode == "Cliente"):
             qhawax_zone = helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone

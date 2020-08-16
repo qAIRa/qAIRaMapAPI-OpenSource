@@ -38,11 +38,18 @@ def getQhawaxName(qhawax_id):
 
 def getInstallationId(qhawax_id):
     installation_id= session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).all()
+                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
+                                    order_by(QhawaxInstallationHistory.installation_date_zone.desc()).all()
     if(installation_id == []):
         return None
 
     return session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date == None). \
-                                    order_by(QhawaxInstallationHistory.instalation_date.desc()).first()[0]
+                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
+                                    order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0]
+
+def getInstallationIdBaseName(qhawax_name):
+    qhawax_id = getQhawaxID(qhawax_name)
+    installation_id = getInstallationId(qhawax_id)
+    return installation_id
+
+

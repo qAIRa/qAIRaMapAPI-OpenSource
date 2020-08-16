@@ -1,9 +1,8 @@
 from flask import jsonify, make_response, request
-
-from project import app
 from project.database.models import Company
-import project.main.business.business_helper as helper
-
+import project.main.business.get_business_helper as get_business_helper
+import project.main.business.post_business_helper as post_business_helper
+from project import app
 
 @app.route('/api/create_company/', methods=['POST'])
 def createCompany():
@@ -23,8 +22,8 @@ def createCompany():
         req_json = request.get_json()
         company_name=str(req_json['company_name']).strip()
         ruc=str(req_json['ruc']).strip()
-        if(helper.companyNameIsNew(company_name) and helper.companyRucIsNew(ruc)):
-            helper.createCompany(req_json)
+        if(get_business_helper.companyNameIsNew(company_name) and get_business_helper.companyRucIsNew(ruc)):
+            post_business_helper.createCompany(req_json)
             return make_response('Company has been created', 200)
         return make_response('The company name or ruc entered already exists ', 200)
     except Exception as e:

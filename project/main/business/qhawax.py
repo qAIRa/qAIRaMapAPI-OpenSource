@@ -1,18 +1,9 @@
 from flask import jsonify, make_response, request
-
-import datetime
-import dateutil.parser
-import dateutil.tz
-import os
-
-from project import app, db, socketio
 from project.database.models import Qhawax
-import project.main.business.business_helper as helper
-
-from sqlalchemy import or_
-
-from passlib.hash import bcrypt
-from project.response_codes import RESPONSE_CODES
+import project.main.same_function_helper as same_helper
+import project.main.business.get_business_helper as get_business_helper
+import project.main.business.post_business_helper as post_business_helper
+from project import app
 
 @app.route('/api/get_qhawax_inca/', methods=['GET'])
 def getIncaQhawaxInca():
@@ -25,32 +16,11 @@ def getIncaQhawaxInca():
     """
     try:
         name = request.args.get('name')
-        inca_qhawax = helper.queryIncaQhawax(name)
+        inca_qhawax = get_business_helper.queryIncaQhawax(name)
         return inca_qhawax
     except Exception as e:
         print(e)
         return make_response('Invalid format', 400)
-
-@app.route('/api/get_qhawaxs_active_mode_customer/', methods=['GET'])
-def getActiveQhawaxModeCustomer():
-    """
-    To get all active qHAWAXs that are in field in mode costumer
-    
-    No parameters required
-
-    """
-    qhawaxs = helper.queryQhawaxModeCustomer()
-    if qhawaxs is not None:
-        try:
-            qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
-            qhawaxs_list = helper.getDescriptionOfQhawaxInField(qhawaxs_list)
-            return make_response(jsonify(qhawaxs_list), 200)
-        except TypeError as e:
-            json_message = jsonify({'error': ' \'%s\' ' % (e)})
-            return make_response(json_message, 400)
-    else:
-        return make_response(jsonify('There are no qHAWAXs in field'), 404)
-
 
 @app.route('/api/save_main_inca/', methods=['POST'])
 def updateIncaData():
@@ -70,24 +40,12 @@ def updateIncaData():
     try:
         name = str(req_json['name']).strip()
         value_inca = req_json['value_inca']
-        helper.updateMainIncaInDB(value_inca, name)
+        post_business_helper.updateMainIncaInDB(value_inca, name)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
         return make_response('Invalid format. Exception="%s"' % (e), 400)
 
-
-@app.route('/api/get_time_active_qhawax/', methods=['GET'])
-def getQhawaxLatestTimestamp():
-    """
-    To get qHAWAX Raw Measurement latest timestamp
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    qhawax_name = request.args.get('qhawax_name')
-    return str(helper.getQhawaxLatestTimestamp(qhawax_name))
 
 @app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxProcessedLatestTimestamp():
@@ -99,24 +57,7 @@ def getQhawaxProcessedLatestTimestamp():
 
     """
     qhawax_name = request.args.get('qhawax_name')
-    return str(helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name))
-
-@app.route('/api/qhawax_status/', methods=['GET'])
-def getQhawaxStatus():
-    """
-    Get qHAWAX Status   
-
-    :type name: string
-    :param name: qHAWAX name
-
-    """
-    try:
-        name = request.args.get('name')
-        qhawax_status = helper.getQhawaxStatus(name)
-        return qhawax_status
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    return str(get_business_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name))
 
 @app.route('/api/qhawax_change_status_off/', methods=['POST'])
 def sendQhawaxStatusOff():
@@ -133,12 +74,12 @@ def sendQhawaxStatusOff():
 
     """
     req_json = request.get_json()   
-    helper.saveStatusOff(req_json)
+    post_business_helper.saveStatusOff(req_json)
     qhawax_name = str(req_json['qhawax_name']).strip()
     observation_type="Interna"
     description="Se apagó el qHAWAX"
     person_in_charge = None
-    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
+    post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
@@ -155,28 +96,28 @@ def sendQhawaxStatusOn():
     """
     req_json = request.get_json()
     qhawax_name = str(req_json['qhawax_name']).strip()
-    helper.saveStatusOn(qhawax_name) 
-    helper.saveTurnOnLastTime(qhawax_name)
-    helper.updateMainIncaInDB(0,qhawax_name)
+    post_business_helper.saveStatusOn(qhawax_name) 
+    post_business_helper.saveTurnOnLastTime(qhawax_name)
+    post_business_helper.updateMainIncaInDB(0,qhawax_name)
     observation_type="Interna"
     description="Se prendió el qHAWAX"
     person_in_charge = None
-    helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
+    post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
     return make_response('Success', 200)
 
 
 @app.route('/api/get_time_all_active_qhawax/', methods=['GET'])
 def getTimeAllActiveQhawax():
     """
-    Get Time   
+    Get Time All Active qHAWAX - Script   
 
     :type name: string
     :param name: qHAWAX name
 
     """
     name = request.args.get('name')
-    installation_id = helper.getInstallationIdBaseName(name)
-    values = helper.getTimeQhawaxHistory(installation_id)
+    installation_id = same_helper.getInstallationIdBaseName(name)
+    values = get_business_helper.getTimeQhawaxHistory(installation_id)
     values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
     return make_response(jsonify(values_list), 200)
 
@@ -198,41 +139,27 @@ def createQhawax():
         req_json = request.get_json()
         qhawax_name=str(req_json['qhawax_name']).strip() 
         qhawax_type=str(req_json['qhawax_type']).strip()
-        if(helper.qhawaxNameIsNew(qhawax_name)):
-            last_qhawax_id = helper.queryGetLastQhawax()
+        if(get_business_helper.qhawaxNameIsNew(qhawax_name)):
+            last_qhawax_id = get_business_helper.queryGetLastQhawax()
             if(last_qhawax_id==None):
-                helper.createQhawax(1, qhawax_name,qhawax_type)
+                post_business_helper.createQhawax(1, qhawax_name,qhawax_type)
             else:
-                helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
+                post_business_helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
             description="Se registró qHAWAX"
             observation_type="Interna"
             person_in_charge = req_json['person_in_charge']
-            helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
-            last_gas_sensor_id = helper.queryGetLastGasSensor()
+            post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
+            last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
             if(last_gas_sensor_id ==None):
-                helper.insertDefaultOffsets(0,qhawax_name)
+                post_business_helper.insertDefaultOffsets(0,qhawax_name)
             else:
-                helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
+                post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
             return make_response('qHAWAX & Sensors have been created', 200)
         return make_response('The qHAWAX name entered already exists ', 200)
     except Exception as e:
         print(e)
         return make_response('Invalid format', 400)
 
-@app.route('/api/get_qhawaxs/', methods=['GET'])
-def getAllQhawax():
-    """
-    Get All qHAWAXs   
-
-    No parameters required
-
-    """
-    qhawaxs = helper.queryAllQhawax()
-    if qhawaxs is not None:
-        qhawax_list = [qhawax._asdict() for qhawax in qhawaxs]
-        return make_response(jsonify(qhawax_list), 200)
-    else:
-        return make_response(jsonify('qHAWAXs not found'), 404)
 
 @app.route('/api/change_to_calibration/', methods=['POST'])
 def qhawaxChangeToCalibration():
@@ -249,15 +176,15 @@ def qhawaxChangeToCalibration():
         req_json = request.get_json()
         qhawax_name = str(req_json['qhawax_name']).strip()
 
-        flag_costumer = helper.isItFieldQhawax(qhawax_name)
+        flag_costumer = get_business_helper.isItFieldQhawax(qhawax_name)
         if(flag_costumer == True):
-            helper.saveTimeQhawaxOff(qhawax_name)
-        helper.updateMainIncaInDB(-2,qhawax_name)
-        helper.changeMode(qhawax_name,"Calibracion")
+            post_business_helper.saveTimeQhawaxOff(qhawax_name)
+        post_business_helper.updateMainIncaInDB(-2,qhawax_name)
+        post_business_helper.changeMode(qhawax_name,"Calibracion")
         observation_type="Interna"
         description="Se cambió a modo calibracion"
         person_in_charge = req_json['person_in_charge']
-        helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
+        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
@@ -277,19 +204,19 @@ def qhawaxEndCalibration():
     try:
         req_json = request.get_json()
         qhawax_name = str(req_json['qhawax_name']).strip()
-        flag_costumer = helper.isItFieldQhawax(qhawax_name)
+        flag_costumer = get_business_helper.isItFieldQhawax(qhawax_name)
         if(flag_costumer == True):
-            helper.saveTimeQhawaxOn(qhawax_name)
-            helper.changeMode(qhawax_name,"Cliente")
+            post_business_helper.saveTimeQhawaxOn(qhawax_name)
+            post_business_helper.changeMode(qhawax_name,"Cliente")
             description="Se cambió a modo cliente"
-            helper.updateMainIncaInDB(0,qhawax_name)
+            post_business_helper.updateMainIncaInDB(0,qhawax_name)
         else:
-            helper.changeMode(qhawax_name,"Stand By")
+            post_business_helper.changeMode(qhawax_name,"Stand By")
             description="Se cambió a modo stand by"
-            helper.updateMainIncaInDB(-1,qhawax_name)
+            post_business_helper.updateMainIncaInDB(-1,qhawax_name)
         observation_type="Interna"
         person_in_charge = req_json['person_in_charge']
-        helper.writeBitacora(qhawax_id,observation_type,description,person_in_charge)
+        post_business_helper.writeBitacora(qhawax_name,observation_type,description,person_in_charge)
         return make_response('Success', 200)
     except Exception as e:
         print(e)
@@ -306,6 +233,6 @@ def getQhawaxValidProcessedLatestTimestamp():
 
     """
     qhawax_name = request.args.get('qhawax_name')
-    return str(helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
+    return str(get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
 
 

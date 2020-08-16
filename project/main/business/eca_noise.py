@@ -1,8 +1,7 @@
 from flask import jsonify, make_response, request
-
-from project import app, db, socketio
 from project.database.models import EcaNoise
-import project.main.business.business_helper as helper
+import project.main.business.get_business_helper as get_business_helper
+from project import app
 
 @app.route('/api/get_eca_noise_limit/', methods=['GET'])
 def getEcaNoiseLimitById():
@@ -15,7 +14,7 @@ def getEcaNoiseLimitById():
     """
     noiseID = int(request.args.get('ID'))
     if(noiseID!=None):
-        ecaNoiseInfo = helper.queryGetEcaNoise(noiseID)
+        ecaNoiseInfo = get_business_helper.queryGetEcaNoise(noiseID)
         if ecaNoiseInfo is not None:
             return make_response(jsonify(ecaNoiseInfo), 200)
     return make_response(jsonify('Eca noise not found'), 404)
@@ -28,7 +27,7 @@ def getAllAreas():
     No parameters required
 
     """
-    allAreas = helper.queryGetAreas()
+    allAreas = get_business_helper.queryGetAreas()
     if allAreas is not None:
         allAreas_list = [{'area_name': area.area_name, 'id': area.id} for area in allAreas]
         return make_response(jsonify(allAreas_list), 200)

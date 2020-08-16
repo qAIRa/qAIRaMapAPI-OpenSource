@@ -14,17 +14,16 @@ def validAndBeautyJsonProcessed(data_json):
     data_json = checkNumberValues(data_json)
     data_json = gasConversionPPBtoMG(data_json, arr_season)
     data_json = roundUpThree(data_json)   
-    timestamp_zone = dateutil.parser.parse(data_json["timestamp"])
-    utc = timestamp_zone.utcoffset().total_seconds()/3600
     data_json["timestamp_zone"] = data_json["timestamp"]
-
     return data_json
 
 def gasConversionPPBtoMG(data_json,season):
-    data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': 0,'H2S': data_json['H2S'],'H2S_ug_m3': 0,'NO2': data_json['NO2'],'NO2_ug_m3': 0,'O3': data_json['O3'],
-                'O3_ug_m3': 0, 'PM1': data_json['PM1'],'PM10': data_json['PM10'],'PM25': data_json['PM25'],'SO2': data_json['SO2'],'SO2_ug_m3': 0,'spl': data_json['spl'],
-                'UV': data_json['UV'],'UVA': data_json['UVA'],'UVB': data_json['UVB'],'humidity': data_json['humidity'],'lat':data_json['lat'],
-                'lon':data_json['lon'],'pressure': data_json['pressure'],'temperature': data_json['temperature'],'timestamp': data_json['timestamp']}
+    data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': 0,'H2S': data_json['H2S'],'H2S_ug_m3': 0,
+          'NO2': data_json['NO2'],'NO2_ug_m3': 0,'O3': data_json['O3'],'O3_ug_m3': 0, 'PM1': data_json['PM1'],
+          'PM10': data_json['PM10'],'PM25': data_json['PM25'],'SO2': data_json['SO2'],'SO2_ug_m3': 0,
+          'spl': data_json['spl'],'UV': data_json['UV'],'UVA': data_json['UVA'],'UVB': data_json['UVB'],
+          'humidity': data_json['humidity'],'lat':data_json['lat'],'lon':data_json['lon'],
+          'pressure': data_json['pressure'],'temperature': data_json['temperature'],'timestamp': data_json['timestamp']}
 
     for key in data:
         if(key in pollutant):
