@@ -5,7 +5,6 @@ import time
 from project import app, db, socketio
 import string
 
-import project.database.utils as utils
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
@@ -343,6 +342,7 @@ def saveTimeQhawaxOff(qhawax_name):
     :param qhawax_name: qHAWAX name
     """
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
-    session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_registration_time_zone':datetime.datetime.now(dateutil.tz.tzutc())})
+    session.query(QhawaxInstallationHistory).filter_by(id=installation_id).\
+            update(values={'last_registration_time_zone':datetime.datetime.now(dateutil.tz.tzutc())})
     session.commit()
 
