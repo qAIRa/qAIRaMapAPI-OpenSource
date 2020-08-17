@@ -1,27 +1,18 @@
 language: python
-
 dist: bionic
-
 python:
-  - "3.7.6"
-
+- 3.7.6
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-
+- pip install -r requirements.txt
+- pip install coveralls
 script:
-  - pytest -v --cov=project/
-  - coverage run -m pytest project/test/
-
-after_success: "coveralls"
-
+- pytest -v --cov=project/
+- coverage run -m pytest project/test/
+after_success: coveralls
 env:
   global:
-    - SQLALCHEMY_DATABASE_URI='postgres://qaira:$3cq4IR4@qairamap-db-dev.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/qairamap_db'
-    - SECRET_KEY=my_precious
-    
+  - secure: R1jvAAdMkTV4C47FoEsdEBu0ncpr6wEbs3z9C2e4h75QvCHM8sL4Eq4nR++amNJHFapSvYwAnKAb/Z1PUi8EZVvWWmdShseWYRD8mGh6wWm/fTIYNDfP4aRIcKdptppoFDlAEQ8vDtn9duuQTuye3WB8tLSDYzXYJJOfh+lAuqIRXGu6LSuR9zkOBe/MVX/eBCJ3r9WAodTKR1l+PWNrLNQtrT78sW9Y/xdCZ+XXLNVM1UDkuEIm7mA/CPkmTFwTGglVQcqhBv/18d7bhf5zyZFKee9qDt3XFHM19JgeOWArIwiKXQWkHR36JHGi75RpffpXmKUMjIr2EDT24joOn4InpKdFe1vEFUXukaQK3+fLtiBdUzg60+EjhkNdQXpTMK1sIEY7J4bKDN9DiqaP2QREbhwqZESiaaGQgu1/Fvzv7eCujdHgCBV6PhHr2Zu0NqcGrbj9KdwUbKqP/lzTQ3vX+5HooDMashZXVcsxXp2ryZTIXB9KXHKowhieE16zajOFC+zphqzUOfO/WIE2q5YaSor+hmAT/ZX+WG+MFpHVbT/qY0gLyGbSPnpi44BEBO8F3M8kqGCiEO1YvXFFkFJ9OM26bmq83QA00zTVHyr6vmnvC0dmuOZr7yxhghZrAs6JbtfgGHIM2iOWiXsc5uDcpGE3oYh3TBj9frEVLDk=
 notifications:
   email:
     recipients:
-      - l.montalvo@qairadrones.com
-
+    - l.montalvo@qairadrones.com
