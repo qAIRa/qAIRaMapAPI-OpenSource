@@ -10,15 +10,14 @@ install:
   - pip install coveralls
 
 script:
-  - pytest -v --cov=project
+  - pytest -v --cov=project/main/
   - coverage run -m pytest project/test/
 
 after_success: "coveralls"
 
 env:
   global:
-    - SQLALCHEMY_DATABASE_URI='postgres://qaira:$3cq4IR4@qairamap-db-dev.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/qairamap_db'
-    - SECRET_KEY=my_precious
+    - secure: "oLiQDFkDbKP/Sc/a6Tlm7p+pdjhVf2o5N8UAqRI78U6X80lT4l6P4Vy/XMTFaAtmcT0ce1WKzvQSmtSoSMIlN+FTQfmtYszcAmgn0vXwylePG6rW+sep+WqdvLhmA551AvzibhKx5A5zCoGBSw3pSBSXWICSd0el4T33hOXRNCnauX/EsyzH14118GV2y9YQ7SCD6xCC62K+h5B6DrGnuLloXnIhmw7tsYzPDOPEiMCdUb0IhoteTadXA2eO5eDHT+7znbACXmqb7DV23073kC+ijU8RrMuYf4LcffGrbBXeP32EsNA/BFadBnKjBC/BPvtRJf3grwy935OT5HYp94o7Q8B5WoSWbA+M6XdGkx+GdXTP8b/LQl0zZfVaFo08G5x/FfQ6oKtqTlOaRxHR4csMT8lQhjeKQOQaR1bYt6bW+CVw/wGIu9wJ0beOIfnXIeQgOs+1BD+d2jvUMg9Xa3u3xMU5rmL9oter+lB8k0gbJHYZiiJo+DoJ5D5Xl25NcrRJd1y3h/TsKp/iDslEFRPhaYFM8uYs6LgbfZoXt42ncjp0m9VP6klKdlOkHMpL/iY9I5nv9Owz5jxwIRgC3LyQgfe6U/sRuohQSOop+odUsiENJLnzigIdx8SBeGsjqpGT/TcoYV8KOw1UjDjeOp6e5LhiG/IPpHxUEI9bP2Q="
 
 notifications:
   email:
