@@ -1,17 +1,13 @@
 import time
 from project import app, db
 import string
-
-import project.database.utils as utils
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 
 from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallationHistory, \
                                     Company, AirQualityMeasurement, ProcessedMeasurement, \
                                     ValidProcessedMeasurement
-
 session = db.session
-
 
 def getTimeQhawaxHistory(installation_id):
     values= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
@@ -275,25 +271,33 @@ def isItFieldQhawax(qhawax_name):
 def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
     """
     Helper qHAWAX function to get latest timestamp in UTC 00 from Processed Measurement
+    
     :type qhawax_name: string
     :param qhawax_name: qHAWAX name
+    
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_list = session.query(Qhawax.id).filter_by(name=qhawax_name).all()
-        if(qhawax_list == []):
-            raise TypeError("The qHAWAX name could not be found")
-        qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).one().id
-        qhawax_time = session.query(ProcessedMeasurement.timestamp_zone).filter_by(qhawax_id=qhawax_id).first()
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        qhawax_time = session.query(ProcessedMeasurement.timestamp_zone).\
+                              filter_by(qhawax_id=qhawax_id).first()
         processed_measurement_timestamp=""
         if(qhawax_time!=None):
-            processed_measurement_timestamp = session.query(ProcessedMeasurement.timestamp_zone).filter_by(qhawax_id=qhawax_id) \
-                .order_by(ProcessedMeasurement.id.desc()).first().timestamp_zone
+            processed_measurement_timestamp = session.query(ProcessedMeasurement.timestamp_zone).\
+                                                      filter_by(qhawax_id=qhawax_id).\
+                                                      order_by(ProcessedMeasurement.id.desc()).first().timestamp_zone
         return processed_measurement_timestamp
     else:
-        raise TypeError("The qhawax name should be string")
+        raise TypeError("The qHAWAX name should be string")
 
 
 def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
+    """
+    Helper qHAWAX function to get latest timestamp in UTC 00 from Valid Processed Measurement
+    
+    :type qhawax_name: string
+    :param qhawax_name: qHAWAX name
+    
+    """
     if(isinstance(qhawax_name, str)):
         installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
         valid_processed_measurement_timestamp=""
@@ -307,7 +311,7 @@ def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
         
         return valid_processed_measurement_timestamp
     else:
-        raise TypeError("The qhawax name should be string")
+        raise TypeError("The qHAWAX name should be string")
 
 def queryQhawaxInFieldInPublicMode():
     """

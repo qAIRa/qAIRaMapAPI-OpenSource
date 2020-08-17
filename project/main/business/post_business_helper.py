@@ -1,10 +1,8 @@
 import datetime
 import dateutil
 import dateutil.parser
-import time
 from project import app, db, socketio
 import string
-
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
@@ -328,9 +326,9 @@ def writeBinnacle(qhawax_name,observation_type,description,person_in_charge):
 
     """
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    bitacora = {'timestamp': datetime.datetime.now(dateutil.tz.tzutc()),
+    bitacora = {'timestamp_zone': datetime.datetime.now(dateutil.tz.tzutc()),
                 'observation_type': observation_type,'description': description, 'qhawax_id':qhawax_id,
-                'solution':None,'person_in_charge':person_in_charge,'end_date':None,'start_date':None}
+                'solution':None,'person_in_charge':person_in_charge,'end_date_zone':None,'start_date_zone':None}
     bitacora_update = Bitacora(**bitacora)
     session.add(bitacora_update)
     session.commit()

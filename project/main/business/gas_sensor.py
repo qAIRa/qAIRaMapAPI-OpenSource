@@ -7,7 +7,7 @@ from project import app
 @app.route('/api/request_offsets/', methods=['GET'])
 def requestOffsets():
     """
-    get qHAWAX offsets
+    endpoint to list offsets variable filter by qHAWAX ID
 
     :type ID: string
     :param ID: qHAWAX Name
@@ -24,7 +24,7 @@ def requestOffsets():
 @app.route('/api/request_controlled_offsets/', methods=['GET'])
 def requestControlledOffsets():
     """
-    get qHAWAX controlled offsets
+    endpoint to list controlled offsets variable filter by qHAWAX ID
 
     :type ID: string
     :param ID: qHAWAX Name
@@ -41,7 +41,7 @@ def requestControlledOffsets():
 @app.route('/api/request_non_controlled_offsets/', methods=['GET'])
 def requestNonControlledOffsets():
     """
-    get qHAWAX non controlled offsets
+    endpoint to list non-controlled offsets variable filter by qHAWAX ID
 
     :type ID: string
     :param ID: qHAWAX Name
@@ -59,7 +59,7 @@ def requestNonControlledOffsets():
 @app.route('/api/save_offsets/', methods=['POST'])
 def saveOffsets():
     """
-    save qHAWAX offsets
+    endpoint to save offset variables
 
     :type product_id: integer
     :param product_id: qHAWAX Name
@@ -89,7 +89,7 @@ def saveOffsets():
 @app.route('/api/save_controlled_offsets/', methods=['POST'])
 def saveControlledOffsets():
     """
-    save qHAWAX controlled offsets
+    endpoint to save controlled offset variables
 
     :type product_id: integer
     :param product_id: qHAWAX Name
@@ -116,7 +116,7 @@ def saveControlledOffsets():
 @app.route('/api/save_non_controlled_offsets/', methods=['POST'])
 def saveNonControlledOffsets():
     """
-    save qHAWAX non controlled offsets
+    endpoint to save non controlled offset variables
 
     :type product_id: integer
     :param product_id: qHAWAX Name

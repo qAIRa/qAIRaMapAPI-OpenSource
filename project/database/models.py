@@ -1,6 +1,4 @@
 from project import db
-from passlib.hash import bcrypt
-from sqlalchemy_json import NestedMutableJson
 
 class Company(db.Model):
     __tablename__ = 'company'
@@ -16,15 +14,6 @@ class Company(db.Model):
     installations = db.relationship('QhawaxInstallationHistory', backref='company', lazy='subquery',
                              cascade='delete, delete-orphan')
 
-    def __init__(self, name, email_group,ruc,address,phone, contact_person):
-        utils.checkValidEmailGroup(email_group)
-        self.name = name
-        self.email_group = email_group
-        self.ruc = ruc
-        self.address = address
-        self.phone = phone
-        self.contact_person = contact_person
-
 class Qhawax(db.Model):
     __tablename__ = 'qhawax'
 
@@ -37,6 +26,7 @@ class Qhawax(db.Model):
     state = db.Column(db.String(5), nullable=False, unique=True)
     availability = db.Column(db.String(100), nullable=False, unique=True)
     mode = db.Column(db.String(100), nullable=False, unique=True)
+    
     processed_measurements = db.relationship('ProcessedMeasurement', backref='qhawax', lazy='subquery',
                                                 cascade='delete, delete-orphan')
     air_quality_measurements = db.relationship('AirQualityMeasurement', backref='qhawax', lazy='subquery',
@@ -50,15 +40,6 @@ class Qhawax(db.Model):
     bitacoras = db.relationship('Bitacora', backref='qhawax', lazy='subquery',
                                                 cascade='delete, delete-orphan')
 
-    def __init__(self,id, name, qhawax_type,state, availability,main_inca,main_aqi,mode):
-        self.id = id
-        self.name = name
-        self.qhawax_type = qhawax_type
-        self.state = state
-        self.availability = availability
-        self.main_inca= main_inca
-        self.main_aqi = main_aqi
-        self.mode = mode
 
 class GasSensor(db.Model):
     __tablename__ = 'gas_sensor'
@@ -84,7 +65,6 @@ class ProcessedMeasurement(db.Model):
 
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
@@ -140,7 +120,6 @@ class AirQualityMeasurement(db.Model):
 
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
@@ -174,8 +153,8 @@ class EcaNoise(db.Model):
     area_name = db.Column(db.String(100))
     max_daytime_limit = db.Column(db.Integer)
     max_night_limit = db.Column(db.Integer)
-    installations = db.relationship('QhawaxInstallationHistory', backref='eca_noise', lazy='subquery',
-                             cascade='delete, delete-orphan') 
+    installations = db.relationship('QhawaxInstallationHistory',
+                                    backref='eca_noise', lazy='subquery', cascade='delete, delete-orphan') 
 
 class QhawaxInstallationHistory(db.Model):
     __tablename__ = 'qhawax_installation_history'
@@ -198,15 +177,15 @@ class QhawaxInstallationHistory(db.Model):
     index_type = db.Column(db.String(100), nullable=False, unique=True)
     measuring_height = db.Column(db.Integer)
     season = db.Column(db.String(300), nullable=False, unique=True)
-    last_time_physically_turn_on = db.Column(db.DateTime, nullable=False)
     last_time_physically_turn_on_zone = db.Column(db.DateTime, nullable=False)
     person_in_charge = db.Column(db.String(300), nullable=False, unique=True)
     is_public  = db.Column(db.String(10), nullable=False, unique=True)
-    last_registration_time = db.Column(db.DateTime, nullable=False)
     last_registration_time_zone = db.Column(db.DateTime, nullable=False)
     main_inca = db.Column(db.Float) 
-    valid_processed_measurements = db.relationship('ValidProcessedMeasurement', backref='qhawax_installation_history', lazy='subquery',
-                                                cascade='delete, delete-orphan')
+    valid_processed_measurements = db.relationship('ValidProcessedMeasurement', \
+                                                   backref='qhawax_installation_history', 
+                                                   lazy='subquery',
+                                                   cascade='delete, delete-orphan')
 
 class ValidProcessedMeasurement(db.Model):
     __tablename__ = 'valid_processed_measurement'
@@ -248,15 +227,12 @@ class Bitacora(db.Model):
 
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     observation_type = db.Column(db.String(100))
     description = db.Column(db.String(800))
     solution = db.Column(db.String(800))
     person_in_charge = db.Column(db.String(100))
-    start_date = db.Column(db.DateTime, nullable=False)
     start_date_zone = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
     end_date_zone = db.Column(db.DateTime, nullable=False)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 

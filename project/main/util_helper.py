@@ -2,7 +2,6 @@ import datetime
 import dateutil
 import dateutil.parser
 import time
-from project import app
 
 pollutant=['SO2','NO2','O3','CO','H2S']
 pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
