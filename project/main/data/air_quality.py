@@ -124,15 +124,12 @@ def getGasAverageMeasurementsEvery24():
         return make_response(jsonify('Measurements not found'), 404)
 
 @app.route('/api/average_valid_processed_period/', methods=['GET'])
-def getAverageValidProcessedMeasurementsTimePeriodByCompany():
+def getAverageValidProcessedMeasurementsTimePeriod():
     """
     To list all average measurement of valid processed measurement table in a define period of time and company
 
     :type qhawax_id: integer
     :param qhawax_id: qHAWAX ID
-
-    :type company_id: integer
-    :param company_id: company ID
 
     :type initial_timestamp: timestamp without timezone
     :param initial_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
@@ -140,17 +137,11 @@ def getAverageValidProcessedMeasurementsTimePeriodByCompany():
     :type final_timestamp: timestamp without timezone
     :param final_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
     """
-    qhawax_id = request.args.get('qhawax_id')
-    company_id = request.args.get('company_id')
+    qhawax_id = int(request.args.get('qhawax_id'))
     initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
 
-    average_valid_processed_measurements=[]
-    if(int(company_id)!=1):
-        if (helper.qhawaxBelongsCompany(qhawax_id,company_id)):   
-            average_valid_processed_measurements = helper.queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp)
-    elif (int(company_id)==1):
-        average_valid_processed_measurements = helper.queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp)
+    average_valid_processed_measurements = helper.queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp)
     
     average_valid_processed_measurements_list = []
 
