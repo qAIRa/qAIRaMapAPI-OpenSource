@@ -10,8 +10,8 @@ install:
   - pip install coveralls
 
 script:
-  - pytest -v --cov
-  - coverage run -m pytest test/
+  - pytest -v --cov=project
+  - coverage run -m pytest project/test/
 
 after_success: "coveralls"
 
