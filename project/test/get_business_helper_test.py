@@ -7,9 +7,6 @@ class TestGetBusinessData(unittest.TestCase):
 	Test of Get Business Functions
 
 	"""
-	def test_query_get_companies(self):
-		companies = get_business_helper.queryGetCompanies()
-		self.assertAlmostEqual(get_business_helper.queryGetCompanies(),companies)
 
 	def test_query_get_eca_noise(self):
 		e1 = (1, 'Zona de Protección Especial', 50, 40)

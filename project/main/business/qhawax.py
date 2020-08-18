@@ -18,9 +18,9 @@ def getIncaQhawaxInca():
         name = request.args.get('name')
         inca_qhawax = get_business_helper.queryIncaQhawax(name)
         return inca_qhawax
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/save_main_inca/', methods=['POST'])
 def updateIncaData():

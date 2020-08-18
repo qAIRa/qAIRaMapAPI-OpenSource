@@ -10,39 +10,18 @@ from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallat
 session = db.session
 
 def getTimeQhawaxHistory(installation_id):
-    values= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
-                          QhawaxInstallationHistory.last_registration_time_zone).\
-                    filter(QhawaxInstallationHistory.id == installation_id).first()
-    if (values!=None):
+    """
+    Get time qHAWAX History
+
+    :type installation_id: integer
+    :param installation_id: Installation ID
+
+    """
+    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
+              QhawaxInstallationHistory.last_registration_time_zone)
+    if(same_helper.verifyIfQhawaxInstallationExistBaseOnID(installation_id)==True):
+        values = session.query(*fields).filter_by(id= installation_id).first()
         return values
-    else:
-        return None
-
-def getMainIncaQhawaxTable(qhawax_id):
-    """
-    Get qHAWAX Main Inca
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    """
-    main_inca = session.query(Qhawax.main_inca).filter_by(id=qhawax_id).one()[0]
-    return main_inca
-
-
-def queryGetCompanies():
-    """
-    Helper Company function to list all companies 
-
-    No parameters required
-
-    """
-    sensors = (Company.id, Company.name, Company.email_group, Company.ruc, 
-               Company.address, Company.phone, Company.contact_person)
-    companies = session.query(*sensors).all()
-    if(companies == []):
-        return None
-    return session.query(*sensors).order_by(Company.id.desc()).all()
 
 def queryGetAreas():
     """
@@ -51,8 +30,11 @@ def queryGetAreas():
     No parameters required
 
     """
-    sensors = (EcaNoise.id, EcaNoise.area_name)
-    return session.query(*sensors).order_by(EcaNoise.id.desc()).all()
+    fields = (EcaNoise.id, EcaNoise.area_name)
+    areas = session.query(*fields).all()
+    if(areas == []):
+        return None
+    return session.query(*fields).order_by(EcaNoise.id.desc()).all()
 
 def queryGetEcaNoise(eca_noise_id):
     """
@@ -62,13 +44,10 @@ def queryGetEcaNoise(eca_noise_id):
     :param eca_noise_id: Eca Noise ID
 
     """
-    if(type(eca_noise_id) not in [int]):
-        raise TypeError("The eca noise id should be int")
-    fields = (EcaNoise.id, EcaNoise.area_name, EcaNoise.max_daytime_limit, EcaNoise.max_night_limit)
-    area_list = session.query(*fields).filter(EcaNoise.id == eca_noise_id).all()
-    if (area_list == []):
-        return area_list
-    return session.query(*fields).filter(EcaNoise.id == eca_noise_id).one()
+    fields = (EcaNoise.id, EcaNoise.area_name, EcaNoise.max_daytime_limit, \
+              EcaNoise.max_night_limit)
+    if(same_helper.verifyIfAreaExistBaseOnID(eca_noise_id)==True):
+        return session.query(*fields).filter_by(id= eca_noise_id).one()
 
 
 def getOffsetsFromProductID(qhawax_name):
@@ -79,22 +58,20 @@ def getOffsetsFromProductID(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
+    attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, \
+                  GasSensor.sensitivity, GasSensor.sensitivity_2)
     if(isinstance(qhawax_name, str)):
         qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        offsets_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
+        
+        offset_json = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}
+        initial_offset_json = util_helper.initializeOffsetJson(offset_json)
 
-        attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, GasSensor.sensitivity, GasSensor.sensitivity_2)
-        sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
-        all_sensors=['CO','SO2','H2S','O3','NO','NO2']
-
-        initial_offsets = {}
-        for sensor in all_sensors:
-            initial_offsets[sensor] = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}
-
-        for sensor in sensors:
+        for sensor in offsets_sensors:
             sensor_dict = sensor._asdict()
-            initial_offsets[sensor_dict.pop('type')] = sensor_dict
+            initial_offset_json[sensor_dict.pop('type')] = sensor_dict
 
-        return initial_offsets
+        return initial_offset_json
     else:
         raise TypeError("The qHAWAX name should be string")
 
@@ -107,22 +84,19 @@ def getControlledOffsetsFromProductID(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
+    attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
     if(isinstance(qhawax_name, str)):
         qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
 
-        attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
-        sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
-        all_sensors=['CO','SO2','H2S','O3','NO','NO2']
+        controlled_offset_json = {'C0': 0.0, 'C1': 0.0, 'C2': 0.0}
+        initial_controlled_offsets = util_helper.initializeOffsetJson(controlled_offset_json)
 
-        initial_offsets = {}
-        for sensor in all_sensors:
-            initial_offsets[sensor] = {'C0': 0.0, 'C1': 0.0, 'C2': 0.0}
-
-        for sensor in sensors:
+        for sensor in controlled_sensors:
             sensor_dict = sensor._asdict()
-            initial_offsets[sensor_dict.pop('type')] = sensor_dict
+            initial_controlled_offsets[sensor_dict.pop('type')] = sensor_dict
         
-        return initial_offsets
+        return initial_controlled_offsets
     else:
         raise TypeError("The qHAWAX name should be string")
 
@@ -134,21 +108,18 @@ def getNonControlledOffsetsFromProductID(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
+    attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
     if(isinstance(qhawax_name, str)):
         qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        non_controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
 
-        attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
-        sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
-        all_sensors=['CO','SO2','H2S','O3','NO','NO2']
+        non_controlled_offsets = {'NC1': 0.0, 'NC0': 0.0}
+        initial_non_controlled_offsets = util_helper.initializeOffsetJson(non_controlled_offsets)
 
-        initial_offsets = {}
-        for sensor in all_sensors:
-            initial_offsets[sensor] = {'NC1': 0.0, 'NC0': 0.0}
-
-        for sensor in sensors:
+        for sensor in non_controlled_sensors:
             sensor_dict = sensor._asdict()
-            initial_offsets[sensor_dict.pop('type')] = sensor_dict
-        return initial_offsets
+            initial_non_controlled_offsets[sensor_dict.pop('type')] = sensor_dict
+        return initial_non_controlled_offsets
     else:
         raise TypeError("The qHAWAX name should be string")
 
@@ -162,20 +133,11 @@ def queryIncaQhawax(name):
 
     """
     if(isinstance(name, str)):
-        qhawax_inca = session.query(Qhawax.main_inca).filter_by(name=name).one()
-        if qhawax_inca[0] == 50:
-            resultado = 'green'
-        elif qhawax_inca[0] == 100:
-            resultado = 'yellow'
-        elif qhawax_inca[0] == 500:
-            resultado = 'orange'
-        elif qhawax_inca[0] == 600:
-            resultado = 'red'
-        else:
-            resultado = 'green'
-        return resultado
+        qhawax_id = same_helper.getQhawaxID(name)
+        qhawax_inca = same_helper.getMainIncaQhawaxTable(qhawax_id)
+        return util_helper.getColorBaseOnIncaValue(qhawax_inca)
     else:
-        raise TypeError("The qhawax name should be string")
+        raise TypeError("The qHAWAX name should be string")
 
 def getInstallationDateByQhawaxID(qhawax_id):
     installation_date = session.query(QhawaxInstallationHistory.installation_date_zone).\
