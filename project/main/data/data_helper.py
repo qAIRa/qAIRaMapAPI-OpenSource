@@ -7,6 +7,7 @@ from project.database.models import AirQualityMeasurement, ProcessedMeasurement,
                                     ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
+import project.main.business.post_business_helper as post_business_helper
 
 session = db.session
 
@@ -365,6 +366,6 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
 def validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value):
     storeValidProcessedDataInDB(data_json, qhawax_id, product_id)
     if(inca_value==0.0):
-        business_helper.updateMainIncaInDB(1,product_id)
+        post_business_helper.updateMainIncaInDB(1,product_id)
 
 
