@@ -237,5 +237,28 @@ class Bitacora(db.Model):
     end_date_zone = db.Column(db.DateTime, nullable=False)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
+class AirDailyMeasurement(db.Model):
+    __tablename__ = 'air_daily_measurement'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    CO = db.Column(db.Float)
+    CO_ug_m3 = db.Column(db.Float)
+    H2S = db.Column(db.Float)
+    H2S_ug_m3 = db.Column(db.Float)
+    NO2 = db.Column(db.Float)
+    NO2_ug_m3 = db.Column(db.Float)
+    O3 = db.Column(db.Float)
+    O3_ug_m3 = db.Column(db.Float)
+    PM25 = db.Column(db.Float)
+    PM10 = db.Column(db.Float)
+    SO2 = db.Column(db.Float)
+    SO2_ug_m3 = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    pressure = db.Column(db.Float)
+    temperature = db.Column(db.Float)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 import project.database.utils as utils

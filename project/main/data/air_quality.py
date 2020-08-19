@@ -44,8 +44,6 @@ def storeAirQualityData():
     if request.method == 'POST':
         try:
             data_json = request.get_json()
-            print("Entre a air_quality_measurements y todo bien")
-            print(data_json)
             helper.storeAirQualityDataInDB(data_json)
             return make_response('OK', 200)
         except Exception as e:

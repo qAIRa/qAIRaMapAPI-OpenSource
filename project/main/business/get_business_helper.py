@@ -23,6 +23,25 @@ def getTimeQhawaxHistory(installation_id):
         values = session.query(*fields).filter_by(id= installation_id).first()[0]
         return values
 
+def queryQhawaxModeCustomer():
+    """
+    Get qHAWAX list in mode Customer and state ON
+
+    No parameters required
+
+    """
+    qhawax_column = (Qhawax.id, Qhawax.name, Qhawax.main_inca, Qhawax.qhawax_type,\
+                     QhawaxInstallationHistory.comercial_name, EcaNoise.area_name)
+
+    qhawax_list = session.query(*qhawax_column).\
+                          join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                          join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                          group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                          filter(Qhawax.mode =="Cliente", \
+                                 Qhawax.state =="ON", \
+                                 QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
+    return qhawax_list
+
 def queryGetAreas():
     """
     Helper Eca Noise function to list all zones 

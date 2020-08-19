@@ -41,6 +41,36 @@ def getValidProcessedMeasurementsTimePeriod():
         
     return make_response(jsonify('Valid Measurements not found'), 404)
 
+@app.route('/api/daily_valid_processed_measurements/', methods=['GET'])
+def getDailyValidProcessedData():
+    """
+    To list all measurement of valid processed measurement table in a define period of time
+
+    :type id: integer
+    :param id: qHAWAX ID
+
+    :type start_date: timestamp without timezone
+    :param start_date: initial timestamp day-month-year hour:minute:second (UTC OO)
+
+    :type end_date: timestamp without timezone
+    :param end_date: final timestamp day-month-year hour:minute:second (UTC OO)
+    
+
+    """
+    qhawax_id = int(request.args.get('qhawax_id'))
+    initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%Y-%m-%d %H:%M:%S')
+    final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%Y-%m-%d %H:%M:%S')
+    
+    installation_id = same_helper.getInstallationId(qhawax_id)
+    if(installation_id!= None):
+        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
+        if valid_processed_measurements is not None:
+            valid_processed_measurements_list = [daily_valid_measurement._asdict() for daily_valid_measurement in valid_processed_measurements]
+            return make_response(jsonify(valid_processed_measurements_list), 200)
+    else:
+        return make_response(jsonify('Any Valid ProcessedMeasurement found'), 200)
+
+    return make_response(jsonify('It was an error'), 404)
 
 @app.route('/api/valid_processed_measurements/', methods=['GET'])
 def getValidProcessedData():
@@ -64,7 +94,8 @@ def getValidProcessedData():
     
     if(qhawax_id!=None):
         installation_id = same_helper.getInstallationId(qhawax_id)
-        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp)
+        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, \
+                                                                                  initial_timestamp, final_timestamp)
 
     if valid_processed_measurements is not None:
         valid_processed_measurements_list = [valid_measurement._asdict() for valid_measurement in valid_processed_measurements]

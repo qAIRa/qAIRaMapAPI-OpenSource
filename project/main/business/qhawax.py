@@ -22,6 +22,26 @@ def getIncaQhawaxInca():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+@app.route('/api/get_qhawaxs_active_mode_customer/', methods=['GET'])
+def getActiveQhawaxModeCustomer():
+    """
+    To get all active qHAWAXs that are in field in mode costumer
+    
+    No parameters required
+
+    """
+    qhawaxs = get_business_helper.queryQhawaxModeCustomer()
+    if qhawaxs is not None:
+        try:
+            qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
+            print(qhawaxs_list)
+            return make_response(jsonify(qhawaxs_list), 200)
+        except TypeError as e:
+            json_message = jsonify({'error': ' \'%s\' ' % (e)})
+            return make_response(json_message, 400)
+    else:
+        return make_response(jsonify('There are no qHAWAXs in field'), 404)
+
 @app.route('/api/save_main_inca/', methods=['POST'])
 def updateIncaData():
     """
