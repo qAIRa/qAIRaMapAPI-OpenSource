@@ -20,7 +20,7 @@ def getTimeQhawaxHistory(installation_id):
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
               QhawaxInstallationHistory.last_registration_time_zone)
     if(same_helper.verifyIfQhawaxInstallationExistBaseOnID(installation_id)==True):
-        values = session.query(*fields).filter_by(id= installation_id).first()
+        values = session.query(*fields).filter_by(id= installation_id).first()[0]
         return values
 
 def queryGetAreas():
@@ -47,7 +47,7 @@ def queryGetEcaNoise(eca_noise_id):
     fields = (EcaNoise.id, EcaNoise.area_name, EcaNoise.max_daytime_limit, \
               EcaNoise.max_night_limit)
     if(same_helper.verifyIfAreaExistBaseOnID(eca_noise_id)==True):
-        return session.query(*fields).filter_by(id= eca_noise_id).one()
+        return session.query(*fields).filter_by(id= eca_noise_id).first()[0]
 
 
 def getOffsetsFromProductID(qhawax_name):
@@ -143,7 +143,7 @@ def getInstallationDateByQhawaxID(qhawax_id):
     installation_date = session.query(QhawaxInstallationHistory.installation_date_zone).\
                                 filter_by(qhawax_id=qhawax_id). \
                                 filter(QhawaxInstallationHistory.end_date_zone == None). \
-                                order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()
+                                order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0]
     if (installation_date==None):
         return installation_date
     return installation_date[0]
@@ -152,14 +152,14 @@ def getFirstTimestampValidProcessed(qhawax_installation_id):
 
     first_timestamp =session.query(ValidProcessedMeasurement.timestamp_zone). \
                              filter(ValidProcessedMeasurement.qhawax_installation_id == int(qhawax_installation_id)). \
-                             order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()                  
+                             order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()[0]               
     if (first_timestamp==None):
         return first_timestamp
     return first_timestamp[0]
 
 def getMainIncaQhawax(name):
     installation_id=same_helper.getInstallationIdBaseName(name)
-    qhawax_inca = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).one()[0]
+    qhawax_inca = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).first()[0]
     return qhawax_inca
 
 def queryGetLastQhawax():
@@ -241,7 +241,7 @@ def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
     if(isinstance(qhawax_name, str)):
         qhawax_id = same_helper.getQhawaxID(qhawax_name)
         qhawax_time = session.query(ProcessedMeasurement.timestamp_zone).\
-                              filter_by(qhawax_id=qhawax_id).first()
+                              filter_by(qhawax_id=qhawax_id).first()[0]
         processed_measurement_timestamp=""
         if(qhawax_time!=None):
             processed_measurement_timestamp = session.query(ProcessedMeasurement.timestamp_zone).\
@@ -265,7 +265,7 @@ def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
         valid_processed_measurement_timestamp=""
         if(installation_id != None):
             qhawax_time = session.query(ValidProcessedMeasurement.timestamp_zone).\
-                                  filter_by(qhawax_installation_id=installation_id).first()
+                                  filter_by(qhawax_installation_id=installation_id).first()[0]
             if(qhawax_time!=None):
                 valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
                                                                 filter_by(qhawax_installation_id=installation_id) \

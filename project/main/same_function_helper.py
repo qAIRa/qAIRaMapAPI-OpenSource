@@ -46,7 +46,7 @@ def getQhawaxID(qhawax_name):
         qhawax_list = session.query(Qhawax.id).filter_by(name= qhawax_name).all()
         if(qhawax_list == []):
             raise TypeError("The qHAWAX name could not be found")
-        qhawax_id = session.query(Qhawax.id).filter_by(name= qhawax_name).one()
+        qhawax_id = session.query(Qhawax.id).filter_by(name= qhawax_name).first()[0]
         return qhawax_id
     else:
         raise TypeError("The qHAWAX name should be string")
@@ -60,7 +60,7 @@ def getQhawaxName(qhawax_id):
 
     """
     if(verifyIfQhawaxExistBaseOnID(qhawax_id)==True):
-        return session.query(Qhawax.name).filter_by(id =qhawax_id).one() 
+        return session.query(Qhawax.name).filter_by(id =qhawax_id).first()[0]
 
 
 def getInstallationId(qhawax_id):
@@ -90,6 +90,6 @@ def getMainIncaQhawaxTable(qhawax_id):
 
     """
     if(verifyIfQhawaxExistBaseOnID(qhawax_id)==True):
-        return session.query(Qhawax.main_inca).filter_by(id=qhawax_id).one()[0]
+        return session.query(Qhawax.main_inca).filter_by(id=qhawax_id).first()[0]
 
 
