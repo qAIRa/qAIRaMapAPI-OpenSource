@@ -54,11 +54,11 @@ def getComercialName(qhawax_id):
     """
     if(isinstance(qhawax_id, int)):
         comercial_name = session.query(QhawaxInstallationHistory.comercial_name).\
-                                 filter_by(qhawax_id=qhawax_id, end_date=None).all()
+                                 filter_by(qhawax_id=qhawax_id, end_date_zone=None).all()
         if(comercial_name == []):
             raise TypeError("The qHAWAX comercial name could not be found")
         comercial_name = session.query(QhawaxInstallationHistory.comercial_name).\
-                                 filter_by(qhawax_id=qhawax_id, end_date=None).one()[0]
+                                 filter_by(qhawax_id=qhawax_id, end_date_zone=None).one()[0]
     return comercial_name
 
 def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp):
@@ -257,7 +257,7 @@ def getNoiseData(qhawax_name):
     """
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).\
-                           filter_by(qhawax_id=qhawax_id,end_date=None).first()
+                           filter_by(qhawax_id=qhawax_id,end_date_zone=None).first()
     zone = session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
     return zone
 
