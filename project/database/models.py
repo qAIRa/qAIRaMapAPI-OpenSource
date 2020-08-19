@@ -65,6 +65,7 @@ class ProcessedMeasurement(db.Model):
 
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
