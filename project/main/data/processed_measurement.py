@@ -112,7 +112,7 @@ def handleProcessedData():
             post_business_helper.updateMainIncaInDB(0,product_id)
             description="Se prendió el qHAWAX"
             observation_type="Interna"
-            post_business_helper.writeBitacora(product_id,observation_type,description,None,None,None)
+            post_business_helper.writeBinnacle(product_id,observation_type,description,None)
         if(mode == "Cliente"):
             qhawax_zone = helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone
