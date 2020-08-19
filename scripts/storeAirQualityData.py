@@ -4,9 +4,9 @@ import dateutil.parser
 import dateutil.tz
 from math import log10
 
-#BASE_URL = 'https://qairamapnapi-dev-opensource.qairadrones.com/'
+BASE_URL = 'https://qairamapnapi-dev-opensource.qairadrones.com/'
 #BASE_URL = 'http://54.159.70.183/'
-BASE_URL = 'http://0.0.0.0:5000/'
+#BASE_URL = 'http://0.0.0.0:5000/'
 GET_ACTIVE_QHAWAX_IN_FIELD = 'api/get_qhawaxs_active_mode_customer/'
 VALID_PROCESSED_DATA_ENDPOINT = 'api/valid_processed_measurements/'
 AIR_QUALITY_DATA_ENDPOINT = 'api/air_quality_measurements/'
