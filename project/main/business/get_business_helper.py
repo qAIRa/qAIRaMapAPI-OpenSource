@@ -47,7 +47,7 @@ def queryGetEcaNoise(eca_noise_id):
     fields = (EcaNoise.id, EcaNoise.area_name, EcaNoise.max_daytime_limit, \
               EcaNoise.max_night_limit)
     if(same_helper.verifyIfAreaExistBaseOnID(eca_noise_id)==True):
-        return session.query(*fields).filter_by(id= eca_noise_id).first()[0]
+        return session.query(*fields).filter_by(id= eca_noise_id).first()
 
 
 def getOffsetsFromProductID(qhawax_name):

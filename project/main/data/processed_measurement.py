@@ -105,14 +105,6 @@ def handleProcessedData():
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
         mode = helper.getQhawaxMode(qhawax_id)
-        inca_value = helper.getMainIncaQhawaxTable(product_id)
-        if(inca_value == -1): 
-            post_business_helper.saveStatusOn(product_id)
-            post_business_helper.saveTurnOnLastTime(product_id)
-            post_business_helper.updateMainIncaInDB(0,product_id)
-            description="Se prendió el qHAWAX"
-            observation_type="Interna"
-            post_business_helper.writeBinnacle(product_id,observation_type,description,None)
         if(mode == "Cliente"):
             qhawax_zone = helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone
