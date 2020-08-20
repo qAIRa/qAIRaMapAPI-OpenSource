@@ -8,7 +8,6 @@ pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
 pollutant_25C=[2.62,1.88,1.96,1.15,1.39]
 
-
 def initializeOffsetJson(json):
     all_sensors=['CO','SO2','H2S','O3','NO','NO2']
     initial = {}

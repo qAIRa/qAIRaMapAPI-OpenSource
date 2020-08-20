@@ -34,7 +34,6 @@ def getActiveQhawaxModeCustomer():
     if qhawaxs is not None:
         try:
             qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
-            print(qhawaxs_list)
             return make_response(jsonify(qhawaxs_list), 200)
         except TypeError as e:
             json_message = jsonify({'error': ' \'%s\' ' % (e)})

@@ -20,7 +20,7 @@ def getTimeQhawaxHistory(installation_id):
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
               QhawaxInstallationHistory.last_registration_time_zone)
     if(same_helper.verifyIfQhawaxInstallationExistBaseOnID(installation_id)==True):
-        values = session.query(*fields).filter_by(id= installation_id).first()[0]
+        values = session.query(*fields).filter_by(id= installation_id).first()
         return values
 
 def queryQhawaxModeCustomer():
@@ -313,3 +313,61 @@ def queryQhawaxInFieldInPublicMode():
                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
                                    order_by(Qhawax.id).all() 
 
+def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
+    """
+    Helper Gas Sensor function to save non controlled offsets from qHAWAX ID
+
+    :type qhawax_name: string
+    :param qhawax_name: qHAWAX name
+
+    :type sensor: string
+    :param sensor: sensor type ('CO', 'NO2','PM10','PM25','SO2','O3','H2S')
+
+    :type initial_timestamp: timestamp
+    :param initial_timestamp: initial search date
+
+    :type final_timestamp: timestamp
+    :param final_timestamp: last search date
+
+    """
+    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
+    if qhawax_id is None:
+        return None
+    
+    if sensor == 'CO':
+        datos = AirQualityMeasurement.CO
+        hoursPerSensor = 8
+    elif sensor == 'NO2':
+        datos = AirQualityMeasurement.NO2
+        hoursPerSensor = 1
+    elif sensor == 'PM10':
+        datos = AirQualityMeasurement.PM10
+        hoursPerSensor = 24
+    elif sensor == 'PM25':
+        datos = AirQualityMeasurement.PM25
+        hoursPerSensor = 24
+    elif sensor == 'SO2':
+        datos = AirQualityMeasurement.SO2
+        hoursPerSensor = 24
+    elif sensor == 'O3':
+        datos = AirQualityMeasurement.O3
+        hoursPerSensor = 8
+    elif sensor == 'H2S':
+        datos = AirQualityMeasurement.H2S
+        hoursPerSensor = 24
+
+    resultado=[]
+    resultado = session.query(datos).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
+                                      filter(AirQualityMeasurement.timestamp_zone > initial_timestamp). \
+                                      filter(AirQualityMeasurement.timestamp_zone < final_timestamp). \
+                                      order_by(AirQualityMeasurement.timestamp_zone).all()
+    sum = 0        
+
+    if len(resultado) == 0 :
+        return 0
+    else :
+        for i in range(len(resultado)):
+            sum = sum + resultado[i][0]
+        promf = sum /len(resultado)
+        
+    return promf
