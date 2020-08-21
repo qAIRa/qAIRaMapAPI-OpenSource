@@ -30,16 +30,16 @@ def getActiveQhawaxModeCustomer():
     No parameters required
 
     """
-    qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-    if qhawaxs is not None:
-        try:
+    try:
+        qhawaxs = get_business_helper.queryQhawaxModeCustomer()
+        if qhawaxs is not None:
             qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
             return make_response(jsonify(qhawaxs_list), 200)
-        except TypeError as e:
-            json_message = jsonify({'error': ' \'%s\' ' % (e)})
-            return make_response(json_message, 400)
-    else:
-        return make_response(jsonify('There are no qHAWAXs in field'), 404)
+        else:
+            return make_response(jsonify('There are no qHAWAXs in field'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/save_main_inca/', methods=['POST'])
 def updateIncaData():
@@ -135,10 +135,16 @@ def getTimeAllActiveQhawax():
 
     """
     name = request.args.get('name')
-    installation_id = same_helper.getInstallationIdBaseName(name)
-    values = get_business_helper.getTimeQhawaxHistory(installation_id)
-    values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
-    return make_response(jsonify(values_list), 200)
+    try:
+        values = get_business_helper.getTimeQhawaxHistory(name)
+        if(values is not None):
+            values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
+            return make_response(jsonify(values_list), 200)
+        else:
+            return make_response(jsonify('The qHAWAX name is not in field'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/create_qhawax/', methods=['POST'])
 def createQhawax():

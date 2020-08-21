@@ -9,7 +9,7 @@ from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallat
                                     ValidProcessedMeasurement
 session = db.session
 
-def getTimeQhawaxHistory(installation_id):
+def getTimeQhawaxHistory(name):
     """
     Get time qHAWAX History
 
@@ -19,9 +19,13 @@ def getTimeQhawaxHistory(installation_id):
     """
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
               QhawaxInstallationHistory.last_registration_time_zone)
-    if(same_helper.verifyIfQhawaxInstallationExistBaseOnID(installation_id)==True):
-        values = session.query(*fields).filter_by(id= installation_id).first()
-        return values
+    installation_id = same_helper.getInstallationIdBaseName(name)
+    if(installation_id is not None):
+        if(same_helper.verifyIfQhawaxInstallationExistBaseOnID(installation_id)==True):
+            values = session.query(*fields).filter_by(id= installation_id).first()
+            return values
+    else:
+        return None
 
 def queryQhawaxModeCustomer():
     """
@@ -84,15 +88,11 @@ def getOffsetsFromProductID(qhawax_name):
         offsets_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
         
         offset_json = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}
-        initial_offset_json = util_helper.initializeOffsetJson(offset_json)
-
-        for sensor in offsets_sensors:
-            sensor_dict = sensor._asdict()
-            initial_offset_json[sensor_dict.pop('type')] = sensor_dict
+        initial_offset_json = util_helper.gasSensorJson(offset_json,offsets_sensors)
 
         return initial_offset_json
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 
 def getControlledOffsetsFromProductID(qhawax_name):
@@ -109,15 +109,11 @@ def getControlledOffsetsFromProductID(qhawax_name):
         controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
 
         controlled_offset_json = {'C0': 0.0, 'C1': 0.0, 'C2': 0.0}
-        initial_controlled_offsets = util_helper.initializeOffsetJson(controlled_offset_json)
+        initial_controlled_offsets = util_helper.gasSensorJson(controlled_offset_json,controlled_sensors)
 
-        for sensor in controlled_sensors:
-            sensor_dict = sensor._asdict()
-            initial_controlled_offsets[sensor_dict.pop('type')] = sensor_dict
-        
         return initial_controlled_offsets
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 def getNonControlledOffsetsFromProductID(qhawax_name):
     """
@@ -133,15 +129,11 @@ def getNonControlledOffsetsFromProductID(qhawax_name):
         non_controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
 
         non_controlled_offsets = {'NC1': 0.0, 'NC0': 0.0}
-        initial_non_controlled_offsets = util_helper.initializeOffsetJson(non_controlled_offsets)
+        initial_non_controlled_offsets = util_helper.gasSensorJson(non_controlled_offsets,non_controlled_sensors)
 
-        for sensor in non_controlled_sensors:
-            sensor_dict = sensor._asdict()
-            initial_non_controlled_offsets[sensor_dict.pop('type')] = sensor_dict
         return initial_non_controlled_offsets
     else:
-        raise TypeError("The qHAWAX name should be string")
-
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 def queryIncaQhawax(name):
     """
@@ -156,25 +148,43 @@ def queryIncaQhawax(name):
         qhawax_inca = same_helper.getMainIncaQhawaxTable(qhawax_id)
         return util_helper.getColorBaseOnIncaValue(qhawax_inca)
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(name)+" should be string")
 
-def getInstallationDateByQhawaxID(qhawax_id):
-    installation_date = session.query(QhawaxInstallationHistory.installation_date_zone).\
-                                filter_by(qhawax_id=qhawax_id). \
-                                filter(QhawaxInstallationHistory.end_date_zone == None). \
-                                order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0]
-    if (installation_date==None):
-        return installation_date
-    return installation_date[0]
+def getInstallationDate(qhawax_id):
+    """
+    Helper qHAWAX function to get Installation Date
 
-def getFirstTimestampValidProcessed(qhawax_installation_id):
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
 
-    first_timestamp =session.query(ValidProcessedMeasurement.timestamp_zone). \
-                             filter(ValidProcessedMeasurement.qhawax_installation_id == int(qhawax_installation_id)). \
-                             order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()[0]               
-    if (first_timestamp==None):
-        return first_timestamp
-    return first_timestamp[0]
+    """
+    if(same_helper.verifyIfQhawaxExistBaseOnID(qhawax_id)==True):
+        installation_date = session.query(QhawaxInstallationHistory.installation_date_zone).\
+                                    filter(QhawaxInstallationHistory.qhawax_id == qhawax_id). \
+                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
+                                    order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()
+        if (installation_date==None):
+            return None
+        return installation_date[0]
+
+def getFirstTimestampValidProcessed(qhawax_id):
+    """
+    Helper qHAWAX Installation function to get first timestamp of Valid Processed 
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    """
+    installation_id = same_helper.getInstallationId(qhawax_id)
+    if(installation_id is not None):
+        first_timestamp =session.query(ValidProcessedMeasurement.timestamp_zone). \
+                                 filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
+                                 order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()           
+        if (first_timestamp==None):
+            return None
+        return first_timestamp[0]
+    else:
+        None
 
 def getMainIncaQhawax(name):
     installation_id=same_helper.getInstallationIdBaseName(name)

@@ -2,11 +2,10 @@ from flask import jsonify, make_response, request
 import datetime
 import dateutil.parser
 import dateutil.tz
-import os
-
 from project import app, db, socketio
-from project.database.models import Qhawax, ProcessedMeasurement
-import project.main.data.data_helper as helper
+from project.database.models import Qhawax
+import project.main.data.post_data_helper as post_data_helper
+import project.main.data.get_data_helper as get_data_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 
@@ -31,7 +30,7 @@ def getValidProcessedMeasurementsTimePeriod():
 
     installation_id = same_helper.getInstallationId(qhawax_id)
     if(installation_id!= None):
-        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, \
+        valid_processed_measurements = get_data_helper.queryDBValidProcessedByQhawaxScript(installation_id, \
                                                                                 initial_timestamp_utc, final_timestamp_utc)
         if valid_processed_measurements is not None:
             valid_processed_measurements_list = [measurement._asdict() for measurement in valid_processed_measurements]
@@ -63,7 +62,7 @@ def getDailyValidProcessedData():
     
     installation_id = same_helper.getInstallationId(qhawax_id)
     if(installation_id!= None):
-        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
+        valid_processed_measurements = get_data_helper.queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp_utc, final_timestamp_utc)
         if valid_processed_measurements is not None:
             valid_processed_measurements_list = [daily_valid_measurement._asdict() for daily_valid_measurement in valid_processed_measurements]
             return make_response(jsonify(valid_processed_measurements_list), 200)
@@ -94,7 +93,7 @@ def getValidProcessedData():
     
     if(qhawax_id!=None):
         installation_id = same_helper.getInstallationId(qhawax_id)
-        valid_processed_measurements = helper.queryDBValidProcessedByQhawaxScript(installation_id, \
+        valid_processed_measurements = get_data_helper.queryDBValidProcessedByQhawaxScript(installation_id, \
                                                                                   initial_timestamp, final_timestamp)
 
     if valid_processed_measurements is not None:
@@ -114,5 +113,5 @@ def getTimeOfValidProcessed():
 
     """
     qhawax_name = request.args.get('name')
-    return str(helper.getLatestTimestampValidProcessed(qhawax_name))
+    return str(get_data_helper.getLatestTimestampValidProcessed(qhawax_name))
 

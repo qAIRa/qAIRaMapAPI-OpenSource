@@ -2,11 +2,9 @@ from flask import jsonify, make_response, request
 import datetime
 import dateutil.parser
 import dateutil.tz
-import os
-
 from project import app, db, socketio
-import project.main.data.data_helper as helper
-from sqlalchemy import or_
+import project.main.data.post_data_helper as post_data_helper
+import project.main.data.get_data_helper as get_data_helper
 
 
 @app.route('/api/air_daily_quality_measurements/', methods=['POST'])
@@ -20,7 +18,7 @@ def storeAirDailyData():
     """
     try:
         data_json = request.get_json()
-        helper.storeAirDailyQualityDataInDB(data_json)
+        post_data_helper.storeAirDailyQualityDataInDB(data_json)
         return make_response('OK', 200)
     except Exception as e:
         print(e)
@@ -53,7 +51,7 @@ def getAirDailyMeasurementsTimePeriod():
     end_week = int(request.args.get('end_week'))
     end_year = int(request.args.get('end_year'))
 
-    air_daily_measurements = helper.queryDBAirDailyQuality(qhawax_id, init_week, init_year,end_week, end_year)
+    air_daily_measurements = get_data_helper.queryDBAirDailyQuality(qhawax_id, init_week, init_year,end_week, end_year)
     if air_daily_measurements is not None:
         air_quality_measurements_list = [measurement._asdict() for measurement in air_daily_measurements]
         return make_response(jsonify(air_quality_measurements_list), 200)

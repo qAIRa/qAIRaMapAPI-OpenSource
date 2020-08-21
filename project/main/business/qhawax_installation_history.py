@@ -140,21 +140,20 @@ def getInstallationDate():
     
     """
     try:
-        qhawax_id = request.args.get('qhawax_id')
-        installation_date = get_business_helper.getInstallationDateByQhawaxID(qhawax_id)
-        if installation_date != None:
-            installation_id = same_helper.getInstallationId(qhawax_id)
-            first_timestamp = get_business_helper.getFirstTimestampValidProcessed(installation_id)
+        qhawax_id = int(request.args.get('qhawax_id'))
+        installation_date = get_business_helper.getInstallationDate(qhawax_id)
+        if (installation_date != None):
+            first_timestamp = get_business_helper.getFirstTimestampValidProcessed(qhawax_id)
             if(first_timestamp!=None):
                 if(first_timestamp>installation_date):
-                    return first_timestamp
+                    return str(first_timestamp)
                 else:
-                    return installation_date
+                    return str(installation_date)
             else:
-                return installation_date
+                return str(installation_date)
         else:
-            return make_response(jsonify("qHAWAX is not in field"), 200)
-    except Exception as e:
-        print(e)
-        return make_response('No Installation Date', 400)
+            return make_response(jsonify("qHAWAX ID "+str(qhawax_id)+" is not in field"), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 

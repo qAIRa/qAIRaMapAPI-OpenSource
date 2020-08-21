@@ -13,25 +13,25 @@ def verifyIfQhawaxExistBaseOnID(qhawax_id):
         raise TypeError("The qHAWAX id should be int")
     qhawax_list = session.query(Qhawax.name).filter_by(id=qhawax_id).all()
     if(qhawax_list == []):
-        raise TypeError("The qHAWAX ID could not be found")
+        raise TypeError("The qHAWAX ID "+str(qhawax_id)+" has not been found")
     return True
 
 def verifyIfQhawaxInstallationExistBaseOnID(installation_id):
     if(type(installation_id) not in [int]):
-        raise TypeError("The qHAWAX installation ID should be int")
+        raise TypeError("The qHAWAX installation ID "+str(installation_id)+" should be int")
     installation_date_zone = session.query(QhawaxInstallationHistory.installation_date_zone).\
                                      filter_by(id= installation_id).all()
     if(installation_date_zone == []):
-        raise TypeError("The qHAWAX installation ID could not be found")
+        raise TypeError("The qHAWAX installation ID "+str(installation_id)+" has not been found")
     return True
 
 def verifyIfAreaExistBaseOnID(eca_noise_id):
     if(type(eca_noise_id) not in [int]):
-        raise TypeError("The eca noise id should be int")
+        raise TypeError("The ID "+str(eca_noise_id) +"should be int")
     area_name = session.query(EcaNoise.area_name).\
                         filter_by(id=eca_noise_id).all()
     if(area_name == []):
-        raise TypeError("The area ID could not be found")
+        raise TypeError("The area ID " + str(eca_noise_id)+" has not been found")
     return True
 
 def getQhawaxID(qhawax_name):
@@ -45,11 +45,11 @@ def getQhawaxID(qhawax_name):
     if(isinstance(qhawax_name, str)):
         qhawax_list = session.query(Qhawax.id).filter_by(name= qhawax_name).all()
         if(qhawax_list == []):
-            raise TypeError("The qHAWAX name could not be found")
+            raise TypeError("The qHAWAX name "+str(qhawax_name)+" has not been found")
         qhawax_id = session.query(Qhawax.id).filter_by(name= qhawax_name).first()[0]
         return qhawax_id
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 def getQhawaxName(qhawax_id):
     """
@@ -65,7 +65,7 @@ def getQhawaxName(qhawax_id):
 
 def getInstallationId(qhawax_id):
     if(type(qhawax_id) not in [int]):
-        raise TypeError("The qHAWAX id should be int")
+        raise TypeError("The qHAWAX id "+str(qhawax_id)+" should be int")
     installation_id= session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
                                     filter(QhawaxInstallationHistory.end_date_zone == None). \
                                     order_by(QhawaxInstallationHistory.installation_date_zone.desc()).all()
@@ -91,5 +91,4 @@ def getMainIncaQhawaxTable(qhawax_id):
     """
     if(verifyIfQhawaxExistBaseOnID(qhawax_id)==True):
         return session.query(Qhawax.main_inca).filter_by(id=qhawax_id).first()[0]
-
 

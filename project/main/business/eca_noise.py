@@ -34,7 +34,7 @@ def getAllAreas():
         if allAreas is not None:
             allAreas_list = [{'area_name': area.area_name, 'id': area.id} for area in allAreas]
             return make_response(jsonify(allAreas_list), 200)
-        return make_response(jsonify('Areas not found'), 404)
+        return make_response(jsonify('There are no areas recorded in database'), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
