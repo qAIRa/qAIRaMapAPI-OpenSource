@@ -61,8 +61,8 @@ def newQhawaxInstallation():
     :param season: season of the year when the module was deployed
 
     """
+    data_json = request.get_json()
     try:
-        data_json = request.get_json()
         qhawax_id = data_json['qhawax_id']
         post_business_helper.storeNewQhawaxInstallation(data_json)
         post_business_helper.setOccupiedQhawax(qhawax_id)
@@ -73,9 +73,9 @@ def newQhawaxInstallation():
         person_in_charge = data_json['person_in_charge']
         post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('OK', 200)
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 
 @app.route('/api/saveEndWorkField/', methods=['POST'])
@@ -92,8 +92,8 @@ def saveEndWorkField():
     :param end_date: end date of qHAWAX installation
 
     """
+    data_json = request.get_json()
     try:
-        data_json = request.get_json()
         qhawax_id = data_json['qhawax_id']
         installation_id = helper.getInstallationId(qhawax_id)
         post_business_helper.saveEndWorkFieldDate(installation_id, data_json['end_date'])
@@ -105,9 +105,9 @@ def saveEndWorkField():
         person_in_charge = data_json['person_in_charge']
         post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('OK', 200)
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 
 @app.route('/api/AllQhawaxInMap/', methods=['GET'])
@@ -121,13 +121,16 @@ def getQhawaxInMap():
     :param company_id: company ID
 
     """
-     
-    qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
-    if qhawax_in_field is not None:
-        qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
-        return make_response(jsonify(qhawax_in_field_list), 200)
-    else:
-        return make_response(jsonify('qHAWAXs not found'), 404)
+    try:
+        qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
+        if qhawax_in_field is not None:
+            qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
+            return make_response(jsonify(qhawax_in_field_list), 200)
+        else:
+            return make_response(jsonify('qHAWAXs not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 
 @app.route('/api/GetInstallationDate/', methods=['GET'])

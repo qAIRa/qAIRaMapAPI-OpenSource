@@ -186,23 +186,30 @@ def getFirstTimestampValidProcessed(qhawax_id):
     else:
         None
 
-def getMainIncaQhawax(name):
-    installation_id=same_helper.getInstallationIdBaseName(name)
-    qhawax_inca = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).first()[0]
-    return qhawax_inca
-
 def queryGetLastQhawax():
+    """
+    Helper qHAWAX function to get last qHAWAX ID
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    """
     qhawax_list = session.query(Qhawax.id).all()
     if(qhawax_list==[]):
         return None
-
     return session.query(Qhawax.id).order_by(Qhawax.id.desc()).all()[0]
 
 def queryGetLastGasSensor():
+    """
+    Helper Gas Sensor function to get last Gas Sensor ID
+
+    :type qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    """
     gas_sensor_list = session.query(GasSensor.id).all()
     if(gas_sensor_list==[]):
         return None
-
     return session.query(GasSensor.id).order_by(GasSensor.id.desc()).all()[0]
 
 
@@ -214,10 +221,13 @@ def qhawaxNameIsNew(name):
     :param name: qHAWAX name
 
     """
-    name = session.query(Qhawax.name).filter_by(name=name).all()
-    if (name == []):
-        return True
-    return False
+    if(isinstance(name, str)):
+        name = session.query(Qhawax.name).filter_by(name=name).all()
+        if (name == []):
+            return True
+        return False
+    else:
+        raise TypeError("The qHAWAX name "+str(name)+" should be string")
 
 def companyNameIsNew(name):
     """
@@ -227,11 +237,13 @@ def companyNameIsNew(name):
     :param name: company name
 
     """
-    name = session.query(Company.name).filter_by(name=name).all()
-    if (name == []):
-        return True
-    return False
-
+    if(isinstance(name, str)):
+        name = session.query(Company.name).filter_by(name=name).all()
+        if (name == []):
+            return True
+        return False
+    else:
+        raise TypeError("The company name "+str(name)+" should be string")
 
 def companyRucIsNew(ruc):
     """
@@ -241,10 +253,13 @@ def companyRucIsNew(ruc):
     :param ruc: RUC of company
 
     """
-    ruc = session.query(Company.ruc).filter_by(ruc=ruc).all()
-    if (ruc == []):
-        return True
-    return False
+    if(isinstance(ruc, str)):
+        ruc = session.query(Company.ruc).filter_by(ruc=ruc).all()
+        if (ruc == []):
+            return True
+        return False
+    else:
+        raise TypeError("RUC "+str(ruc)+" should be string and should has max 11 characters")
 
 def isItFieldQhawax(qhawax_name):
     """
@@ -254,10 +269,13 @@ def isItFieldQhawax(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
-    if(installation_id != None):
-        return True
-    return False
+    if(isinstance(qhawax_name, str)):
+        installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+        if(installation_id != None):
+            return True
+        return False
+    else:
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
     """
@@ -278,7 +296,7 @@ def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
                                                       order_by(ProcessedMeasurement.id.desc()).first().timestamp_zone
         return processed_measurement_timestamp
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 
 def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
@@ -299,7 +317,6 @@ def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
                 valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
                                                                 filter_by(qhawax_installation_id=installation_id) \
                                                                 .order_by(ValidProcessedMeasurement.timestamp_zone.desc()).first().timestamp_zone
-        
         return valid_processed_measurement_timestamp
     else:
         raise TypeError("The qHAWAX name should be string")
@@ -340,10 +357,8 @@ def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
     :param final_timestamp: last search date
 
     """
-    qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
-    if qhawax_id is None:
-        return None
-    
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+
     if sensor == 'CO':
         datos = AirQualityMeasurement.CO
         hoursPerSensor = 8
@@ -371,13 +386,5 @@ def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
                                       filter(AirQualityMeasurement.timestamp_zone > initial_timestamp). \
                                       filter(AirQualityMeasurement.timestamp_zone < final_timestamp). \
                                       order_by(AirQualityMeasurement.timestamp_zone).all()
-    sum = 0        
-
-    if len(resultado) == 0 :
-        return 0
-    else :
-        for i in range(len(resultado)):
-            sum = sum + resultado[i][0]
-        promf = sum /len(resultado)
         
-    return promf
+    return util_helper.getAverage(resultado)

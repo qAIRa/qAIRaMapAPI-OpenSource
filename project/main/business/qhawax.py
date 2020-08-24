@@ -61,22 +61,9 @@ def updateIncaData():
         value_inca = req_json['value_inca']
         post_business_helper.updateMainIncaInDB(value_inca, name)
         return make_response('OK', 200)
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format. Exception="%s"' % (e), 400)
-
-
-@app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
-def getQhawaxProcessedLatestTimestamp():
-    """
-    To get qHAWAX Processed Measurement latest timestamp
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    qhawax_name = request.args.get('qhawax_name')
-    return str(get_business_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name))
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/qhawax_change_status_off/', methods=['POST'])
 def sendQhawaxStatusOff():
@@ -92,15 +79,18 @@ def sendQhawaxStatusOff():
     :param qhawax_lost_timestamp: the last time qHAWAX send measurement with timezone
 
     """
-    req_json = request.get_json()   
-    post_business_helper.saveStatusOff(req_json)
-    qhawax_name = str(req_json['qhawax_name']).strip()
-    observation_type="Interna"
-    description="Se apagó el qHAWAX"
-    person_in_charge = None
-    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-    return make_response('Success', 200)
-
+    req_json = request.get_json()
+    try:
+        post_business_helper.saveStatusOff(req_json)
+        qhawax_name = str(req_json['qhawax_name']).strip()
+        observation_type="Interna"
+        description="Se apagó el qHAWAX"
+        person_in_charge = None
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        return make_response('Success', 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/qhawax_change_status_on/', methods=['POST'])
 def sendQhawaxStatusOn():
@@ -114,15 +104,19 @@ def sendQhawaxStatusOn():
 
     """
     req_json = request.get_json()
-    qhawax_name = str(req_json['qhawax_name']).strip()
-    post_business_helper.saveStatusOn(qhawax_name) 
-    post_business_helper.saveTurnOnLastTime(qhawax_name)
-    post_business_helper.updateMainIncaInDB(0,qhawax_name)
-    observation_type="Interna"
-    description="Se prendió el qHAWAX"
-    person_in_charge = None
-    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-    return make_response('Success', 200)
+    try:
+        qhawax_name = str(req_json['qhawax_name']).strip()
+        post_business_helper.saveStatusOn(qhawax_name) 
+        post_business_helper.saveTurnOnLastTime(qhawax_name)
+        post_business_helper.updateMainIncaInDB(0,qhawax_name)
+        observation_type="Interna"
+        description="Se prendió el qHAWAX"
+        person_in_charge = None
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        return make_response('Success', 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 
 @app.route('/api/get_time_all_active_qhawax/', methods=['GET'])
@@ -134,8 +128,8 @@ def getTimeAllActiveQhawax():
     :param name: qHAWAX name
 
     """
-    name = request.args.get('name')
     try:
+        name = request.args.get('name')
         values = get_business_helper.getTimeQhawaxHistory(name)
         if(values is not None):
             values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
@@ -160,8 +154,8 @@ def createQhawax():
     :param qhawax_type: qHAWAX type (it could be STATIC or AEREO)
 
     """
+    req_json = request.get_json()
     try:
-        req_json = request.get_json()
         qhawax_name=str(req_json['qhawax_name']).strip() 
         qhawax_type=str(req_json['qhawax_type']).strip()
         if(get_business_helper.qhawaxNameIsNew(qhawax_name)):
@@ -181,9 +175,9 @@ def createQhawax():
                 post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
             return make_response('qHAWAX & Sensors have been created', 200)
         return make_response('The qHAWAX name entered already exists ', 200)
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 
 @app.route('/api/change_to_calibration/', methods=['POST'])
@@ -197,10 +191,9 @@ def qhawaxChangeToCalibration():
     :param qhawax_name: qHAWAX name
 
     """
+    req_json = request.get_json()
     try:
-        req_json = request.get_json()
         qhawax_name = str(req_json['qhawax_name']).strip()
-
         flag_costumer = get_business_helper.isItFieldQhawax(qhawax_name)
         if(flag_costumer == True):
             post_business_helper.saveTimeQhawaxOff(qhawax_name)
@@ -211,9 +204,9 @@ def qhawaxChangeToCalibration():
         person_in_charge = req_json['person_in_charge']
         post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('Success', 200)
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/end_calibration/', methods=['POST'])
 def qhawaxEndCalibration():
@@ -226,8 +219,8 @@ def qhawaxEndCalibration():
     :param qhawax_name: qHAWAX name
 
     """
+    req_json = request.get_json()
     try:
-        req_json = request.get_json()
         qhawax_name = str(req_json['qhawax_name']).strip()
         flag_costumer = get_business_helper.isItFieldQhawax(qhawax_name)
         if(flag_costumer == True):
@@ -243,10 +236,25 @@ def qhawaxEndCalibration():
         person_in_charge = req_json['person_in_charge']
         post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
         return make_response('Success', 200)
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
+@app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
+def getQhawaxProcessedLatestTimestamp():
+    """
+    To get qHAWAX Processed Measurement latest timestamp
+
+    :type qhawax_name: string
+    :param qhawax_name: qHAWAX name
+
+    """
+    try:
+        qhawax_name = request.args.get('qhawax_name')
+        return str(get_business_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name))
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxValidProcessedLatestTimestamp():
@@ -257,7 +265,11 @@ def getQhawaxValidProcessedLatestTimestamp():
     :param qhawax_name: qHAWAX name
 
     """
-    qhawax_name = request.args.get('qhawax_name')
-    return str(get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
+    try:
+        qhawax_name = request.args.get('qhawax_name')
+        return str(get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 

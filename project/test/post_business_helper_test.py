@@ -7,7 +7,6 @@ class TestPostBusinessData(unittest.TestCase):
 	Test of Post Business Functions
 
 	"""
-
 	def test_create_company_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.createCompany)
 		self.assertRaises(TypeError,post_business_helper.createCompany,4,None)

@@ -74,17 +74,14 @@ def saveOffsets():
     try:
         qhawax_name = str(req_json['product_id']).strip()
         offsets = req_json['offsets']
-        try:
-            post_business_helper.updateOffsetsFromProductID(qhawax_name, offsets)
-            description="Se actualizaron constantes offsets"
-            observation_type="Interna"
-            person_in_charge = req_json['person_in_charge']
-            post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-            return make_response('Success', 200)
-        except TypeError as e:
-            json_message = jsonify({'error': '\'%s\'' % (e)})
-            return make_response(json_message, 400)
-    except KeyError as e:
+        person_in_charge = req_json['person_in_charge']
+        post_business_helper.updateOffsetsFromProductID(qhawax_name, offsets)
+        description="Se actualizaron constantes offsets"
+        observation_type="Interna"
+        person_in_charge = person_in_charge
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        return make_response('Success', 200)
+    except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
         return make_response(json_message, 400)
 
@@ -104,16 +101,15 @@ def saveControlledOffsets():
     try:
         qhawax_name = str(req_json['product_id']).strip()
         controlled_offsets = req_json['controlled_offsets']
-    except KeyError as e:
+        post_business_helper.updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets)
+        description="Se actualizaron constantes controladas"
+        observation_type="Interna"
+        person_in_charge = req_json['person_in_charge']
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        return make_response('Success', 200)
+    except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
         return make_response(json_message, 400)
-
-    post_business_helper.updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets)
-    description="Se actualizaron constantes controladas"
-    observation_type="Interna"
-    person_in_charge = req_json['person_in_charge']
-    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-    return make_response('Success', 200)
 
 @app.route('/api/save_non_controlled_offsets/', methods=['POST'])
 def saveNonControlledOffsets():
@@ -131,16 +127,16 @@ def saveNonControlledOffsets():
     try:
         qhawax_name = str(req_json['product_id']).strip()
         non_controlled_offsets = req_json['non_controlled_offsets']
-    except KeyError as e:
+        post_business_helper.updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
+        description="Se actualizaron constantes no controladas"
+        observation_type="Interna"
+        person_in_charge = req_json['person_in_charge']
+        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        return make_response('Success', 200)
+    except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
         return make_response(json_message, 400)
 
-    post_business_helper.updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
-    description="Se actualizaron constantes no controladas"
-    observation_type="Interna"
-    person_in_charge = req_json['person_in_charge']
-    post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-    return make_response('Success', 200)
 
 @app.route('/api/measurementPromedio/', methods=['GET'])
 def requestProm():

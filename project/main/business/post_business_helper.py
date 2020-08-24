@@ -27,14 +27,17 @@ def updateOffsetsFromProductID(qhawax_name, offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        if(isinstance(offsets, dict)):
+            qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
-        for sensor_type in offsets:
-            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                     update(values=offsets[sensor_type])
-        session.commit()
+            for sensor_type in offsets:
+                session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
+                                         update(values=offsets[sensor_type])
+            session.commit()
+        else:
+            raise TypeError("The Json Offset "+str(offsets)+" should be in Json Format")
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
     """
@@ -48,15 +51,18 @@ def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        if(isinstance(controlled_offsets, dict)):
+            qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
-        for sensor_type in controlled_offsets:
-            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                     update(values=controlled_offsets[sensor_type])
-    
-        session.commit()
+            for sensor_type in controlled_offsets:
+                session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
+                                         update(values=controlled_offsets[sensor_type])
+        
+            session.commit()
+        else:
+            raise TypeError("The Json Controlled Offset "+str(controlled_offsets)+" should be in Json Format")
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 
 def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets):
@@ -71,15 +77,18 @@ def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
 
     """
     if(isinstance(qhawax_name, str)):
-        qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        if(isinstance(non_controlled_offsets, dict)):
+            qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
-        for sensor_type in non_controlled_offsets:
-            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                     update(values=non_controlled_offsets[sensor_type])
-    
-        session.commit()
+            for sensor_type in non_controlled_offsets:
+                session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
+                                         update(values=non_controlled_offsets[sensor_type])
+        
+            session.commit()
+        else:
+            raise TypeError("The Json Non Controlled Offset "+str(controlled_offsets)+" should be in Json Format")
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 
 def updateMainIncaInDB(new_main_inca, qhawax_name):
