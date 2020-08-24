@@ -86,7 +86,7 @@ def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
         
             session.commit()
         else:
-            raise TypeError("The Json Non Controlled Offset "+str(controlled_offsets)+" should be in Json Format")
+            raise TypeError("The Json Non Controlled Offset "+str(non_controlled_offsets)+" should be in Json Format")
     else:
         raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
