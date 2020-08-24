@@ -57,7 +57,6 @@ def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
             for sensor_type in controlled_offsets:
                 session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
                                          update(values=controlled_offsets[sensor_type])
-        
             session.commit()
         else:
             raise TypeError("The Json Controlled Offset "+str(controlled_offsets)+" should be in Json Format")
@@ -83,7 +82,6 @@ def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
             for sensor_type in non_controlled_offsets:
                 session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
                                          update(values=non_controlled_offsets[sensor_type])
-        
             session.commit()
         else:
             raise TypeError("The Json Non Controlled Offset "+str(non_controlled_offsets)+" should be in Json Format")
