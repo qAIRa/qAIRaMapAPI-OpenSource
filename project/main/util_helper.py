@@ -2,12 +2,50 @@ import datetime
 import dateutil
 import dateutil.parser
 import time
-from project import app
 
 pollutant=['SO2','NO2','O3','CO','H2S']
 pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
 pollutant_25C=[2.62,1.88,1.96,1.15,1.39]
+
+def getAverage(resultado):
+    sum = 0        
+
+    if len(resultado) == 0 :
+        return 0
+    else :
+        for i in range(len(resultado)):
+            sum = sum + resultado[i][0]
+        promf = sum /len(resultado)
+
+    return promf
+
+def gasSensorJson(json,sensors):
+    all_sensors=['CO','SO2','H2S','O3','NO','NO2']
+    
+    initial = {}
+
+    for sensor in all_sensors:
+        initial[sensor] = json
+
+    for sensor in sensors:
+        sensor_dict = sensor._asdict()
+        initial[sensor_dict.pop('type')] = sensor_dict
+
+    return initial
+
+def getColorBaseOnIncaValue(qhawax_inca):
+    if qhawax_inca == 50:
+        resultado = 'green'
+    elif qhawax_inca == 100:
+        resultado = 'yellow'
+    elif qhawax_inca == 500:
+        resultado = 'orange'
+    elif qhawax_inca == 600:
+        resultado = 'red'
+    else:
+        resultado = 'green'
+    return resultado
 
 def validAndBeautyJsonProcessed(data_json):
     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 

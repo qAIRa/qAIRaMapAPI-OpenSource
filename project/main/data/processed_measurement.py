@@ -1,19 +1,17 @@
 from flask import jsonify, make_response, request
 import datetime
 from datetime import timedelta
+import json
 import pytz
 import dateutil.parser
 import dateutil.tz
-import os
 from project import app, db, socketio
-from project.database.models import Qhawax, ProcessedMeasurement
-import project.main.data.data_helper as helper
+import project.main.data.post_data_helper as post_data_helper
+import project.main.data.get_data_helper as get_data_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
-from sqlalchemy import or_
-import csv
 
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
@@ -32,7 +30,7 @@ def getProcessedData():
         if request.args.get('interval_minutes') is not None else 60 
     final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
     initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes) 
-    processed_measurements = helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+    processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
     if processed_measurements is not None:
         processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
         return make_response(jsonify(processed_measurements_list), 200)
@@ -96,34 +94,29 @@ def handleProcessedData():
 
     """
     try:
-        flag_email = False
         data_json = request.get_json()
         product_id = data_json['ID']
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
-        helper.storeProcessedDataInDB(data_json)
+        post_data_helper.storeProcessedDataInDB(data_json)
         qhawax_id = same_helper.getQhawaxID(product_id)
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
-        mode = helper.getQhawaxMode(qhawax_id)
-        inca_value = helper.getMainIncaQhawaxTable(product_id)
-        if(inca_value == -1): 
-            post_business_helper.saveStatusOn(product_id)
-            post_business_helper.saveTurnOnLastTime(product_id)
-            post_business_helper.updateMainIncaInDB(0,product_id)
-            description="Se prendió el qHAWAX"
-            observation_type="Interna"
-            post_business_helper.writeBitacora(product_id,observation_type,description,None,None,None)
+        mode = get_data_helper.getQhawaxMode(qhawax_id)
+        inca_value = same_helper.getMainIncaQhawaxTable(qhawax_id)
         if(mode == "Cliente"):
-            qhawax_zone = helper.getNoiseData(product_id)
+            qhawax_zone = get_data_helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone
-            minutes_difference,last_time_turn_on = helper.getHoursDifference(qhawax_id)
+            minutes_difference,last_time_turn_on = get_data_helper.getHoursDifference(qhawax_id)
+            socket_json =  json.dumps(data_json)
             if(minutes_difference!=None):
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
+                        post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
+                        socketio.emit('new_data_summary_valid', socket_json) 
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
+                        post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
+                        socketio.emit('new_data_summary_valid', socket_json)
         socketio.emit('new_data_summary_processed', data_json)
         return make_response('OK', 200)
     except TypeError as e:
@@ -151,7 +144,7 @@ def getAverageProcessedMeasurementsTimePeriod():
     initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
     
-    processed_measurements = helper.queryDBProcessed(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
+    processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
 
     if processed_measurements is not None:
         processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
@@ -180,40 +173,10 @@ def getProcessedMeasurementsTimePeriod():
     initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
 
-    processed_measurements = helper.queryDBProcessed(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
+    processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
     if processed_measurements is not None:
         processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
         return make_response(jsonify(processed_measurements_list), 200)
     return make_response(jsonify('Measurements not found'), 404)
 
-@app.route('/api/importProcessedData/', methods=['POST'])
-def importProcessedData():
-    """
-    To list all measurement of processed measurement table in a define period of time
-
-    :type csv_file: string
-    :param csv_file: csv of measurement from qhAWAX
-
-    """
-    try:
-        file = request.args.get('csv_file')
-        with open(file, 'r') as f:
-            reader = csv.reader(f)
-            next(reader) # Skip the header row.
-            for row in reader:
-                data_json = {"ID": row[0], "timestamp": row[1], "temperature": float(row[2]), "pressure": float(row[3]), "humidity": float(row[4]), "spl": float(row[5]),
-                        "UV": float(row[6]), "UVA": float(row[7]), "UVB": float(row[8]),"CO": float(row[9]), "H2S": float(row[10]), "NO2": float(row[11]), "O3": float(row[12]), 
-                        "SO2": float(row[13]),"PM1": float(row[14]), "PM25": float(row[15]), "PM10": float(row[16]), "lat": float(row[17]), "lon": float(row[18]),"VOC": 0.0 }
-                data_json = util_helper.checkNegatives(data_json)
-                product_id = data_json['ID']
-                arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
-                data_json = util_helper.gasConversionPPBtoMG(data_json, arr_season)
-                data_json = util_helper.roundUpThree(data_json)
-                qhawax_id = same_helper.getQhawaxID(product_id)
-                helper.storeProcessedDataInDB(data_json)
-                helper.storeValidProcessedDataInDB(data_json, qhawax_id, product_id)
-        return make_response('OK', 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
 

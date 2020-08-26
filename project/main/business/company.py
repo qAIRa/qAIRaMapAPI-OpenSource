@@ -26,6 +26,6 @@ def createCompany():
             post_business_helper.createCompany(req_json)
             return make_response('Company has been created', 200)
         return make_response('The company name or ruc entered already exists ', 200)
-    except Exception as e:
-        print(e)
-        return make_response('Invalid format', 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)

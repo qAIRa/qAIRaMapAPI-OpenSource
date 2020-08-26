@@ -2,12 +2,9 @@ from flask import jsonify, make_response, request
 import datetime
 import dateutil.parser
 import dateutil.tz
-import os
-
 from project import app, db, socketio
-from project.database.models import EcaNoise
-import project.main.data.data_helper as helper
-from sqlalchemy import or_
+import project.main.data.post_data_helper as post_data_helper
+import project.main.data.get_data_helper as get_data_helper
 
 @app.route('/api/saveGasInca/', methods=['POST'])
 def handleGasInca():
@@ -18,8 +15,8 @@ def handleGasInca():
 
     Json input of Air Measurement
 
-    :type timestamp: string
-    :param timestamp: timestamp with time zone
+    :type timestamp_zone: string
+    :param timestamp_zone: timestamp with time zone
 
     :type CO: double
     :param CO: value of CO measurement
@@ -48,7 +45,7 @@ def handleGasInca():
     """
     try:
         data_json = request.get_json()
-        helper.storeGasIncaInDB(data_json)
+        post_data_helper.storeGasIncaInDB(data_json)
         socketio.emit('gas_inca_summary', data_json)
         return make_response('OK', 200)
     except Exception as e:
@@ -65,12 +62,12 @@ def getLastGasIncaData():
     """
     final_timestamp_gases = datetime.datetime.now(dateutil.tz.tzutc())
     initial_timestamp_gases = final_timestamp_gases - datetime.timedelta(hours=1)
-    gas_inca_last_data = helper.queryDBGasInca(initial_timestamp_gases, final_timestamp_gases)
+    gas_inca_last_data = get_data_helper.queryDBGasInca(initial_timestamp_gases, final_timestamp_gases)
     gas_inca_last_data_list = []
     if gas_inca_last_data is not None:  
         for measurement in gas_inca_last_data:
             measurement = measurement._asdict()
-            measurement['qhawax_name'] = helper.getQhawaxName(measurement['qhawax_id'])[0]
+            measurement['qhawax_name'] = get_data_helper.getQhawaxName(measurement['qhawax_id'])[0]
             gas_inca_last_data_list.append(measurement)
         return make_response(jsonify(gas_inca_last_data_list), 200)
     else:
