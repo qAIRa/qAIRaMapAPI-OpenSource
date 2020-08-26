@@ -3,7 +3,7 @@ from project.database.models import Qhawax
 import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
-from project import app
+from project import app, socketio
 
 @app.route('/api/get_qhawax_inca/', methods=['GET'])
 def getIncaQhawaxInca():
@@ -56,11 +56,17 @@ def updateIncaData():
 
     """
     req_json = request.get_json()
+    jsonsend = {}
     try:
         name = str(req_json['name']).strip()
         value_inca = req_json['value_inca']
-        post_business_helper.updateMainIncaInDB(value_inca, name)
-        return make_response('OK', 200)
+        post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
+        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+            post_business_helper.updateMainIncaInDB(value_inca, name)
+        jsonsend['main_inca'] = new_main_inca
+        jsonsend['name'] = qhawax_name 
+        socketio.emit('update_inca', jsonsend)
+        return make_response('Success: Save new inca value', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -68,7 +74,7 @@ def updateIncaData():
 @app.route('/api/qhawax_change_status_off/', methods=['POST'])
 def sendQhawaxStatusOff():
     """
-    Set qHAWAX OFF  
+    Endpoint to set qHAWAX OFF because script detect no new data within five minutes
 
     Json input of following fields:
 
@@ -80,14 +86,20 @@ def sendQhawaxStatusOff():
 
     """
     req_json = request.get_json()
+    jsonsend = {}
     try:
-        post_business_helper.saveStatusOff(req_json)
-        qhawax_name = str(req_json['qhawax_name']).strip()
-        observation_type="Interna"
+        name = str(req_json['qhawax_name']).strip()
+        qhawax_time_off = req_json['qhawax_lost_timestamp']
+        post_business_helper.saveStatusOffQhawaxTable(name)
+        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+            post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
+        jsonsend['main_inca'] = -1
+        jsonsend['name'] = qhawax_name 
+        socketio.emit('update_inca', jsonsend)
         description="Se apagó el qHAWAX"
         person_in_charge = None
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-        return make_response('Success', 200)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        return make_response('Success: qHAWAX off', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -95,7 +107,7 @@ def sendQhawaxStatusOff():
 @app.route('/api/qhawax_change_status_on/', methods=['POST'])
 def sendQhawaxStatusOn():
     """
-    Set qHAWAX ON   
+    Set qHAWAX ON due to module reset (sensors reset) 
 
     Json input of following fields:
     
@@ -104,16 +116,18 @@ def sendQhawaxStatusOn():
 
     """
     req_json = request.get_json()
+    jsonsend = {}
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
-        post_business_helper.saveStatusOn(qhawax_name) 
-        post_business_helper.saveTurnOnLastTime(qhawax_name)
-        post_business_helper.updateMainIncaInDB(0,qhawax_name)
-        observation_type="Interna"
-        description="Se prendió el qHAWAX"
+        post_business_helper.saveStatusOn(qhawax_name)
+        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+            post_business_helper.saveTurnOnLastTime(qhawax_name)
+        jsonsend['main_inca'] = 0
+        jsonsend['name'] = qhawax_name 
+        description="Se prendió el qHAWAX luego de un reinicio del modulo"
         person_in_charge = None
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-        return make_response('Success', 200)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        return make_response('Success: qHAWAX ON physically', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -165,15 +179,14 @@ def createQhawax():
             else:
                 post_business_helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
             description="Se registró qHAWAX"
-            observation_type="Interna"
             person_in_charge = req_json['person_in_charge']
-            post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+            post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
             last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
             if(last_gas_sensor_id ==None):
                 post_business_helper.insertDefaultOffsets(0,qhawax_name)
             else:
                 post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
-            return make_response('qHAWAX & Sensors have been created', 200)
+            return make_response('Success: qHAWAX & Sensors have been created', 200)
         return make_response('The qHAWAX name entered already exists ', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
@@ -190,20 +203,24 @@ def qhawaxChangeToCalibration():
     :type qhawax_name: string
     :param qhawax_name: qHAWAX name
 
+    :type person_in_charge: string
+    :param person_in_charge: username who change mode to calibration
+
     """
     req_json = request.get_json()
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
-        flag_costumer = get_business_helper.isItFieldQhawax(qhawax_name)
-        if(flag_costumer == True):
-            post_business_helper.saveTimeQhawaxOff(qhawax_name)
-        post_business_helper.updateMainIncaInDB(-2,qhawax_name)
+        qhawax_time_off = now.replace(tzinfo=None)
+        post_business_helper.saveStatusOffQhawaxTable(qhawax_name)
+        post_business_helper.updateMainIncaQhawaxTable(-2,qhawax_name)
+        if(get_business_helper.getQhawaxMode(qhawax_name)=='Cliente'):
+            post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
+            post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qhawax_name)
         post_business_helper.changeMode(qhawax_name,"Calibracion")
-        observation_type="Interna"
         description="Se cambió a modo calibracion"
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-        return make_response('Success', 200)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        return make_response('Success: qHAWAX have changed to calibration mode', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -222,20 +239,22 @@ def qhawaxEndCalibration():
     req_json = request.get_json()
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
+        person_in_charge = str(req_json['person_in_charge'])
         flag_costumer = get_business_helper.isItFieldQhawax(qhawax_name)
         if(flag_costumer == True):
-            post_business_helper.saveTimeQhawaxOn(qhawax_name)
-            post_business_helper.changeMode(qhawax_name,"Cliente")
+            post_business_helper.turnOnAfterCalibration(qhawax_name)
+            mode = "Cliente"
             description="Se cambió a modo cliente"
-            post_business_helper.updateMainIncaInDB(0,qhawax_name)
+            main_inca = 0
         else:
-            post_business_helper.changeMode(qhawax_name,"Stand By")
+            mode = "Stand By"
             description="Se cambió a modo stand by"
-            post_business_helper.updateMainIncaInDB(-1,qhawax_name)
-        observation_type="Interna"
-        person_in_charge = req_json['person_in_charge']
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-        return make_response('Success', 200)
+            main_inca = -1
+        post_business_helper.changeMode(qhawax_name,mode)
+        post_business_helper.updateMainIncaQhawaxTable(main_inca, qhawax_name)
+        post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qhawax_name)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        return make_response('Success: qHAWAX have changed to original mode', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

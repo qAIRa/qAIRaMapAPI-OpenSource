@@ -11,8 +11,8 @@ script:
 after_success: coveralls
 env:
   global:
-    - SQLALCHEMY_DATABASE_URI:'postgres://qaira:$3cq4IR4@qairamap-db-dev.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/qairamap_db'
-    - SECRET_KEY:my_precious
+    - SQLALCHEMY_DATABASE_URI:"postgres://qaira:$3cq4IR4@qairamap-db-dev.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/qairamap_db"
+    - SECRET_KEY:"my_precious"
 notifications:
   email:
     recipients:

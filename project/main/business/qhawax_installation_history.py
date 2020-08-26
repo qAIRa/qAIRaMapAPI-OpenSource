@@ -69,11 +69,10 @@ def newQhawaxInstallation():
         post_business_helper.setModeCustomer(qhawax_id)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
         description="Se registró qHAWAX en campo"
-        observation_type="Interna"
         person_in_charge = data_json['person_in_charge']
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-        return make_response('OK', 200)
-    except TypeError as e:
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        return make_response('Success: Save new qHAWAX in field', 200)
+    except Exception as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
@@ -95,16 +94,15 @@ def saveEndWorkField():
     data_json = request.get_json()
     try:
         qhawax_id = data_json['qhawax_id']
-        installation_id = helper.getInstallationId(qhawax_id)
-        post_business_helper.saveEndWorkFieldDate(installation_id, data_json['end_date'])
+        end_date = data_json['end_date']
+        post_business_helper.saveEndWorkFieldDate(qhawax_id, end_date)
         post_business_helper.setAvailableQhawax(qhawax_id)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
         post_business_helper.changeMode(qhawax_name, "Stand By")
         description="Se registró fin de trabajo en campo"
-        observation_type="Interna"
         person_in_charge = data_json['person_in_charge']
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
-        return make_response('OK', 200)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        return make_response('Success: Save qHAWAX last day in field', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -156,6 +154,69 @@ def getInstallationDate():
                 return str(installation_date)
         else:
             return make_response(jsonify("qHAWAX ID "+str(qhawax_id)+" is not in field"), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/updateQhawaxInstallation/', methods=['POST'])
+def updateQhawaxInstallation():
+    """
+    To create a qHAWAX in Field 
+    
+    Json input of following fields:
+    
+    :type  qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type  lat: double
+    :param lat: latitude of qHAWAX location
+
+    :type  lon: double
+    :param lon: longitude of qHAWAX location
+
+    :type  link_report: string
+    :param link_report: link of installation report
+
+    :type  observations: string
+    :param observations: installation detail
+
+    :type  district: string
+    :param district: district where qHAWAX is located
+
+    :type  comercial_name: string
+    :param comercial_name: qHAWAX comercial name
+
+    :type  address: string
+    :param address: address where qHAWAX is located
+
+    :type  company_id: integer
+    :param company_id: company ID to which qHAWAX belongs
+
+    :type  eca_noise_id: integer
+    :param eca_noise_id: ID of type of qHAWAX zone
+
+    :type  qhawax_id: integer
+    :param qhawax_id: qHAWAX ID
+
+    :type  connection_type: string
+    :param connection_type: Type of qHAWAX connection
+
+    :type  measuring_height: integer
+    :param measuring_height: Height of qHAWAX in field
+
+    :type  season: string
+    :param season: season of the year when the module was deployed
+
+    """
+    try:
+        data_json = request.get_json()
+        qhawax_id = int(data_json['qhawax_id'])
+        post_business_helper.updateQhawaxInstallation(data_json)
+        qhawax_name = same_helper.getQhawaxName(qhawax_id)
+        description="Se modificaron algunos campos de la instalación del qHAWAX"
+        person_in_charge = data_json['person_in_charge']
+        helper.writeBitacora(qhawax_name,description,person_in_charge)
+        return make_response('Sucess: Update data of qHAWAX in field', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

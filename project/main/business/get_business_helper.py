@@ -92,7 +92,7 @@ def getOffsetsFromProductID(qhawax_name):
 
         return initial_offset_json
     else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
 
 
 def getControlledOffsetsFromProductID(qhawax_name):
@@ -113,7 +113,7 @@ def getControlledOffsetsFromProductID(qhawax_name):
 
         return initial_controlled_offsets
     else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
 
 def getNonControlledOffsetsFromProductID(qhawax_name):
     """
@@ -133,7 +133,7 @@ def getNonControlledOffsetsFromProductID(qhawax_name):
 
         return initial_non_controlled_offsets
     else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
 
 def queryIncaQhawax(name):
     """
@@ -148,7 +148,7 @@ def queryIncaQhawax(name):
         qhawax_inca = same_helper.getMainIncaQhawaxTable(qhawax_id)
         return util_helper.getColorBaseOnIncaValue(qhawax_inca)
     else:
-        raise TypeError("The qHAWAX name "+str(name)+" should be string")
+        raise TypeError("qHAWAX name "+str(name)+" should be string")
 
 def getInstallationDate(qhawax_id):
     """
@@ -227,7 +227,7 @@ def qhawaxNameIsNew(name):
             return True
         return False
     else:
-        raise TypeError("The qHAWAX name "+str(name)+" should be string")
+        raise TypeError("qHAWAX name "+str(name)+" should be string")
 
 def companyNameIsNew(name):
     """
@@ -243,7 +243,7 @@ def companyNameIsNew(name):
             return True
         return False
     else:
-        raise TypeError("The company name "+str(name)+" should be string")
+        raise TypeError("Company name "+str(name)+" should be string")
 
 def companyRucIsNew(ruc):
     """
@@ -275,7 +275,7 @@ def isItFieldQhawax(qhawax_name):
             return True
         return False
     else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
 
 def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
     """
@@ -296,7 +296,7 @@ def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
                                                       order_by(ProcessedMeasurement.id.desc()).first().timestamp_zone
         return processed_measurement_timestamp
     else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
 
 
 def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
@@ -319,7 +319,7 @@ def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
                                                                 .order_by(ValidProcessedMeasurement.timestamp_zone.desc()).first().timestamp_zone
         return valid_processed_measurement_timestamp
     else:
-        raise TypeError("The qHAWAX name should be string")
+        raise TypeError("qHAWAX name should be string")
 
 def queryQhawaxInFieldInPublicMode():
     """
@@ -388,3 +388,8 @@ def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
                                       order_by(AirQualityMeasurement.timestamp_zone).all()
         
     return util_helper.getAverage(resultado)
+
+
+def getQhawaxMode(qhawax_name):
+    return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
+

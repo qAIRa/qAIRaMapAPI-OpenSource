@@ -16,6 +16,13 @@ def verifyIfQhawaxExistBaseOnID(qhawax_id):
         raise TypeError("The qHAWAX ID "+str(qhawax_id)+" has not been found")
     return True
 
+def verifyIfQhawaxExistBaseOnName(qhawax_name):
+    if(isinstance(qhawax_name, str)):   
+        qhawax_list = session.query(Qhawax.name).filter_by(name=qhawax_name).all()
+        if(qhawax_list == []):
+            raise TypeError("The qHAWAX name "+str(qhawax_name)+" has not been found")
+        return True
+
 def verifyIfQhawaxInstallationExistBaseOnID(installation_id):
     if(type(installation_id) not in [int]):
         raise TypeError("The qHAWAX installation ID "+str(installation_id)+" should be int")
@@ -42,14 +49,9 @@ def getQhawaxID(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    if(isinstance(qhawax_name, str)):
-        qhawax_list = session.query(Qhawax.id).filter_by(name= qhawax_name).all()
-        if(qhawax_list == []):
-            raise TypeError("The qHAWAX name "+str(qhawax_name)+" has not been found")
+    if(verifyIfQhawaxExistBaseOnName(qhawax_name)):
         qhawax_id = session.query(Qhawax.id).filter_by(name= qhawax_name).first()[0]
         return qhawax_id
-    else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
 
 def getQhawaxName(qhawax_id):
     """

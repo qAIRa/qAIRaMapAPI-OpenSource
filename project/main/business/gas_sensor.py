@@ -77,9 +77,8 @@ def saveOffsets():
         person_in_charge = req_json['person_in_charge']
         post_business_helper.updateOffsetsFromProductID(qhawax_name, offsets)
         description="Se actualizaron constantes offsets"
-        observation_type="Interna"
         person_in_charge = person_in_charge
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         return make_response('Success', 200)
     except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
@@ -103,9 +102,8 @@ def saveControlledOffsets():
         controlled_offsets = req_json['controlled_offsets']
         post_business_helper.updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets)
         description="Se actualizaron constantes controladas"
-        observation_type="Interna"
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         return make_response('Success', 200)
     except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
@@ -129,9 +127,8 @@ def saveNonControlledOffsets():
         non_controlled_offsets = req_json['non_controlled_offsets']
         post_business_helper.updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
         description="Se actualizaron constantes no controladas"
-        observation_type="Interna"
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.writeBinnacle(qhawax_name,observation_type,description,person_in_charge)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         return make_response('Success', 200)
     except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
