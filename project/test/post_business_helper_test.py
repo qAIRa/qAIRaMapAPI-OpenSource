@@ -18,9 +18,9 @@ class TestPostBusinessData(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH080",None,None,None)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH080",None,4,None)
-		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004",4,None)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004",None)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004")
+		self.assertRaises(TypeError,post_business_helper.writeBinnacle,None)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,80)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,80,None,None,None)
 
