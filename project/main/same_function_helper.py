@@ -20,8 +20,10 @@ def verifyIfQhawaxExistBaseOnName(qhawax_name):
     if(isinstance(qhawax_name, str)):   
         qhawax_list = session.query(Qhawax.name).filter_by(name=qhawax_name).all()
         if(qhawax_list == []):
-            raise TypeError("The qHAWAX name "+str(qhawax_name)+" has not been found")
+            raise TypeError("qHAWAX name "+str(qhawax_name)+" has not been found")
         return True
+    else:
+        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
 
 def verifyIfQhawaxInstallationExistBaseOnID(installation_id):
     if(type(installation_id) not in [int]):
@@ -68,15 +70,17 @@ def getQhawaxName(qhawax_id):
 def getInstallationId(qhawax_id):
     if(type(qhawax_id) not in [int]):
         raise TypeError("The qHAWAX id "+str(qhawax_id)+" should be int")
-    installation_id= session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
-                                    order_by(QhawaxInstallationHistory.installation_date_zone.desc()).all()
+    installation_id= session.query(QhawaxInstallationHistory.id).\
+                             filter_by(qhawax_id=qhawax_id). \
+                             filter(QhawaxInstallationHistory.end_date_zone == None). \
+                             order_by(QhawaxInstallationHistory.installation_date_zone.desc()).all()
     if(installation_id == []):
         return None
 
-    return session.query(QhawaxInstallationHistory.id).filter_by(qhawax_id=qhawax_id). \
-                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
-                                    order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0]
+    return session.query(QhawaxInstallationHistory.id).\
+                   filter_by(qhawax_id=qhawax_id). \
+                   filter(QhawaxInstallationHistory.end_date_zone == None). \
+                   order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0]
 
 def getInstallationIdBaseName(qhawax_name):
     qhawax_id = getQhawaxID(qhawax_name)
