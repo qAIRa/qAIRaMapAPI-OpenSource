@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource) [![Coverage Status](https://coveralls.io/repos/github/qAIRa/qairamapAPI-OpenSource/badge.svg?branch=development)](https://coveralls.io/github/qAIRa/qairamapAPI-OpenSource?branch=development) [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability)
+[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource) [![Coverage Status](https://coveralls.io/repos/github/qAIRa/qAIRaMapAPI-OpenSource/badge.svg?branch=master)](https://coveralls.io/github/qAIRa/qAIRaMapAPI-OpenSource?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability)
+
 
 #  qAIRa Map API
 
@@ -75,6 +76,19 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 Dont hesitate to contact us in [qAIRa Public Slack Channel](https://join.slack.com/t/qaira-publico/shared_invite/zt-e49w6375-9_vVmPdf8nFvXWfIvkagxw)
+
+## FAQs
+
+If you're encountering some oddities in the API, here's a list of resolutions to some of the problems you may be experiencing.
+
+Why am I getting a 404?
+The request could not be understood by the server due to malformed syntax. The client should not repeat the request without modifications
+
+Why am I not seeing all my results?
+Most API calls accessing a list of resources (e.g., users, issues, etc.). If you're making requests and receiving an incomplete set of results, a response is specified in an unsupported content type.
+
+Why am I getting a 500?
+Server Mistake - Indicates that something went wrong on the server that prevent the server from fulfilling the request.
 
 ## Issues 
 
