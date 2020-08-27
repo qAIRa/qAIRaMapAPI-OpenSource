@@ -7,7 +7,7 @@ install:
 - pip install coveralls
 script:
 - pytest -v --cov=project/main/
-- coverage run -m pytest project/main/
+- coverage run -m pytest project/test/
 after_success: coveralls
 env:
   global:
