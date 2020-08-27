@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource) [![Coverage Status](https://coveralls.io/repos/github/qAIRa/qAIRaMapAPI-OpenSource/badge.svg?branch=master)](https://coveralls.io/github/qAIRa/qAIRaMapAPI-OpenSource?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability)
+[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource) [![Coverage Status](https://coveralls.io/repos/github/qAIRa/qAIRaMapAPI-OpenSource/badge.svg?branch=master)](https://coveralls.io/github/qAIRa/qAIRaMapAPI-OpenSource?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability) [![Documentation Status](https://readthedocs.org/projects/qairamapapi-opensource/badge/?version=latest)](https://qairamapapi-opensource.readthedocs.io/en/latest/?badge=latest)
 
 
 #  qAIRa Map API
@@ -12,7 +12,7 @@ We work with modules, called qHAWAX, that capture data from gases, dust and envi
 Clone or download the project to the device where it will be used.
 
 ```
-git clone https://github.com/qAIRa/qairamapAPI.git
+git clone https://github.com/qAIRa/qAIRaMapAPI-OpenSource.git
 ```
 
 ### Prerequisites Ubuntu & Mac
