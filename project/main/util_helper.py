@@ -8,6 +8,15 @@ pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
 pollutant_25C=[2.62,1.88,1.96,1.15,1.39]
 
+
+def getValidTime(minutes_diff, date_util):
+    if(is_intance(minutes_diff) is not [int]):
+        raise TypeError("Variable "+str(minutes_diff)+" should be integer")
+
+    if(minutes_diff<5):
+        return date_util + datetime.timedelta(minutes=10)
+    return date_util + datetime.timedelta(hours=2)
+
 def getAverage(resultado):
     sum = 0        
 

@@ -162,7 +162,7 @@ def getTimeAllActiveQhawax():
             values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
             return make_response(jsonify(values_list), 200)
         else:
-            return make_response(jsonify('The qHAWAX name is not in field'), 200)
+            return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

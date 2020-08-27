@@ -84,14 +84,16 @@ def getInstallationId(qhawax_id):
 
     if(qhawaxExistBasedOnID(qhawax_id)):
         installation_id= session.query(QhawaxInstallationHistory.id).\
-                             filter_by(qhawax_id=qhawax_id).all()
+                                 filter_by(qhawax_id=qhawax_id).\
+                                 filter(QhawaxInstallationHistory.end_date_zone == None). \
+                                 all()
         if(installation_id == []):
             return None
 
-        return int(session.query(QhawaxInstallationHistory.id).\
+        return session.query(QhawaxInstallationHistory.id).\
                        filter_by(qhawax_id=qhawax_id). \
                        filter(QhawaxInstallationHistory.end_date_zone == None). \
-                       order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0])
+                       order_by(QhawaxInstallationHistory.installation_date_zone.desc()).first()[0]
     return None
 
 def getQhawaxName(qhawax_id):

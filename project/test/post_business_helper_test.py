@@ -142,10 +142,11 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets)
 		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,None)
 		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,None, None)
-		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,"50", "qH050")
+		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,"1", "qH001")
 		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,50,100)
-		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,"50",50)
+		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,"1",50)
 		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,50,None)
+		self.assertRaises(TypeError,post_business_helper.insertDefaultOffsets,True,"qH001")
 
 	def test_create_company_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.createCompany)

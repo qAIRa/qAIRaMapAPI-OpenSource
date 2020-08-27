@@ -322,12 +322,15 @@ def insertDefaultOffsets(last_gas_sensor_id, qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
+    if(type(last_gas_sensor_id) not in [int]):
+        raise TypeError("Gas Sensor ID should be integer")
+
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = int(same_helper.getQhawaxID(qhawax_name))
         initial_serial_number = qhawax_id*100
         start = 1
         for index in range(len(var_gases)):
-            sensor_data = {'id':int(last_gas_sensor_id)+start, 'qhawax_id':qhawax_id, 
+            sensor_data = {'id':last_gas_sensor_id+start, 'qhawax_id':qhawax_id, 
                            'serial_number': initial_serial_number + start, 'type': var_gases[index],
                            'WE': 0.0, 'AE': 0.0,'sensitivity': 0.0, 'sensitivity_2': 0.0,
                            'C0':0.0,'C1':0.0,'C2':0.0,'NC0':0.0,'NC1':0.0}

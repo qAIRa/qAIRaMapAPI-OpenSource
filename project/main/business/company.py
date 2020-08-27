@@ -24,8 +24,8 @@ def createCompany():
         ruc=str(req_json['ruc']).strip()
         if(get_business_helper.companyNameIsNew(company_name) and get_business_helper.companyRucIsNew(ruc)):
             post_business_helper.createCompany(req_json)
-            return make_response('Company has been created', 200)
-        return make_response('The company name or ruc entered already exists ', 200)
+            return make_response({'Succes':'Company has been created'}, 200)
+        return make_response({'Warning':'The company name or ruc entered already exists '}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

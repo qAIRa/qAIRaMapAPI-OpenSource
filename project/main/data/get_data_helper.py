@@ -20,7 +20,7 @@ def getQhawaxMode(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    if(same_helper.verifyIfQhawaxExistBaseOnID(qhawax_id)):
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         qhawax_mode = session.query(Qhawax.mode).filter_by(id=qhawax_id).one()[0]
         return qhawax_mode
     else:

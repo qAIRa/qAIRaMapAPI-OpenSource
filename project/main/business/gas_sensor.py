@@ -22,7 +22,7 @@ def requestOffsets():
         if(offsets is not None):
             return make_response(jsonify(offsets), 200)
         else:
-            return make_response(jsonify("qHAWAX name has not been found"), 200)
+            return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -42,7 +42,7 @@ def requestControlledOffsets():
         if(controlled_offsets is not None):
             return make_response(jsonify(controlled_offsets), 200)
         else:
-            return make_response(jsonify("qHAWAX name has not been found"), 200)
+            return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -62,7 +62,7 @@ def requestNonControlledOffsets():
         if(non_controlled_offsets is not None):
             return make_response(jsonify(non_controlled_offsets), 200)
         else:
-            return make_response(jsonify("qHAWAX name has not been found"), 200)
+            return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -83,12 +83,11 @@ def saveOffsets():
     try:
         qhawax_name = str(req_json['product_id']).strip()
         offsets = req_json['offsets']
+        description =req_json['description']
         person_in_charge = req_json['person_in_charge']
         post_business_helper.updateOffsetsFromProductID(qhawax_name, offsets)
-        description="Se actualizaron constantes offsets"
-        person_in_charge = person_in_charge
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success', 200)
+        return make_response({'Success':'Offsets have been updated'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
         return make_response(json_message, 400)
@@ -109,11 +108,11 @@ def saveControlledOffsets():
     try:
         qhawax_name = str(req_json['product_id']).strip()
         controlled_offsets = req_json['controlled_offsets']
-        post_business_helper.updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets)
-        description="Se actualizaron constantes controladas"
+        description =req_json['description']
         person_in_charge = req_json['person_in_charge']
+        post_business_helper.updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success', 200)
+        return make_response({'Success':'Controlled offsets have been updated'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
         return make_response(json_message, 400)
@@ -134,11 +133,11 @@ def saveNonControlledOffsets():
     try:
         qhawax_name = str(req_json['product_id']).strip()
         non_controlled_offsets = req_json['non_controlled_offsets']
-        post_business_helper.updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
-        description="Se actualizaron constantes no controladas"
+        description =req_json['description']
         person_in_charge = req_json['person_in_charge']
+        post_business_helper.updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success', 200)
+        return make_response({'Success':'Non Controlled offsets have been updated'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': 'Parameter \'%s\' is missing in JSON object' % (e)})
         return make_response(json_message, 400)
@@ -168,11 +167,9 @@ def requestProm():
     name = request.args.get('name')
     sensor = request.args.get('sensor')
     hoursSensor = request.args.get('hoursSensor')
-    minutes_diff = int(request.args.get('minutes_diff'))  
-    if(minutes_diff<5):
-        last_time_turn_on = dateutil.parser.parse(request.args.get('last_time_turn_on')) + datetime.timedelta(minutes=10)
-    elif(minutes_diff>=5):
-        last_time_turn_on = dateutil.parser.parse(request.args.get('last_time_turn_on')) + datetime.timedelta(hours=2)
+    minutes_diff = int(request.args.get('minutes_diff'))
+    date_util =  dateutil.parser.parse(request.args.get('last_time_turn_on'))
+    last_time_turn_on = getValidTime(minutes_diff, date_util)
     final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
     initial_timestamp = final_timestamp - datetime.timedelta(hours=int(hoursSensor))
     if(initial_timestamp.replace(tzinfo=None)>=last_time_turn_on.replace(tzinfo=None)):

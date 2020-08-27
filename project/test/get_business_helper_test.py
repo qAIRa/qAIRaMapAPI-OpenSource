@@ -13,7 +13,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,4.33)
 		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,5)
 		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,None)
-		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,"String_")
+		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,True)
 
 	def test_query_qhawax_mode_customer_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,4.33)
@@ -48,7 +48,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID)
 		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,4.33)
 		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,None)
-		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,"PUCP")
+		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,True)
 
 	def test_query_get_offsets_from_productID(self):
 		qhawax_name= 'qH001'
@@ -64,7 +64,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID)
 		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,4)
 		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,None)
-		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,"342")
+		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,True)
 
 	def test_query_get_controlled_offsets_from_productID(self):
 		qhawax_name= 'qH004'
@@ -80,7 +80,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID)
 		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,4)
 		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,None)
-		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,"342")
+		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,True)
 
 	def test_query_get_non_controlled_offsets_from_productID(self):
 		qhawax_name= 'qH001'
@@ -94,10 +94,9 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_query_inca_qhawax_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,True)
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,4)
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,None)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,"342")
+		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,True)
 
 	def test_query_inca_qhawax(self):
 		e1 = "green"

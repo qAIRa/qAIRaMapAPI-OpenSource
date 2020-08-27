@@ -18,7 +18,7 @@ def getEcaNoiseLimitById():
         if ecaNoiseInfo is not None:
             return make_response(jsonify(ecaNoiseInfo), 200)
         else:
-            return make_response(jsonify("Eca noise ID has not been found"), 200)
+            return make_response(jsonify({'Warning':'Eca noise ID has not been found'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -36,7 +36,7 @@ def getAllAreas():
         if allAreas is not None:
             allAreas_list = [{'area_name': area.area_name, 'id': area.id} for area in allAreas]
             return make_response(jsonify(allAreas_list), 200)
-        return make_response(jsonify('There are no areas recorded in database'), 200)
+        return make_response(jsonify({'Warning':'There are no areas recorded in database'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
