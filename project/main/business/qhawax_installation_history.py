@@ -153,7 +153,7 @@ def getInstallationDate():
             else:
                 return str(installation_date)
         else:
-            return make_response(jsonify("qHAWAX ID "+str(qhawax_id)+" is not in field"), 200)
+            return make_response(jsonify("qHAWAX ID "+str(qhawax_id)+" has not been found in field"), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

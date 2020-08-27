@@ -17,7 +17,9 @@ def getIncaQhawaxInca():
     try:
         name = request.args.get('name')
         inca_qhawax = get_business_helper.queryIncaQhawax(name)
-        return inca_qhawax
+        if(inca_qhawax is not None):
+            return make_response(jsonify(inca_qhawax), 200)
+        return make_response({'Warning':'qHAWAX name has not been found'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -32,11 +34,10 @@ def getActiveQhawaxModeCustomer():
     """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-        if qhawaxs is not None:
+        if qhawaxs is not []:
             qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
             return make_response(jsonify(qhawaxs_list), 200)
-        else:
-            return make_response(jsonify('There are no qHAWAXs in field'), 200)
+        return make_response({'Warning':'There are no qHAWAXs in field'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
@@ -64,9 +65,9 @@ def updateIncaData():
         if(get_business_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.updateMainIncaInDB(value_inca, name)
         jsonsend['main_inca'] = new_main_inca
-        jsonsend['name'] = qhawax_name 
+        jsonsend['name'] = name 
         socketio.emit('update_inca', jsonsend)
-        return make_response('Success: Save new inca value', 200)
+        return make_response({'Success':' save inca value'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -84,22 +85,28 @@ def sendQhawaxStatusOff():
     :type qhawax_lost_timestamp: string
     :param qhawax_lost_timestamp: the last time qHAWAX send measurement with timezone
 
+    :type description: string
+    :param description: qHAWAX description
+
+    :type person_in_charge: string
+    :param person_in_charge: person who did this action
+
     """
     req_json = request.get_json()
     jsonsend = {}
     try:
         name = str(req_json['qhawax_name']).strip()
         qhawax_time_off = req_json['qhawax_lost_timestamp']
+        description = req_json['description']
+        person_in_charge = req_json['person_in_charge']
         post_business_helper.saveStatusOffQhawaxTable(name)
         if(get_business_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
         jsonsend['main_inca'] = -1
-        jsonsend['name'] = qhawax_name 
+        jsonsend['name'] = name 
         socketio.emit('update_inca', jsonsend)
-        description="Se apagó el qHAWAX"
-        person_in_charge = None
-        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success: qHAWAX off', 200)
+        post_business_helper.writeBinnacle(name,description,person_in_charge)
+        return make_response({'Success': 'qHAWAX off'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -114,20 +121,26 @@ def sendQhawaxStatusOn():
     :type qhawax_name: string
     :param qhawax_name: qHAWAX name
 
+    :type description: string
+    :param description: qHAWAX description
+
+    :type person_in_charge: string
+    :param person_in_charge: person who did this action
+
     """
     req_json = request.get_json()
     jsonsend = {}
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
-        post_business_helper.saveStatusOn(qhawax_name)
-        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+        description = req_json['description']
+        person_in_charge = req_json['person_in_charge']
+        post_business_helper.saveStatusOnTable(qhawax_name)
+        if(get_business_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveTurnOnLastTime(qhawax_name)
         jsonsend['main_inca'] = 0
         jsonsend['name'] = qhawax_name 
-        description="Se prendió el qHAWAX luego de un reinicio del modulo"
-        person_in_charge = None
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success: qHAWAX ON physically', 200)
+        return make_response({'Success': 'qHAWAX ON physically'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -166,28 +179,34 @@ def createQhawax():
 
     :type qhawax_type: string
     :param qhawax_type: qHAWAX type (it could be STATIC or AEREO)
+    
+    :type description: string
+    :param description: qHAWAX description
+
+    :type person_in_charge: string
+    :param person_in_charge: person who did this action
 
     """
     req_json = request.get_json()
     try:
         qhawax_name=str(req_json['qhawax_name']).strip() 
         qhawax_type=str(req_json['qhawax_type']).strip()
+        person_in_charge = req_json['person_in_charge']
+        description = req_json['description']
         if(get_business_helper.qhawaxNameIsNew(qhawax_name)):
             last_qhawax_id = get_business_helper.queryGetLastQhawax()
             if(last_qhawax_id==None):
                 post_business_helper.createQhawax(1, qhawax_name,qhawax_type)
             else:
                 post_business_helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
-            description="Se registró qHAWAX"
-            person_in_charge = req_json['person_in_charge']
-            post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
             last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
             if(last_gas_sensor_id ==None):
                 post_business_helper.insertDefaultOffsets(0,qhawax_name)
             else:
                 post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
-            return make_response('Success: qHAWAX & Sensors have been created', 200)
-        return make_response('The qHAWAX name entered already exists ', 200)
+            post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+            return make_response({'Success': 'qHAWAX & Sensors have been created'}, 200)
+        return make_response({'Warning':'The qHAWAX name entered already exists '}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -203,13 +222,18 @@ def qhawaxChangeToCalibration():
     :type qhawax_name: string
     :param qhawax_name: qHAWAX name
 
+    :type description: string
+    :param description: qHAWAX description
+
     :type person_in_charge: string
-    :param person_in_charge: username who change mode to calibration
+    :param person_in_charge: username who change mode
 
     """
     req_json = request.get_json()
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
+        person_in_charge = req_json['person_in_charge']
+        description = req_json['description']
         qhawax_time_off = now.replace(tzinfo=None)
         post_business_helper.saveStatusOffQhawaxTable(qhawax_name)
         post_business_helper.updateMainIncaQhawaxTable(-2,qhawax_name)
@@ -217,10 +241,8 @@ def qhawaxChangeToCalibration():
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
             post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qhawax_name)
         post_business_helper.changeMode(qhawax_name,"Calibracion")
-        description="Se cambió a modo calibracion"
-        person_in_charge = req_json['person_in_charge']
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success: qHAWAX have changed to calibration mode', 200)
+        return make_response({'Success': 'qHAWAX have changed to calibration mode'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -234,6 +256,9 @@ def qhawaxEndCalibration():
     
     :type qhawax_name: string
     :param qhawax_name: qHAWAX name
+
+    :type person_in_charge: string
+    :param person_in_charge: username who change mode
 
     """
     req_json = request.get_json()
@@ -254,7 +279,7 @@ def qhawaxEndCalibration():
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qhawax_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success: qHAWAX have changed to original mode', 200)
+        return make_response({'Success': 'qHAWAX have changed to original mode'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -270,7 +295,13 @@ def getQhawaxProcessedLatestTimestamp():
     """
     try:
         qhawax_name = request.args.get('qhawax_name')
-        return str(get_business_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name))
+        processed_timestamp = get_business_helper.getLatestTimeInProcessedMeasurement(qhawax_name)
+        if(processed_timestamp is not None):
+            if(processed_timestamp is ""):
+                return make_response({'Warning':' qHAWAX name has not been found in Processed Measurement'},200)
+            return make_response(str(processed_timestamp),200)
+        else:
+            return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -286,7 +317,13 @@ def getQhawaxValidProcessedLatestTimestamp():
     """
     try:
         qhawax_name = request.args.get('qhawax_name')
-        return str(get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name))
+        valid_processed_timestamp = get_business_helper.getLatestTimeInValidProcessed(qhawax_name)
+        if(valid_processed_timestamp is not None):
+            if(valid_processed_timestamp is ""):
+                return make_response({'Warning':' qHAWAX name has not been found in Valid Processed Measurement'},200)
+            return make_response(str(valid_processed_timestamp),200)
+        else:
+            return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

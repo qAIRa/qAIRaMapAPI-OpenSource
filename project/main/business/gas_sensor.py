@@ -19,7 +19,10 @@ def requestOffsets():
     qhawax_name = request.args.get('ID')
     try:
         offsets = get_business_helper.getOffsetsFromProductID(qhawax_name)
-        return make_response(jsonify(offsets), 200)
+        if(offsets is not None):
+            return make_response(jsonify(offsets), 200)
+        else:
+            return make_response(jsonify("qHAWAX name has not been found"), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -36,7 +39,10 @@ def requestControlledOffsets():
     qhawax_name = request.args.get('ID')
     try:
         controlled_offsets = get_business_helper.getControlledOffsetsFromProductID(qhawax_name)
-        return make_response(jsonify(controlled_offsets), 200)
+        if(controlled_offsets is not None):
+            return make_response(jsonify(controlled_offsets), 200)
+        else:
+            return make_response(jsonify("qHAWAX name has not been found"), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -53,7 +59,10 @@ def requestNonControlledOffsets():
     qhawax_name = request.args.get('ID')
     try:
         non_controlled_offsets = get_business_helper.getNonControlledOffsetsFromProductID(qhawax_name)
-        return make_response(jsonify(non_controlled_offsets), 200)
+        if(non_controlled_offsets is not None):
+            return make_response(jsonify(non_controlled_offsets), 200)
+        else:
+            return make_response(jsonify("qHAWAX name has not been found"), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

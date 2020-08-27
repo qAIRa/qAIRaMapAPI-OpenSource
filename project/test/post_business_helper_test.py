@@ -2,7 +2,7 @@ import unittest
 
 import project.main.business.post_business_helper as post_business_helper
 
-class TestPostBusinessData(unittest.TestCase):
+class TestPostBusinessHelper(unittest.TestCase):
 	"""
 	Test of Post Business Functions
 

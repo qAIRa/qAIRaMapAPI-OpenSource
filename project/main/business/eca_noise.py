@@ -17,6 +17,8 @@ def getEcaNoiseLimitById():
         ecaNoiseInfo = get_business_helper.queryGetEcaNoise(noiseID)
         if ecaNoiseInfo is not None:
             return make_response(jsonify(ecaNoiseInfo), 200)
+        else:
+            return make_response(jsonify("Eca noise ID has not been found"), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

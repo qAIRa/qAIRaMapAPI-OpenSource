@@ -20,13 +20,12 @@ def getQhawaxMode(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    qhawax_mode = ""
-    if(isinstance(qhawax_id, int)):
-        qhawax_mode = session.query(Qhawax.mode).filter_by(id=qhawax_id).all()
-        if(qhawax_mode == []):
-            raise TypeError("The qHAWAX id could not be found")
+    if(same_helper.verifyIfQhawaxExistBaseOnID(qhawax_id)):
         qhawax_mode = session.query(Qhawax.mode).filter_by(id=qhawax_id).one()[0]
-    return qhawax_mode
+        return qhawax_mode
+    else:
+        return None
+
 
 def getComercialName(qhawax_id):
     """

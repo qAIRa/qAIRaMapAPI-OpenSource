@@ -3,7 +3,7 @@ import datetime
 from datetime import timedelta
 import project.main.business.get_business_helper as get_business_helper
 
-class TestGetBusinessData(unittest.TestCase):
+class TestGetBusinessHelper(unittest.TestCase):
 	"""
 	Test of Get Business Functions
 
@@ -177,16 +177,16 @@ class TestGetBusinessData(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.isItFieldQhawax,None)
 
 	def test_get_qhawax_latest_timestamp_processed_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampProcessedMeasurement,40)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampProcessedMeasurement,True)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampProcessedMeasurement,4.5)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampProcessedMeasurement,None)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInProcessedMeasurement,40)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInProcessedMeasurement,True)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInProcessedMeasurement,4.5)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInProcessedMeasurement,None)
 
 	def test_get_qhawax_latest_timestamp_valid_processed_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement,40)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement,True)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement,4.5)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxLatestTimestampValidProcessedMeasurement,None)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,40)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,True)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,4.5)
+		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,None)
 
 	def test_get_qhawax_in_field_public_mode_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,40)
