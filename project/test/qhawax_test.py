@@ -1,7 +1,7 @@
 import requests
 import json
 
-url='http://0.0.0.0:5000'
+url='https://qairamapnapi-dev-opensource.qairadrones.com'
 
 def test_get_inca_qhawax_inca():
     params = {'name':'qH001'}
