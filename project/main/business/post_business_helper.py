@@ -55,8 +55,6 @@ def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
                                      update(values=controlled_offsets[sensor_type])
         session.commit()
 
-
-
 def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets):
     """
     Helper Gas Sensor function to save non controlled offsets from qHAWAX ID

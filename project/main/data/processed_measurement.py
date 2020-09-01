@@ -117,7 +117,7 @@ def handleProcessedData():
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
                         socketio.emit('new_data_summary_valid', socket_json)
-        socketio.emit('new_data_summary_processed', data_json)
+        socketio.emit('new_data_summary_processed', socket_json)
         return make_response('OK', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

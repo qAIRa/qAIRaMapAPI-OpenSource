@@ -23,8 +23,7 @@ def getQhawaxMode(qhawax_id):
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         qhawax_mode = session.query(Qhawax.mode).filter_by(id=qhawax_id).one()[0]
         return qhawax_mode
-    else:
-        return None
+    return None
 
 def getComercialName(qhawax_id):
     """
@@ -212,15 +211,18 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
 
 def getLatestTimestampValidProcessed(qhawax_name):
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
-    time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).\
-                              filter_by(qhawax_installation_id=installation_id).first()
-    valid_measurement_timestamp=""
-    valid_processed_measurement_timestamp = []
-    if(time_valid_data!=None):
-        valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
-                                                        filter_by(qhawax_installation_id=installation_id). \
-                                                        order_by(ValidProcessedMeasurement.id.desc()).first().timestamp_zone
-    return valid_processed_measurement_timestamp
+    if(installation_id is not None):
+        time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).\
+                                  filter_by(qhawax_installation_id=installation_id).first()
+        valid_measurement_timestamp=""
+        valid_processed_measurement_timestamp = []
+        if(time_valid_data!=None):
+            valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
+                                                            filter_by(qhawax_installation_id=installation_id). \
+                                                            order_by(ValidProcessedMeasurement.id.desc()).\
+                                                            first().timestamp_zone
+        return valid_processed_measurement_timestamp
+    return None
 
 def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp):
     """
@@ -243,11 +245,12 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
                ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, 
                ValidProcessedMeasurement.timestamp_zone)
 
-    daily_valid_measurement_list =session.query(*sensors). \
-                                          filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                          filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
-                                          filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
-                                          order_by(ValidProcessedMeasurement.timestamp_zone).all()
-    return daily_valid_measurement_list
+    if(same_helper.qhawaxInstallationExistBasedOnID(installation_id) is True):
+        return session.query(*sensors). \
+                       filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
+                       filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                       filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
+                       order_by(ValidProcessedMeasurement.timestamp_zone).all()
+    return None
 
 

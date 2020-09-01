@@ -49,5 +49,21 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.getNoiseData,None)
 		self.assertRaises(TypeError,get_data_helper.getNoiseData,"qH001",1,2)
 
+	def test_get_hours_difference_not_valid(self):
+		self.assertRaises(TypeError,get_data_helper.getHoursDifference)
+		self.assertRaises(TypeError,get_data_helper.getHoursDifference,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_data_helper.getHoursDifference,True)
+		self.assertRaises(TypeError,get_data_helper.getHoursDifference,-5.0)
+		self.assertRaises(TypeError,get_data_helper.getHoursDifference,None)
+		self.assertRaises(TypeError,get_data_helper.getHoursDifference,"qH001",1,2)
+
+	def test_get_latest_timestamp_valid_processed_not_valid(self):
+		self.assertRaises(TypeError,get_data_helper.getLatestTimestampValidProcessed)
+		self.assertRaises(TypeError,get_data_helper.getLatestTimestampValidProcessed,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_data_helper.getLatestTimestampValidProcessed,True)
+		self.assertRaises(TypeError,get_data_helper.getLatestTimestampValidProcessed,-5.0)
+		self.assertRaises(TypeError,get_data_helper.getLatestTimestampValidProcessed,None)
+		self.assertRaises(TypeError,get_data_helper.getLatestTimestampValidProcessed,1,2)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
