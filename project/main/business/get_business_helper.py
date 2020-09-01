@@ -202,17 +202,6 @@ def queryGetLastGasSensor():
         return None
     return session.query(GasSensor.id).order_by(GasSensor.id.desc()).all()[0]
 
-
-def qhawaxNameIsNew(name):
-    """
-    Get True or False if qHAWAX name already exist
-
-    :type name: string
-    :param name: qHAWAX name
-
-    """
-    return False if same_helper.qhawaxExistBasedOnName(name) else True
-
 def isItFieldQhawax(qhawax_name):
     """
     Check qhawax in field

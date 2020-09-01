@@ -2,6 +2,7 @@ import datetime
 import dateutil
 import dateutil.parser
 from flask import jsonify, make_response, request
+import project.main.exceptions as exception_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app
@@ -90,7 +91,7 @@ def saveOffsets():
     """ 
     try:
         req_json = request.get_json()
-        util_helper.getOffsetTargetofJson(req_json)
+        exception_helper.getOffsetTargetofJson(req_json)
         qhawax_name = str(req_json['product_id']).strip()
         offsets = req_json['offsets']
         description =req_json['description']
@@ -118,7 +119,7 @@ def saveControlledOffsets():
     
     try:
         req_json = request.get_json()
-        util_helper.getControlledOffsetTargetofJson(req_json)
+        exception_helper.getControlledOffsetTargetofJson(req_json)
         qhawax_name = str(req_json['product_id']).strip()
         controlled_offsets = req_json['controlled_offsets']
         description =req_json['description']
@@ -146,7 +147,7 @@ def saveNonControlledOffsets():
     
     try:
         req_json = request.get_json()
-        util_helper.getNonControlledOffsetTargetofJson(req_json)
+        exception_helper.getNonControlledOffsetTargetofJson(req_json)
         qhawax_name = str(req_json['product_id']).strip()
         non_controlled_offsets = req_json['non_controlled_offsets']
         description =req_json['description']

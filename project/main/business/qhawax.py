@@ -1,6 +1,7 @@
 from flask import jsonify, make_response, request
 from project.database.models import Qhawax
 import project.main.same_function_helper as same_helper
+import project.main.exceptions as exception_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app, socketio
@@ -17,12 +18,13 @@ def getIncaQhawaxInca():
     try:
         name = request.args.get('name')
         inca_qhawax = get_business_helper.queryIncaQhawax(name)
-        if(inca_qhawax is not None):
-            return make_response(jsonify(inca_qhawax), 200)
-        return make_response({'Warning':'qHAWAX name has not been found'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+    else:
+        if(inca_qhawax is not None):
+            return make_response(jsonify(inca_qhawax), 200)
+        return make_response({'Warning':'qHAWAX name has not been found'}, 200)
 
 @app.route('/api/get_qhawaxs_active_mode_customer/', methods=['GET'])
 def getActiveQhawaxModeCustomer():
@@ -33,14 +35,16 @@ def getActiveQhawaxModeCustomer():
 
     """
     try:
-        qhawaxs = get_business_helper.queryQhawaxModeCustomer()
+        qhawaxs = get_business_helper.queryQhawaxModeCustomer() 
+    except TypeError as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)
+    else:
         if qhawaxs is not []:
             qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
             return make_response(jsonify(qhawaxs_list), 200)
         return make_response({'Warning':'There are no qHAWAXs in field'}, 200)
-    except TypeError as e:
-        json_message = jsonify({'error': ' \'%s\' ' % (e)})
-        return make_response(json_message, 400)
+
 
 @app.route('/api/save_main_inca/', methods=['POST'])
 def updateIncaData():
@@ -56,21 +60,24 @@ def updateIncaData():
     :param value_inca: qHAWAX inca value
 
     """
-    req_json = request.get_json()
     jsonsend = {}
     try:
+        req_json = request.get_json()
+        exception_helper.getIncaTargetofJson(req_json)
         name = str(req_json['name']).strip()
         value_inca = req_json['value_inca']
         post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
         if(get_business_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.updateMainIncaInDB(value_inca, name)
-        jsonsend['main_inca'] = new_main_inca
+    except (ValueError, TypeError) as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
+        jsonsend['main_inca'] = value_inca
         jsonsend['name'] = name 
         socketio.emit('update_inca', jsonsend)
         return make_response({'Success':' save inca value'}, 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
+
 
 @app.route('/api/qhawax_change_status_off/', methods=['POST'])
 def sendQhawaxStatusOff():
@@ -92,9 +99,11 @@ def sendQhawaxStatusOff():
     :param person_in_charge: person who did this action
 
     """
-    req_json = request.get_json()
+    
     jsonsend = {}
     try:
+        req_json = request.get_json()
+        exception_helper.getStatusOffTargetofJson(req_json)
         name = str(req_json['qhawax_name']).strip()
         qhawax_time_off = req_json['qhawax_lost_timestamp']
         description = req_json['description']
@@ -102,14 +111,16 @@ def sendQhawaxStatusOff():
         post_business_helper.saveStatusOffQhawaxTable(name)
         if(get_business_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
+        post_business_helper.writeBinnacle(name,description,person_in_charge)
+    except (ValueError, TypeError) as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
         jsonsend['main_inca'] = -1
         jsonsend['name'] = name 
         socketio.emit('update_inca', jsonsend)
-        post_business_helper.writeBinnacle(name,description,person_in_charge)
         return make_response({'Success': 'qHAWAX off'}, 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
+
 
 @app.route('/api/qhawax_change_status_on/', methods=['POST'])
 def sendQhawaxStatusOn():
@@ -128,23 +139,25 @@ def sendQhawaxStatusOn():
     :param person_in_charge: person who did this action
 
     """
-    req_json = request.get_json()
+    
     jsonsend = {}
     try:
+        req_json = request.get_json()
+        exception_helper.getStatusOnTargetofJson(req_json)
         qhawax_name = str(req_json['qhawax_name']).strip()
         description = req_json['description']
         person_in_charge = req_json['person_in_charge']
         post_business_helper.saveStatusOnTable(qhawax_name)
         if(get_business_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveTurnOnLastTime(qhawax_name)
-        jsonsend['main_inca'] = 0
-        jsonsend['name'] = qhawax_name 
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response({'Success': 'qHAWAX ON physically'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-
+    else:
+        jsonsend['main_inca'] = 0
+        jsonsend['name'] = qhawax_name 
+        return make_response({'Success': 'qHAWAX ON physically'}, 200)
 
 @app.route('/api/get_time_all_active_qhawax/', methods=['GET'])
 def getTimeAllActiveQhawax():
@@ -158,14 +171,16 @@ def getTimeAllActiveQhawax():
     try:
         name = request.args.get('name')
         values = get_business_helper.getTimeQhawaxHistory(name)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
         if(values is not None):
             values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
             return make_response(jsonify(values_list), 200)
         else:
             return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
+
 
 @app.route('/api/create_qhawax/', methods=['POST'])
 def createQhawax():
@@ -187,29 +202,32 @@ def createQhawax():
     :param person_in_charge: person who did this action
 
     """
-    req_json = request.get_json()
     try:
+        req_json = request.get_json()
+        exception_helper.getQhawaxTargetofJson(req_json)
         qhawax_name=str(req_json['qhawax_name']).strip() 
         qhawax_type=str(req_json['qhawax_type']).strip()
         person_in_charge = req_json['person_in_charge']
         description = req_json['description']
-        if(get_business_helper.qhawaxNameIsNew(qhawax_name)):
-            last_qhawax_id = get_business_helper.queryGetLastQhawax()
-            if(last_qhawax_id==None):
-                post_business_helper.createQhawax(1, qhawax_name,qhawax_type)
-            else:
-                post_business_helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
-            last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
-            if(last_gas_sensor_id ==None):
-                post_business_helper.insertDefaultOffsets(0,qhawax_name)
-            else:
-                post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
-            post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-            return make_response({'Success': 'qHAWAX & Sensors have been created'}, 200)
-        return make_response({'Warning':'The qHAWAX name entered already exists '}, 200)
-    except TypeError as e:
+        last_qhawax_id = get_business_helper.queryGetLastQhawax()
+        if(last_qhawax_id==None):
+            post_business_helper.createQhawax(1, qhawax_name,qhawax_type)
+        else:
+            post_business_helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
+        last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
+        if(last_gas_sensor_id ==None):
+            post_business_helper.insertDefaultOffsets(0,qhawax_name)
+        else:
+            post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+    except (TypeError,ValueError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+    except (Exception) as e:
+        json_message = jsonify({'database error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
+        return make_response({'Success': 'qHAWAX & Sensors have been created'}, 200)
 
 
 @app.route('/api/change_to_calibration/', methods=['POST'])
@@ -242,10 +260,12 @@ def qhawaxChangeToCalibration():
             post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qhawax_name)
         post_business_helper.changeMode(qhawax_name,"Calibracion")
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response({'Success': 'qHAWAX have changed to calibration mode'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+    else:
+        return make_response({'Success': 'qHAWAX have changed to calibration mode'}, 200)
+
 
 @app.route('/api/end_calibration/', methods=['POST'])
 def qhawaxEndCalibration():
@@ -279,10 +299,11 @@ def qhawaxEndCalibration():
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qhawax_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response({'Success': 'qHAWAX have changed to original mode'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+    else:
+        return make_response({'Success': 'qHAWAX have changed to original mode'}, 200)
 
 @app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxProcessedLatestTimestamp():
@@ -296,15 +317,17 @@ def getQhawaxProcessedLatestTimestamp():
     try:
         qhawax_name = request.args.get('qhawax_name')
         processed_timestamp = get_business_helper.getLatestTimeInProcessedMeasurement(qhawax_name)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
         if(processed_timestamp is not None):
             if(processed_timestamp is ""):
                 return make_response({'Warning':' qHAWAX name has not been found in Processed Measurement'},200)
             return make_response(str(processed_timestamp),200)
         else:
             return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
+
 
 @app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxValidProcessedLatestTimestamp():
@@ -318,14 +341,16 @@ def getQhawaxValidProcessedLatestTimestamp():
     try:
         qhawax_name = request.args.get('qhawax_name')
         valid_processed_timestamp = get_business_helper.getLatestTimeInValidProcessed(qhawax_name)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
         if(valid_processed_timestamp is not None):
             if(valid_processed_timestamp is ""):
                 return make_response({'Warning':' qHAWAX name has not been found in Valid Processed Measurement'},200)
             return make_response(str(valid_processed_timestamp),200)
         else:
             return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
+
 
 

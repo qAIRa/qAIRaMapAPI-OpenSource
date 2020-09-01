@@ -2,57 +2,11 @@ import datetime
 import dateutil
 import dateutil.parser
 import time
-import json
 
 pollutant=['SO2','NO2','O3','CO','H2S']
 pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
 pollutant_25C=[2.62,1.88,1.96,1.15,1.39]
-
-
-def getCompanyTargetofJson(data):
-    if 'company_name' not in data:
-        raise ValueError("No target company_name in given json")
-    if 'email_group' not in data:
-        raise ValueError("No target email_group in given json")
-    if 'ruc' not in data:
-        raise ValueError("No target ruc in given json")
-    if 'address' not in data:
-        raise ValueError("No target address in given json")
-    if 'phone' not in data:
-        raise ValueError("No target phone in given json")
-    if 'contact_person' not in data:
-        raise ValueError("No target contact_person in given json")
-
-def getOffsetTargetofJson(data):
-    if 'product_id' not in data:
-        raise ValueError("No target product_id in given json")
-    if 'offsets' not in data:
-        raise ValueError("No target offsets in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
-    if 'person_in_charge' not in data:
-        raise ValueError("No target person_in_charge in given json")
-
-def getControlledOffsetTargetofJson(data):
-    if 'product_id' not in data:
-        raise ValueError("No target product_id in given json")
-    if 'controlled_offsets' not in data:
-        raise ValueError("No target controlled_offsets in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
-    if 'person_in_charge' not in data:
-        raise ValueError("No target person_in_charge in given json")
-
-def getNonControlledOffsetTargetofJson(data):
-    if 'product_id' not in data:
-        raise ValueError("No target product_id in given json")
-    if 'non_controlled_offsets' not in data:
-        raise ValueError("No target non_controlled_offsets in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
-    if 'person_in_charge' not in data:
-        raise ValueError("No target person_in_charge in given json")
 
 def getValidTime(minutes_diff, date_util):
     if(is_intance(minutes_diff) is not [int]):
