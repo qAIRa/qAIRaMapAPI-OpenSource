@@ -64,14 +64,14 @@ def newQhawaxInstallation():
     data_json = request.get_json()
     try:
         qhawax_id = data_json['qhawax_id']
+        qhawax_id = data_json['description']
+        person_in_charge = data_json['person_in_charge']
         post_business_helper.storeNewQhawaxInstallation(data_json)
         post_business_helper.setOccupiedQhawax(qhawax_id)
         post_business_helper.setModeCustomer(qhawax_id)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
-        description="Se registró qHAWAX en campo"
-        person_in_charge = data_json['person_in_charge']
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-        return make_response('Success: Save new qHAWAX in field', 200)
+        return make_response({'Success': 'Save new qHAWAX in field'}, 200)
     except Exception as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -95,12 +95,12 @@ def saveEndWorkField():
     try:
         qhawax_id = data_json['qhawax_id']
         end_date = data_json['end_date']
+        description = data_json['description']
+        person_in_charge = data_json['person_in_charge']
         post_business_helper.saveEndWorkFieldDate(qhawax_id, end_date)
         post_business_helper.setAvailableQhawax(qhawax_id)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
         post_business_helper.changeMode(qhawax_name, "Stand By")
-        description="Se registró fin de trabajo en campo"
-        person_in_charge = data_json['person_in_charge']
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         return make_response('Success: Save qHAWAX last day in field', 200)
     except TypeError as e:
@@ -153,7 +153,7 @@ def getInstallationDate():
             else:
                 return str(installation_date)
         else:
-            return make_response(jsonify("qHAWAX ID "+str(qhawax_id)+" is not in field"), 200)
+            return make_response({'Success ':'qHAWAX ID '+str(qhawax_id)+' has not been found in field'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -211,12 +211,12 @@ def updateQhawaxInstallation():
     try:
         data_json = request.get_json()
         qhawax_id = int(data_json['qhawax_id'])
+        description = int(data_json['description'])
+        person_in_charge = data_json['person_in_charge']
         post_business_helper.updateQhawaxInstallation(data_json)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
-        description="Se modificaron algunos campos de la instalación del qHAWAX"
-        person_in_charge = data_json['person_in_charge']
         helper.writeBitacora(qhawax_name,description,person_in_charge)
-        return make_response('Sucess: Update data of qHAWAX in field', 200)
+        return make_response({'Sucess': 'Update data of qHAWAX in field'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

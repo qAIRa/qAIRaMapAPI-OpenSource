@@ -24,18 +24,15 @@ def updateOffsetsFromProductID(qhawax_name, offsets):
     :param offsets: Json of offset variable of qHAWAX
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(isinstance(offsets, dict)):
-            if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-                qhawax_id = same_helper.getQhawaxID(qhawax_name)
-                for sensor_type in offsets:
-                    session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                             update(values=offsets[sensor_type])
-                session.commit()
-        else:
-            raise TypeError("Offset "+str(offsets)+" should be in Json Format")
-    else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+    if(isinstance(offsets, dict) is not True):
+        raise TypeError("Offset "+str(offsets)+" should be Json Format")
+
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        for sensor_type in offsets:
+            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
+                                     update(values=offsets[sensor_type])
+        session.commit()
 
 def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
     """
@@ -48,18 +45,16 @@ def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
     :param offsets: Json of offset variable of qHAWAX
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(isinstance(controlled_offsets, dict)):
-            if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-                qhawax_id = same_helper.getQhawaxID(qhawax_name)
-                for sensor_type in controlled_offsets:
-                    session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                             update(values=controlled_offsets[sensor_type])
-                session.commit()
-        else:
-            raise TypeError("Controlled Offset "+str(controlled_offsets)+" should be in Json Format")
-    else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+    if(isinstance(controlled_offsets, dict) is not True):
+        raise TypeError("Controlled Offset "+str(controlled_offsets)+" should be Json Format")
+    
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        for sensor_type in controlled_offsets:
+            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
+                                     update(values=controlled_offsets[sensor_type])
+        session.commit()
+
 
 
 def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets):
@@ -73,18 +68,16 @@ def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
     :param offsets: Json of offset variable of qHAWAX
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(isinstance(non_controlled_offsets, dict)):
-            if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-                qhawax_id = same_helper.getQhawaxID(qhawax_name)
-                for sensor_type in non_controlled_offsets:
-                    session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                             update(values=non_controlled_offsets[sensor_type])
-                session.commit()
-        else:
-            raise TypeError("Non Controlled Offset "+str(non_controlled_offsets)+" should be in Json Format")
-    else:
-        raise TypeError("The qHAWAX name "+str(qhawax_name)+" should be string")
+
+    if(isinstance(non_controlled_offsets, dict) is not True):
+        raise TypeError("Non Controlled Offset "+str(non_controlled_offsets)+" should be Json Format")
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+
+    if(qhawax_id is not None):
+        for sensor_type in non_controlled_offsets:
+            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
+                                     update(values=non_controlled_offsets[sensor_type])
+        session.commit()
 
 def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
     """
@@ -100,12 +93,9 @@ def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
     if(type(new_main_inca) not in [int]):
         raise TypeError("Inca value "+str(new_main_inca)+" should be int")
 
-    if(isinstance(qhawax_name, str)):
-        if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-            session.query(Qhawax).filter_by(name=qhawax_name).update(values={'main_inca': new_main_inca})
-            session.commit()
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        session.query(Qhawax).filter_by(name=qhawax_name).update(values={'main_inca': new_main_inca})
+        session.commit()
 
 def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
     """
@@ -121,14 +111,11 @@ def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
     if(type(new_main_inca) not in [int]):
         raise TypeError("Inca value "+str(new_main_inca)+" should be int")
 
-    if(isinstance(qhawax_name, str)):
-        if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-            installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
-            session.query(QhawaxInstallationHistory).filter_by(id=installation_id).\
-                                                     update(values={'main_inca': new_main_inca})
-            session.commit()
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+        session.query(QhawaxInstallationHistory).filter_by(id=installation_id).\
+                                                 update(values={'main_inca': new_main_inca})
+        session.commit()
 
 def saveStatusOffQhawaxTable(qhawax_name):
     """
@@ -138,12 +125,10 @@ def saveStatusOffQhawaxTable(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-            session.query(Qhawax).filter_by(name=qhawax_name).update(values={'state': "OFF",'main_inca':-1})
-            session.commit()
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        session.query(Qhawax).filter_by(name=qhawax_name).\
+                              update(values={'state': "OFF",'main_inca':-1})
+        session.commit()
 
 def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
     """
@@ -156,15 +141,12 @@ def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
     :param qhawax_lost_timestamp: qHAWAX last time off
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-            installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
-            session.query(QhawaxInstallationHistory).\
-                    filter_by(id=installation_id).\
-                    update(values={'main_inca': -1,'last_registration_time_zone':qhawax_lost_timestamp})
-            session.commit()
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        session.query(QhawaxInstallationHistory).\
+                filter_by(id=installation_id).\
+                update(values={'main_inca': -1,'last_registration_time_zone':qhawax_lost_timestamp})
+        session.commit()
 
 def saveStatusOnTable(qhawax_name):
     """
@@ -174,12 +156,9 @@ def saveStatusOnTable(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-            session.query(Qhawax).filter_by(name=qhawax_name).update(values={'state': "ON",'main_inca':0})
-            session.commit()
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        session.query(Qhawax).filter_by(name=qhawax_name).update(values={'state': "ON",'main_inca':0})
+        session.commit()
 
 def saveTurnOnLastTime(qhawax_name):
     """
@@ -189,17 +168,14 @@ def saveTurnOnLastTime(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-            installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
-            now = datetime.datetime.now(dateutil.tz.tzutc())
-            session.query(QhawaxInstallationHistory).\
-                    filter_by(id=installation_id).\
-                    update(values={'main_inca': 0, \
-                                   'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
-            session.commit()
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        now = datetime.datetime.now(dateutil.tz.tzutc())
+        session.query(QhawaxInstallationHistory).\
+                filter_by(id=installation_id).\
+                update(values={'main_inca': 0, \
+                               'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
+        session.commit()
 
 def turnOnAfterCalibration(qhawax_name):
     """
@@ -209,16 +185,14 @@ def turnOnAfterCalibration(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-            installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
-            now = datetime.datetime.now(dateutil.tz.tzutc())
-            session.query(QhawaxInstallationHistory).\
-                    filter_by(id=installation_id).\
-                    update(values={'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
-            session.commit()
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        now = datetime.datetime.now(dateutil.tz.tzutc())
+        session.query(QhawaxInstallationHistory).\
+                filter_by(id=installation_id).\
+                update(values={'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
+        session.commit()
+
 
 def setOccupiedQhawax(qhawax_id):
     """
@@ -228,9 +202,7 @@ def setOccupiedQhawax(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    if(type(qhawax_id) not in [int]):
-        raise TypeError("qHAWAX ID "+str(qhawax_id)+" should be int")
-    if(same_helper.verifyIfQhawaxExistBaseOnID(qhawax_id)):
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': 'Occupied'})
         session.commit()
 
@@ -242,9 +214,7 @@ def setModeCustomer(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    if(type(qhawax_id) not in [int]):
-        raise TypeError("qHAWAX ID "+str(qhawax_id)+" should be int")
-    if(same_helper.verifyIfQhawaxExistBaseOnID(qhawax_id)):
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'mode': "Cliente"})
         session.commit()
 
@@ -259,9 +229,7 @@ def saveEndWorkFieldDate(qhawax_id,end_date):
     :param end_date: qHAWAX installation end date
 
     """
-    if(type(qhawax_id) not in [int]):
-        raise TypeError("qHAWAX ID "+str(qhawax_id)+" should be int")
-    if(same_helper.verifyIfQhawaxExistBaseOnID(qhawax_id)):
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         installation_id = same_helper.getInstallationId(qhawax_id)
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).\
                                                  update(values={'end_date_zone': end_date})
@@ -275,9 +243,7 @@ def setAvailableQhawax(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    if(type(qhawax_id) not in [int]):
-        raise TypeError("qHAWAX ID "+str(qhawax_id)+" should be int")
-    if(same_helper.verifyIfQhawaxExistBaseOnID(qhawax_id)):
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': 'Available'})
         session.commit()
 
@@ -290,14 +256,12 @@ def changeMode(qhawax_name, mode):
     :param qhawax_name: qHAWAX name
 
     """
-    if(isinstance(qhawax_name, str)):
-        if(isinstance(mode, str)):
-            session.query(Qhawax).filter_by(name=qhawax_name).update(values={'mode': mode})
-            session.commit()
-        else:
-            raise TypeError("Mode value "+str(qhawax_name)+" should be string")
-    else:
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
+    if(isinstance(mode, str) is not True):
+        raise TypeError("Mode value "+str(mode)+" should be string")
+
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        session.query(Qhawax).filter_by(name=qhawax_name).update(values={'mode': mode})
+        session.commit()
 
 def updateQhawaxInstallation(data):
     """
@@ -317,7 +281,7 @@ def updateQhawaxInstallation(data):
         else:
             raise Exception("qHAWAX Installation fields must have data")
     else:
-            raise TypeError("qHAWAX Installation data "+str(data)+" should be in Json Format")
+        raise TypeError("qHAWAX Installation data "+str(data)+" should be in Json Format")
 
 def createQhawax(qhawax_id, qhawax_name,qhawax_type):
     """
@@ -358,12 +322,15 @@ def insertDefaultOffsets(last_gas_sensor_id, qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
+    if(type(last_gas_sensor_id) not in [int]):
+        raise TypeError("Gas Sensor ID should be integer")
+
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = int(same_helper.getQhawaxID(qhawax_name))
         initial_serial_number = qhawax_id*100
         start = 1
         for index in range(len(var_gases)):
-            sensor_data = {'id':int(last_gas_sensor_id)+start, 'qhawax_id':qhawax_id, 
+            sensor_data = {'id':last_gas_sensor_id+start, 'qhawax_id':qhawax_id, 
                            'serial_number': initial_serial_number + start, 'type': var_gases[index],
                            'WE': 0.0, 'AE': 0.0,'sensitivity': 0.0, 'sensitivity_2': 0.0,
                            'C0':0.0,'C1':0.0,'C2':0.0,'NC0':0.0,'NC1':0.0}
@@ -380,14 +347,14 @@ def createCompany(json_company):
     :param json_company: json company
 
     """
-    if(isinstance(json_company, dict)):
-        company_name = json_company.pop('company_name', None)
-        json_company['name'] = company_name
-        company_var = Company(**json_company)
-        session.add(company_var)
-        session.commit()
-    else:
+    if(isinstance(json_company, dict) is not True):
         raise TypeError("The Json company "+str(json_company)+" should be in Json Format")
+
+    company_name = json_company.pop('company_name', None)
+    json_company['name'] = company_name
+    company_var = Company(**json_company)
+    session.add(company_var)
+    session.commit()
 
 def storeNewQhawaxInstallation(data):
     """
@@ -438,8 +405,8 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
     if(isinstance(person_in_charge, str) is not True):
         raise TypeError("Person in Charge should be string")
 
-    if(same_helper.verifyIfQhawaxExistBaseOnName(qhawax_name)):
-        qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
         bitacora = {'timestamp_zone': datetime.datetime.now(dateutil.tz.tzutc()), \
                     'observation_type': 'Interna','description': description,  \
                     'qhawax_id':qhawax_id,'solution':None,'person_in_charge':person_in_charge, \
