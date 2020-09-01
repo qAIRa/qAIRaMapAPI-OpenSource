@@ -213,26 +213,6 @@ def qhawaxNameIsNew(name):
     """
     return False if same_helper.qhawaxExistBasedOnName(name) else True
 
-def companyNameIsNew(name):
-    """
-    Get True or False if company name already exist
-
-    :type name: string
-    :param name: company name
-
-    """
-    return False if same_helper.companyExistBasedOnName(name) else True
-
-def companyRucIsNew(ruc):
-    """
-    Get True or False if ruc already exist
-
-    :type ruc: string
-    :param ruc: RUC of company
-
-    """
-    return False if same_helper.companyExistBasedOnRUC(ruc) else True
-
 def isItFieldQhawax(qhawax_name):
     """
     Check qhawax in field

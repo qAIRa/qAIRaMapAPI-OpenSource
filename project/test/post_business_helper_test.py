@@ -154,6 +154,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.createCompany,None)
 		self.assertRaises(TypeError,post_business_helper.createCompany,"PUCP")
 		self.assertRaises(TypeError,post_business_helper.createCompany,True)
+		self.assertRaises(TypeError,post_business_helper.createCompany,{},4.0)
 
 	def test_store_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.storeNewQhawaxInstallation)

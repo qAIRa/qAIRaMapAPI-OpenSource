@@ -347,14 +347,14 @@ def createCompany(json_company):
     :param json_company: json company
 
     """
-    if(isinstance(json_company, dict)):
-        company_name = json_company.pop('company_name', None)
-        json_company['name'] = company_name
-        company_var = Company(**json_company)
-        session.add(company_var)
-        session.commit()
-    else:
+    if(isinstance(json_company, dict) is not True):
         raise TypeError("The Json company "+str(json_company)+" should be in Json Format")
+
+    company_name = json_company.pop('company_name', None)
+    json_company['name'] = company_name
+    company_var = Company(**json_company)
+    session.add(company_var)
+    session.commit()
 
 def storeNewQhawaxInstallation(data):
     """

@@ -87,7 +87,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		offset_sensor ={'CO': {'NC1': 0.0, 'NC0': 0.0}, 
 		               'SO2': {'NC1': 0.0, 'NC0': 1.0}, 
 		               'H2S': {'NC1': 0.0, 'NC0': 0.0}, 
-		                'O3': {'NC1': 0.0, 'NC0': 0.0}, 
+		                'O3': {'NC1': 0.0, 'NC0': 2.0}, 
 		                'NO': {'NC1': 0.0, 'NC0': 0.0}, 
 		               'NO2': {'NC1': 0.0, 'NC0': 0.0}}
 		self.assertAlmostEqual(get_business_helper.getNonControlledOffsetsFromProductID(qhawax_name),offset_sensor)
@@ -140,30 +140,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.qhawaxNameIsNew,True)
 		self.assertRaises(TypeError,get_business_helper.qhawaxNameIsNew,4.5)
 		self.assertRaises(TypeError,get_business_helper.qhawaxNameIsNew,None)
-
-	def test_get_company_name_is_new_valid(self):
-		self.assertAlmostEqual(get_business_helper.companyNameIsNew("Huawei Test"),False)
-		self.assertAlmostEqual(get_business_helper.companyNameIsNew("Test Hotmail."),False)
-		self.assertAlmostEqual(get_business_helper.companyNameIsNew("Municipalidad de Lince"),False)
-		self.assertAlmostEqual(get_business_helper.companyNameIsNew("Nueva Invencion"),True)
-
-	def test_get_company_name_is_new_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.companyNameIsNew,40)
-		self.assertRaises(TypeError,get_business_helper.companyNameIsNew,True)
-		self.assertRaises(TypeError,get_business_helper.companyNameIsNew,4.5)
-		self.assertRaises(TypeError,get_business_helper.companyNameIsNew,None)
-
-	def test_get_ruc_is_new_valid(self):
-		self.assertAlmostEqual(get_business_helper.companyRucIsNew("12345678901"),False)
-		self.assertAlmostEqual(get_business_helper.companyRucIsNew("20001034203"),False)
-		self.assertAlmostEqual(get_business_helper.companyRucIsNew("22340103423"),False)
-		self.assertAlmostEqual(get_business_helper.companyRucIsNew("10701874033"),True)
-
-	def test_get_ruc_is_new_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.companyRucIsNew,40)
-		self.assertRaises(TypeError,get_business_helper.companyRucIsNew,True)
-		self.assertRaises(TypeError,get_business_helper.companyRucIsNew,4.5)
-		self.assertRaises(TypeError,get_business_helper.companyRucIsNew,None)
 
 	def test_qhawax_in_field_valid(self):
 		self.assertAlmostEqual(get_business_helper.isItFieldQhawax("qH002"),False)
