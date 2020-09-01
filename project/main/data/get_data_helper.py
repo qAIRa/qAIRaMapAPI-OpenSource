@@ -26,7 +26,6 @@ def getQhawaxMode(qhawax_id):
     else:
         return None
 
-
 def getComercialName(qhawax_id):
     """
     Helper Processed Measurement function to get qHAWAX comercial name
@@ -35,36 +34,31 @@ def getComercialName(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    if(isinstance(qhawax_id, int)):
-        comercial_name = session.query(QhawaxInstallationHistory.comercial_name).\
-                                 filter_by(qhawax_id=qhawax_id, end_date_zone=None).all()
-        if(comercial_name == []):
-            raise TypeError("The qHAWAX comercial name could not be found")
-        comercial_name = session.query(QhawaxInstallationHistory.comercial_name).\
-                                 filter_by(qhawax_id=qhawax_id, end_date_zone=None).one()[0]
-    return comercial_name
+    installation_id = same_helper.getInstallationId(qhawax_id)
+    if(installation_id is not None):
+        return session.query(QhawaxInstallationHistory.comercial_name).\
+                       filter_by(id=installation_id).one()[0]
+    return None
 
 def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp):
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id!=None):
-        sensors = (AirQualityMeasurement.CO, AirQualityMeasurement.H2S, AirQualityMeasurement.NO2,
+    sensors = (AirQualityMeasurement.CO, AirQualityMeasurement.H2S, AirQualityMeasurement.NO2,
                     AirQualityMeasurement.O3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
                     AirQualityMeasurement.SO2, AirQualityMeasurement.lat, AirQualityMeasurement.lon, 
                     AirQualityMeasurement.alt, AirQualityMeasurement.timestamp_zone)
-        
+
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id!=None):
         return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
                                         filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
                                         filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
                                         order_by(AirQualityMeasurement.timestamp_zone).all()
 
 def getTimeQhawaxHistory(installation_id):
-    values= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
-                          QhawaxInstallationHistory.last_registration_time_zone).\
-                          filter(QhawaxInstallationHistory.id == installation_id).first()
-    if (values!=None):
-        return values
-    else:
-        return None
+    if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
+        return session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
+                             QhawaxInstallationHistory.last_registration_time_zone).\
+                       filter(QhawaxInstallationHistory.id == installation_id).first()
+    return None
 
 def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
     """
@@ -175,11 +169,12 @@ def getNoiseData(qhawax_name):
     :param qhawax_name: qHAWAX name
 
     """
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).\
-                           filter_by(qhawax_id=qhawax_id,end_date_zone=None).first()
-    zone = session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
-    return zone
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).\
+                               filter_by(id=installation_id).first()
+        return session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
+    return None
 
 def getHoursDifference(qhawax_id):
     """

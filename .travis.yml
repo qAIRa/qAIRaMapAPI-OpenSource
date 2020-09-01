@@ -10,6 +10,8 @@ script:
 after_success: coveralls
 env:
   global:
+  - SQLALCHEMY_DATABASE_URI: postgres://qaira:$3cq4IR4@qairamap-db-dev.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/qairamap_db
+  - SECRET_KEY: my_precious
   - secure: PY5ycztLSKJke/SXETi7acCiugMlBHYS3apD2SVkAyq/HTY7gekz4GrU5Be+3Dg4pvZ1re3xKsl5VxuJQFlO88TstghErH7awTYKNaDSiMCTyUmSV3/LLbjqnBo76sJ1e5HSTdKxBfGhMhisnqBN97CiB0QPsdhuTNVojSObOKc6N6lMiC1qgtdHbkDMdjhEMUGrd1BAaxGWEW5daPGhwdRzGZIiamSwhsVjHudIy2Gt4HGjLPWOPARiv16uIPTd18+9d2CSgpqbz+5XUd6vQ/D6MT0NGgMCU30AA6ui2kAK8+s1TXY8KlowgcfnEiAa43uPFw1F/0PkRZccE62UsXfoaLR4qW2pxjM10wAT6mxMSDLYplrmmmpcpBSwJa3gpQzFK5S0TXGvwR+lyTc2+28+UFbKHO31OAjlqWby7cXcKTEwBFJ88TTZLU9RipfgoewPSputHHCBsQyOwNqMC/Gpid7+6rU1SaICuYdczqqKPvUZqk35gwEbLXGIQ1VmYJ6IZMgpEN0SAl1/3LfZewOGwSxXAsayc3oAcQc33kIu1BytvserUJENV5lz+sBDHu3sitq2pnLBabIc7JLRsBWM+8ZxH4SxbdRg0/6pSAJOP2aRj+tjQYOi+JdvV2zq04CAyK8dNhlQRsTPHk26mKx9huQu+FmFkx4SxPPwVEM=
 notifications:
   email:
