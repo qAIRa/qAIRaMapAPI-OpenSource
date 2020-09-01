@@ -3,7 +3,7 @@ import datetime
 from datetime import timedelta
 import project.main.exceptions as exception_helper
 
-class TestGetBusinessHelper(unittest.TestCase):
+class TestMainExceptions(unittest.TestCase):
 	"""
 	Test of Get Business Functions
 

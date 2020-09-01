@@ -116,10 +116,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,True)
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,"qH001",1)
 
-	def test_query_inca_qhawax(self):
-		e1 = "green"
-		self.assertAlmostEqual(get_business_helper.queryIncaQhawax("qH001"),e1)
-
 	def test_get_installation_date_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate)
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,True)
@@ -183,6 +179,15 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,None)
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"})
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
+
+	def test_get_qhawax_mode_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,40)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,True)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,4.5)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,None)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"})
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"},1)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -23,8 +23,7 @@ def getQhawaxMode(qhawax_id):
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         qhawax_mode = session.query(Qhawax.mode).filter_by(id=qhawax_id).one()[0]
         return qhawax_mode
-    else:
-        return None
+    return None
 
 def getComercialName(qhawax_id):
     """
@@ -52,6 +51,7 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp):
                                         filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
                                         filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
                                         order_by(AirQualityMeasurement.timestamp_zone).all()
+    return None
 
 def getTimeQhawaxHistory(installation_id):
     if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
@@ -123,10 +123,12 @@ def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp):
                 AirQualityMeasurement.pressure, AirQualityMeasurement.temperature, AirQualityMeasurement.lat, 
                 AirQualityMeasurement.lon, AirQualityMeasurement.timestamp_zone)
     
-    return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                    filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
-                                    filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
-                                    order_by(AirQualityMeasurement.timestamp).all()
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
+        return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
+                                        filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
+                                        filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
+                                        order_by(AirQualityMeasurement.timestamp).all()
+    return None
 
 def queryDBGasInca(initial_timestamp, final_timestamp):
     """
@@ -184,14 +186,14 @@ def getHoursDifference(qhawax_id):
     :param qhawax_id: qHAWAX ID
 
     """
-    values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
-                           QhawaxInstallationHistory.last_registration_time_zone).\
-                     filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
-    if (values[0]!=None and values[1]!=None):
-        minutes_difference = int((values[0] - values[1]).total_seconds() / 60)
-        return minutes_difference, values[0]
-    else:
-        return None, None
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
+        values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
+                               QhawaxInstallationHistory.last_registration_time_zone).\
+                         filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
+        if (values[0]!=None and values[1]!=None):
+            minutes_difference = int((values[0] - values[1]).total_seconds() / 60)
+            return minutes_difference, values[0]
+    return None, None
 
 def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp):
     sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.CO_ug_m3,ValidProcessedMeasurement.H2S,
@@ -202,25 +204,27 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
                ValidProcessedMeasurement.SPL, ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, 
                ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.lat,ValidProcessedMeasurement.lon, 
                ValidProcessedMeasurement.timestamp_zone)
-
-    valid_measurement_list =session.query(*sensors).\
-                                    filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                    filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
-                                    filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
-                                    order_by(ValidProcessedMeasurement.timestamp_zone).all()
-    return valid_measurement_list
+    if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
+        return session.query(*sensors).\
+                       filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
+                       filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
+                       filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
+                       order_by(ValidProcessedMeasurement.timestamp_zone).all()
+    return None
 
 def getLatestTimestampValidProcessed(qhawax_name):
-    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
-    time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).\
-                              filter_by(qhawax_installation_id=installation_id).first()
-    valid_measurement_timestamp=""
-    valid_processed_measurement_timestamp = []
-    if(time_valid_data!=None):
-        valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
-                                                        filter_by(qhawax_installation_id=installation_id). \
-                                                        order_by(ValidProcessedMeasurement.id.desc()).first().timestamp_zone
-    return valid_processed_measurement_timestamp
+    if(same_helper.getInstallationIdBaseName(qhawax_name) is not None):
+        time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).\
+                                  filter_by(qhawax_installation_id=installation_id).first()
+        valid_measurement_timestamp=""
+        valid_processed_measurement_timestamp = []
+        if(time_valid_data!=None):
+            valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
+                                                            filter_by(qhawax_installation_id=installation_id). \
+                                                            order_by(ValidProcessedMeasurement.id.desc()).\
+                                                            first().timestamp_zone
+        return valid_processed_measurement_timestamp
+    return None
 
 def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp):
     """
@@ -243,11 +247,12 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
                ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, 
                ValidProcessedMeasurement.timestamp_zone)
 
-    daily_valid_measurement_list =session.query(*sensors). \
-                                          filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                          filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
-                                          filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
-                                          order_by(ValidProcessedMeasurement.timestamp_zone).all()
-    return daily_valid_measurement_list
+    if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
+        return session.query(*sensors). \
+                       filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
+                       filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                       filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
+                       order_by(ValidProcessedMeasurement.timestamp_zone).all()
+    return None
 
 

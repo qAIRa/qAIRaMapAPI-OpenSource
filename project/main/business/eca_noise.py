@@ -1,5 +1,4 @@
 from flask import jsonify, make_response, request
-from project.database.models import EcaNoise
 import project.main.business.get_business_helper as get_business_helper
 from project import app
 

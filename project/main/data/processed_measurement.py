@@ -103,6 +103,7 @@ def handleProcessedData():
         data_json['zone'] = "Zona No Definida"
         mode = get_data_helper.getQhawaxMode(qhawax_id)
         inca_value = same_helper.getMainIncaQhawaxTable(qhawax_id)
+        socket_json =  json.dumps(data_json)
         if(mode == "Cliente"):
             qhawax_zone = get_data_helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone
@@ -112,12 +113,15 @@ def handleProcessedData():
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
+                        socket_json = json.loads(socket_json)
                         socketio.emit('new_data_summary_valid', socket_json) 
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
+                        socket_json = json.loads(socket_json)
                         socketio.emit('new_data_summary_valid', socket_json)
-        socketio.emit('new_data_summary_processed', data_json)
+        socket_json = json.loads(socket_json)
+        socketio.emit('new_data_summary_processed', socket_json)
         return make_response('OK', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

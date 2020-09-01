@@ -8,8 +8,19 @@ pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
 pollutant_25C=[2.62,1.88,1.96,1.15,1.39]
 
+def check_valid_date(date):
+    """
+    Check if it's a valid date.
+    """
+    if(isinstance(date) is not [str]):
+        raise TypeError("Variable "+str(date)+" should not be string")
+    try:
+        date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        raise ValueError("Date "+str(date)+" should be datetime YYYY-MM-DD HH:MM:SS Format")
+
 def getValidTime(minutes_diff, date_util):
-    if(is_intance(minutes_diff) is not [int]):
+    if(isinstance(minutes_diff) is not [int]):
         raise TypeError("Variable "+str(minutes_diff)+" should be integer")
 
     if(minutes_diff<5):
@@ -17,6 +28,9 @@ def getValidTime(minutes_diff, date_util):
     return date_util + datetime.timedelta(hours=2)
 
 def getAverage(resultado):
+    if(isinstance(resultado) is not [int]):
+        raise TypeError("Variable "+str(resultado)+" should be integer")
+
     sum = 0        
 
     if len(resultado) == 0 :
@@ -24,9 +38,7 @@ def getAverage(resultado):
     else :
         for i in range(len(resultado)):
             sum = sum + resultado[i][0]
-        promf = sum /len(resultado)
-
-    return promf
+        return (sum /len(resultado))
 
 def gasSensorJson(json,sensors):
     all_sensors=['CO','SO2','H2S','O3','NO','NO2']
@@ -43,6 +55,9 @@ def gasSensorJson(json,sensors):
     return initial
 
 def getColorBaseOnIncaValue(qhawax_inca):
+    if(is_instance(qhawax_inca) is not [int]):
+        raise TypeError("Variable "+str(qhawax_inca)+" should be integer")
+        
     if qhawax_inca == 50:
         resultado = 'green'
     elif qhawax_inca == 100:

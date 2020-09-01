@@ -10,7 +10,9 @@ class TestPostBusinessHelper(unittest.TestCase):
 	def test_update_offsets_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID)
 		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID,None,None)
+		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID,None,{"offset":{}})
 		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID,"qH080")
+		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID,"qH080",True)
 		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID,"qH080",None)
 		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID,"qH004")
 		self.assertRaises(TypeError,post_business_helper.updateOffsetsFromProductID,80)
@@ -18,7 +20,9 @@ class TestPostBusinessHelper(unittest.TestCase):
 	def test_update_controlled_offsets_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID)
 		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID,None,None)
+		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID,None,{"offset":{}})
 		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID,"qH080")
+		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID,"qH080",True)
 		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID,"qH080",None)
 		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID,"qH004")
 		self.assertRaises(TypeError,post_business_helper.updateControlledOffsetsFromProductID,80)
@@ -26,7 +30,9 @@ class TestPostBusinessHelper(unittest.TestCase):
 	def test_update_non_controlled_offsets_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID)
 		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID,None, None)
+		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID,None,{"offset":{}})
 		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID,"qH080")
+		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID,"qH080",True)
 		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID,"qH080",None)
 		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID,"qH004")
 		self.assertRaises(TypeError,post_business_helper.updateNonControlledOffsetsFromProductID,80)

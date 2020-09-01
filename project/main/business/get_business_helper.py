@@ -20,10 +20,8 @@ def getTimeQhawaxHistory(name):
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
               QhawaxInstallationHistory.last_registration_time_zone)
     installation_id = same_helper.getInstallationIdBaseName(name)
-    if(installation_id is not None):
-        values = session.query(*fields).filter_by(id= installation_id).first()
-        return values
-    return None
+    return None if (installation_id is None) else session.query(*fields).\
+                                                        filter_by(id= installation_id).first()
 
 def queryQhawaxModeCustomer():
     """
@@ -35,14 +33,13 @@ def queryQhawaxModeCustomer():
     qhawax_column = (Qhawax.id, Qhawax.name, Qhawax.main_inca, Qhawax.qhawax_type,\
                      QhawaxInstallationHistory.comercial_name, EcaNoise.area_name)
 
-    qhawax_list = session.query(*qhawax_column).\
+    return session.query(*qhawax_column).\
                           join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
                           join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
                           group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
                           filter(Qhawax.mode =="Cliente", \
                                  Qhawax.state =="ON", \
                                  QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
-    return qhawax_list
 
 def queryGetAreas():
     """
@@ -53,9 +50,7 @@ def queryGetAreas():
     """
     fields = (EcaNoise.id, EcaNoise.area_name)
     areas = session.query(*fields).all()
-    if(areas == []):
-        return None
-    return session.query(*fields).order_by(EcaNoise.id.desc()).all()
+    return None if areas is None else session.query(*fields).order_by(EcaNoise.id.desc()).all()
 
 def queryGetEcaNoise(eca_noise_id):
     """
@@ -169,11 +164,9 @@ def getFirstTimestampValidProcessed(qhawax_id):
         first_timestamp =session.query(ValidProcessedMeasurement.timestamp_zone). \
                                  filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
                                  order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()           
-        if (first_timestamp==None):
-            return None
-        return first_timestamp[0]
-    else:
-        None
+        
+        return None if (first_timestamp==None) else first_timestamp[0]
+    return None
 
 
 def queryGetLastQhawax():
@@ -185,9 +178,8 @@ def queryGetLastQhawax():
 
     """
     qhawax_list = session.query(Qhawax.id).all()
-    if(qhawax_list==[]):
-        return None
-    return session.query(Qhawax.id).order_by(Qhawax.id.desc()).all()[0]
+    return None if (qhawax_list== []) else session.query(Qhawax.id).\
+                                                   order_by(Qhawax.id.desc()).all()[0]
 
 def queryGetLastGasSensor():
     """
@@ -232,7 +224,6 @@ def getLatestTimeInProcessedMeasurement(qhawax_name):
                                                       order_by(ProcessedMeasurement.id.desc()).\
                                                       first().timestamp_zone
         return processed_measurement_timestamp
-
     return None
 
 def getLatestTimeInValidProcessed(qhawax_name):
@@ -243,7 +234,6 @@ def getLatestTimeInValidProcessed(qhawax_name):
     :param qhawax_name: qHAWAX name
     
     """
-
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         valid_processed_timestamp = ""
@@ -277,57 +267,11 @@ def queryQhawaxInFieldInPublicMode():
                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
                                    order_by(Qhawax.id).all() 
 
-def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
-    """
-    Helper Gas Sensor function to save non controlled offsets from qHAWAX ID
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type sensor: string
-    :param sensor: sensor type ('CO', 'NO2','PM10','PM25','SO2','O3','H2S')
-
-    :type initial_timestamp: timestamp
-    :param initial_timestamp: initial search date
-
-    :type final_timestamp: timestamp
-    :param final_timestamp: last search date
-
-    """
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-
-    if sensor == 'CO':
-        datos = AirQualityMeasurement.CO
-        hoursPerSensor = 8
-    elif sensor == 'NO2':
-        datos = AirQualityMeasurement.NO2
-        hoursPerSensor = 1
-    elif sensor == 'PM10':
-        datos = AirQualityMeasurement.PM10
-        hoursPerSensor = 24
-    elif sensor == 'PM25':
-        datos = AirQualityMeasurement.PM25
-        hoursPerSensor = 24
-    elif sensor == 'SO2':
-        datos = AirQualityMeasurement.SO2
-        hoursPerSensor = 24
-    elif sensor == 'O3':
-        datos = AirQualityMeasurement.O3
-        hoursPerSensor = 8
-    elif sensor == 'H2S':
-        datos = AirQualityMeasurement.H2S
-        hoursPerSensor = 24
-
-    resultado=[]
-    resultado = session.query(datos).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                      filter(AirQualityMeasurement.timestamp_zone > initial_timestamp). \
-                                      filter(AirQualityMeasurement.timestamp_zone < final_timestamp). \
-                                      order_by(AirQualityMeasurement.timestamp_zone).all()
-        
-    return util_helper.getAverage(resultado)
-
-
 def getQhawaxMode(qhawax_name):
+    """
+    Get qHAWAX mode based on name
+
+    """
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
         return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
     return None
