@@ -1,5 +1,4 @@
 from flask import jsonify, make_response, request
-from project.database.models import Qhawax
 import project.main.same_function_helper as same_helper
 import project.main.exceptions as exception_helper
 import project.main.business.get_business_helper as get_business_helper
@@ -178,8 +177,7 @@ def getTimeAllActiveQhawax():
         if(values is not None):
             values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
             return make_response(jsonify(values_list), 200)
-        else:
-            return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
+        return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
 
 
 @app.route('/api/create_qhawax/', methods=['POST'])
@@ -325,8 +323,7 @@ def getQhawaxProcessedLatestTimestamp():
             if(processed_timestamp is ""):
                 return make_response({'Warning':' qHAWAX name has not been found in Processed Measurement'},200)
             return make_response(str(processed_timestamp),200)
-        else:
-            return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
+        return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
 
 
 @app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
@@ -349,8 +346,7 @@ def getQhawaxValidProcessedLatestTimestamp():
             if(valid_processed_timestamp is ""):
                 return make_response({'Warning':' qHAWAX name has not been found in Valid Processed Measurement'},200)
             return make_response(str(valid_processed_timestamp),200)
-        else:
-            return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
+        return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
 
 
 

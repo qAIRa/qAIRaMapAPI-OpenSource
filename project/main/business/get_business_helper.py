@@ -243,7 +243,6 @@ def getLatestTimeInValidProcessed(qhawax_name):
     :param qhawax_name: qHAWAX name
     
     """
-
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         valid_processed_timestamp = ""
@@ -277,57 +276,11 @@ def queryQhawaxInFieldInPublicMode():
                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
                                    order_by(Qhawax.id).all() 
 
-def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
-    """
-    Helper Gas Sensor function to save non controlled offsets from qHAWAX ID
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type sensor: string
-    :param sensor: sensor type ('CO', 'NO2','PM10','PM25','SO2','O3','H2S')
-
-    :type initial_timestamp: timestamp
-    :param initial_timestamp: initial search date
-
-    :type final_timestamp: timestamp
-    :param final_timestamp: last search date
-
-    """
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-
-    if sensor == 'CO':
-        datos = AirQualityMeasurement.CO
-        hoursPerSensor = 8
-    elif sensor == 'NO2':
-        datos = AirQualityMeasurement.NO2
-        hoursPerSensor = 1
-    elif sensor == 'PM10':
-        datos = AirQualityMeasurement.PM10
-        hoursPerSensor = 24
-    elif sensor == 'PM25':
-        datos = AirQualityMeasurement.PM25
-        hoursPerSensor = 24
-    elif sensor == 'SO2':
-        datos = AirQualityMeasurement.SO2
-        hoursPerSensor = 24
-    elif sensor == 'O3':
-        datos = AirQualityMeasurement.O3
-        hoursPerSensor = 8
-    elif sensor == 'H2S':
-        datos = AirQualityMeasurement.H2S
-        hoursPerSensor = 24
-
-    resultado=[]
-    resultado = session.query(datos).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                      filter(AirQualityMeasurement.timestamp_zone > initial_timestamp). \
-                                      filter(AirQualityMeasurement.timestamp_zone < final_timestamp). \
-                                      order_by(AirQualityMeasurement.timestamp_zone).all()
-        
-    return util_helper.getAverage(resultado)
-
-
 def getQhawaxMode(qhawax_name):
+    """
+    Get qHAWAX mode based on name
+
+    """
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
         return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
     return None

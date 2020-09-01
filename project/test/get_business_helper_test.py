@@ -184,5 +184,14 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"})
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
+	def test_get_qhawax_mode_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,40)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,True)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,4.5)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,None)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"})
+		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"},1)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
