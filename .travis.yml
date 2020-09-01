@@ -4,7 +4,6 @@ python:
 - 3.7.6
 install:
 - pip install -r requirements.txt
-— pip install -e .
 script:
 - pytest -v --cov=project/main/
 after_success: coveralls
