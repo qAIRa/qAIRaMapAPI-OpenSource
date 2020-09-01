@@ -116,10 +116,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,True)
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,"qH001",1)
 
-	def test_query_inca_qhawax(self):
-		e1 = "green"
-		self.assertAlmostEqual(get_business_helper.queryIncaQhawax("qH001"),e1)
-
 	def test_get_installation_date_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate)
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,True)

@@ -10,7 +10,6 @@ from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallat
                                     Company, AirQualityMeasurement, Bitacora
 
 var_gases=['CO','H2S','NO','NO2','O3','SO2']
-
 session = db.session
 
 def updateOffsetsFromProductID(qhawax_name, offsets):
@@ -139,6 +138,8 @@ def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
     :param qhawax_lost_timestamp: qHAWAX last time off
 
     """
+    util_helper.check_valid_date(qhawax_lost_timestamp)
+
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         session.query(QhawaxInstallationHistory).\
@@ -227,6 +228,8 @@ def saveEndWorkFieldDate(qhawax_id,end_date):
     :param end_date: qHAWAX installation end date
 
     """
+    util_helper.check_valid_date(end_date)
+    
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         installation_id = same_helper.getInstallationId(qhawax_id)
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).\

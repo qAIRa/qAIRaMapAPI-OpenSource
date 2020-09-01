@@ -3,6 +3,10 @@ import json
 
 url='https://qairamapnapi-dev-opensource.qairadrones.com'
 
+"""
+Test QHAWAX Endpoints
+
+"""
 def test_get_inca_qhawax_inca():
     params = {'name':'qH001'}
     response = requests.get(url+'/api/get_qhawax_inca/',params=params)
@@ -33,5 +37,3 @@ def test_post_qhawaxs_active_mode_customer_not_valid():
     params = {'no_name':'qH001'}
     response = requests.post(url+'/api/get_qhawaxs_active_mode_customer/',params=params)
     assert response.status_code == 405
-
-
