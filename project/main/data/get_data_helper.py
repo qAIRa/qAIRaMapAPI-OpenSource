@@ -76,7 +76,9 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
     if(isinstance(gas_name, str) is not True):  
         raise TypeError("Gas name "+str(gas_name)+" should be string")
 
-    if(same_helper.getQhawaxID(qhawax_name) is not None):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+
+    if(qhawax_id is not None):
 
         initial_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
         last_timestamp = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=24)
@@ -147,24 +149,39 @@ def queryDBGasInca(initial_timestamp, final_timestamp):
     sensors = (GasInca.CO, GasInca.H2S, GasInca.SO2, GasInca.NO2,GasInca.O3, 
                 GasInca.PM25, GasInca.PM10, GasInca.SO2,GasInca.timestamp_zone, GasInca.qhawax_id, GasInca.main_inca)
     
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
     return session.query(*sensors).filter(GasInca.timestamp_zone >= initial_timestamp). \
                                     filter(GasInca.timestamp_zone <= final_timestamp).all()
                                   
 
 def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
+
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
 
-    sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S, ProcessedMeasurement.NO,
-                ProcessedMeasurement.NO2, ProcessedMeasurement.O3, ProcessedMeasurement.PM1, ProcessedMeasurement.PM25,
-                ProcessedMeasurement.PM10, ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
-                ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
-                ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
-                ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
+        sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S, ProcessedMeasurement.NO,
+                    ProcessedMeasurement.NO2, ProcessedMeasurement.O3, ProcessedMeasurement.PM1, ProcessedMeasurement.PM25,
+                    ProcessedMeasurement.PM10, ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
+                    ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
+                    ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
+                    ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
 
-    return session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
-                                    filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
-                                    filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
-                                    order_by(ProcessedMeasurement.timestamp).all()
+        return session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
+                                        filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                        filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                        order_by(ProcessedMeasurement.timestamp).all()
+    return None
 
 def getNoiseData(qhawax_name):
     """

@@ -41,7 +41,10 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBAirQuality,"qH001","2020/01/01")
 
 	def test_query_air_quality_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryDBAirQuality('qH100',"",""),None)
+		initial_timestamp = "02-09-2020 00:00:00"
+		last_timestamp = "02-09-2020 00:01:00"
+		self.assertAlmostEqual(get_data_helper.queryDBAirQuality('qH001',initial_timestamp,last_timestamp),[])
+		self.assertAlmostEqual(get_data_helper.queryDBAirQuality('qH100',initial_timestamp,last_timestamp),None)
 
 	def test_query_time_qhawax_history_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.getTimeQhawaxHistory)
@@ -63,7 +66,50 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBGasAverageMeasurement,"qH001",1,2)
 
 	def test_query_gas_average_measurement_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH100","CO",[]),None)
+		values_date = {'last_time_on': "02-09-2020 01:00:00", 'last_time_registration': "02-09-2020 00:01:00"} 
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","CO",values_date),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH100","CO",values_date),None)
+
+	def test_query_valid_air_quality_not_valid(self):
+		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality)
+		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,True)
+		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,-5.0)
+		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,None)
+		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,"qH001",1,2)
+
+	def test_query_valid_air_quality_valid(self):
+		initial_timestamp = "02-09-2020 00:00:00"
+		last_timestamp = "02-09-2020 00:01:00"
+		self.assertAlmostEqual(get_data_helper.queryDBValidAirQuality(1,initial_timestamp,last_timestamp),[])
+		self.assertAlmostEqual(get_data_helper.queryDBValidAirQuality(100,initial_timestamp,last_timestamp),None)
+
+	def test_query_valid_air_quality_not_valid(self):
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca)
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,True)
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,-5.0)
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,None)
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,"qH001",1,2)
+
+	def test_query_valid_air_quality_valid(self):
+		initial_timestamp = "02-09-2010 00:00:00"
+		last_timestamp = "02-09-2010 00:01:00"
+		self.assertAlmostEqual(get_data_helper.queryDBGasInca(initial_timestamp,last_timestamp),[])
+
+	def test_query_processed_not_valid(self):
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed)
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,True)
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,-5.0)
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,None)
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001",1,2)
+
+	def test_query_processed_valid(self):
+		initial_timestamp = "02-09-2010 00:00:00"
+		last_timestamp = "02-09-2010 00:01:00"
+		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH001",initial_timestamp,last_timestamp),[])
+		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH100",initial_timestamp,last_timestamp),None)
 
 	def test_query_noise_data_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.getNoiseData)
@@ -74,6 +120,7 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.getNoiseData,"qH001",1,2)
 
 	def test_query_noise_data_valid(self):
+		self.assertAlmostEqual(get_data_helper.getNoiseData("qH004"),"Zona de Protección Especial")
 		self.assertAlmostEqual(get_data_helper.getNoiseData("qH100"),None)
 
 	def test_get_hours_difference_not_valid(self):
