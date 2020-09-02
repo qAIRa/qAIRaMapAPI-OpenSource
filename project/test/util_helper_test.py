@@ -8,12 +8,12 @@ class TestUtilHelper(unittest.TestCase):
 	Test of Get Business Functions
 
 	"""
-	#def test_check_date_not_valid(self):
-		#self.assertRaises(ValueError,util_helper.check_valid_date,{"name":"qH001"})
-		#self.assertRaises(ValueError,util_helper.check_valid_date,4.33)
-		#self.assertRaises(ValueError,util_helper.check_valid_date,5)
-		#self.assertRaises(TypeError,util_helper.check_valid_date,None)
-		#self.assertRaises(ValueError,util_helper.check_valid_date,True)
+	def test_check_date_not_valid(self):
+		self.assertRaises(TypeError,util_helper.check_valid_date,{"name":"qH001"})
+		self.assertRaises(TypeError,util_helper.check_valid_date,4.33)
+		self.assertRaises(TypeError,util_helper.check_valid_date,5)
+		self.assertRaises(TypeError,util_helper.check_valid_date,None)
+		self.assertRaises(TypeError,util_helper.check_valid_date,True)
 
 	def test_check_time_not_valid(self):
 		self.assertRaises(TypeError,util_helper.getValidTime)

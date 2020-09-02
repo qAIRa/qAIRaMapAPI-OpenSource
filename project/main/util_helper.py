@@ -12,7 +12,7 @@ def check_valid_date(date):
     """
     Check if it's a valid date.
     """
-    if(isinstance(date) is not [str]):
+    if(type(date) is not [str]):
         raise TypeError("Variable "+str(date)+" should not be string")
     try:
         date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
@@ -20,7 +20,7 @@ def check_valid_date(date):
         raise ValueError("Date "+str(date)+" should be datetime YYYY-MM-DD HH:MM:SS Format")
 
 def getValidTime(minutes_diff, date_util):
-    if(isinstance(minutes_diff) is not [int]):
+    if(type(minutes_diff) is not [int]):
         raise TypeError("Variable "+str(minutes_diff)+" should be integer")
 
     if(minutes_diff<5):
@@ -28,7 +28,7 @@ def getValidTime(minutes_diff, date_util):
     return date_util + datetime.timedelta(hours=2)
 
 def getAverage(resultado):
-    if(isinstance(resultado) is not [int]):
+    if(type(resultado) is not [int]):
         raise TypeError("Variable "+str(resultado)+" should be integer")
 
     sum = 0        
@@ -55,20 +55,17 @@ def gasSensorJson(json,sensors):
     return initial
 
 def getColorBaseOnIncaValue(qhawax_inca):
-    if(is_instance(qhawax_inca) is not [int]):
-        raise TypeError("Variable "+str(qhawax_inca)+" should be integer")
-        
+    #if(type(qhawax_inca) is not [int]):
+    #    raise TypeError("Variable "+str(qhawax_inca)+" should be integer")
     if qhawax_inca == 50:
-        resultado = 'green'
+        return 'green'
     elif qhawax_inca == 100:
-        resultado = 'yellow'
+        return'yellow'
     elif qhawax_inca == 500:
-        resultado = 'orange'
+        return'orange'
     elif qhawax_inca == 600:
-        resultado = 'red'
-    else:
-        resultado = 'green'
-    return resultado
+        return'red'
+    return 'green'
 
 def validAndBeautyJsonProcessed(data_json):
     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
