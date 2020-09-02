@@ -50,7 +50,7 @@ def queryGetAreas():
     """
     fields = (EcaNoise.id, EcaNoise.area_name)
     areas = session.query(*fields).all()
-    return None if areas is None else session.query(*fields).order_by(EcaNoise.id.desc()).all()
+    return None if (areas is []) else session.query(*fields).order_by(EcaNoise.id.desc()).all()
 
 def queryGetEcaNoise(eca_noise_id):
     """
@@ -132,7 +132,7 @@ def queryIncaQhawax(name):
     """
     qhawax_id = same_helper.getQhawaxID(name)
     if(qhawax_id is not None):
-        qhawax_inca = same_helper.getMainIncaQhawaxTable(qhawax_id)
+        qhawax_inca = int(same_helper.getMainIncaQhawaxTable(qhawax_id))
         return util_helper.getColorBaseOnIncaValue(qhawax_inca)
     return None
 

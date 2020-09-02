@@ -16,6 +16,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,None)
 		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,True)
 
+	def test_query_time_qhawax_history_valid(self):
+		self.assertAlmostEqual(get_business_helper.getTimeQhawaxHistory('qH020'),None)
+		self.assertAlmostEqual(get_business_helper.getTimeQhawaxHistory('qH0100'),None)
+
 	def test_query_qhawax_mode_customer_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,{"name":"qH001"})
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,4.33)
@@ -24,6 +28,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,True)
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,10,None)
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,"String_")
+
+	def test_query_qhawax_mode_customer_valid(self):
+		y = [(4, 'qH004', 50.0, 'STATIC', 'Test Aguitas 2.0', 'Zona de Protección Especial')]
+		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
 
 	def test_query_get_areas_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetAreas,{"name":"qH001"})
@@ -53,6 +61,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		e2 = (2, 'Zona Residencial', 60, 50)
 		self.assertAlmostEqual(get_business_helper.queryGetEcaNoise(1),e1)
 		self.assertAlmostEqual(get_business_helper.queryGetEcaNoise(2),e2)
+		self.assertAlmostEqual(get_business_helper.queryGetEcaNoise(5),None)
 
 	def test_query_get_offsets_from_productID_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID)
@@ -71,6 +80,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		                'NO': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
 		               'NO2': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}}
 		self.assertAlmostEqual(get_business_helper.getOffsetsFromProductID(qhawax_name),offset_sensor)
+		self.assertAlmostEqual(get_business_helper.getOffsetsFromProductID('qH100'),None)
 
 	def test_query_get_controlled_offsets_from_productID_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID)
@@ -89,6 +99,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		                'NO': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}, 
 		                'NO2': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}}
 		self.assertAlmostEqual(get_business_helper.getControlledOffsetsFromProductID(qhawax_name),offset_sensor)
+		self.assertAlmostEqual(get_business_helper.getControlledOffsetsFromProductID('qH100'),None)
 
 	def test_query_get_non_controlled_offsets_from_productID_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID)
@@ -107,6 +118,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		                'NO': {'NC1': 0.0, 'NC0': 0.0}, 
 		               'NO2': {'NC1': 0.0, 'NC0': 0.0}}
 		self.assertAlmostEqual(get_business_helper.getNonControlledOffsetsFromProductID(qhawax_name),offset_sensor)
+		self.assertAlmostEqual(get_business_helper.getNonControlledOffsetsFromProductID('qH100'),None)
 
 	def test_query_inca_qhawax_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax)
@@ -116,6 +128,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,True)
 		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,"qH001",1)
 
+	def test_query_inca_qhawax_valid(self):
+		self.assertAlmostEqual(get_business_helper.queryIncaQhawax('qH001'),'green')
+		self.assertAlmostEqual(get_business_helper.queryIncaQhawax('qH100'),None)
+
 	def test_get_installation_date_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate)
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,True)
@@ -123,12 +139,18 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,None)
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,"342")
 
+	def test_get_installation_date_valid(self):
+		self.assertAlmostEqual(get_business_helper.getInstallationDate(1),None)
+
 	def test_get_first_time_valid_processed_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed)
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed,True)
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed,4.5)
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed,None)
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed,"342")
+
+	def test_get_first_time_valid_processed_valid(self):
+		self.assertAlmostEqual(get_business_helper.getFirstTimestampValidProcessed(1),None)
 
 	def test_get_last_qhawax_id_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastQhawax,40)
@@ -164,6 +186,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInProcessedMeasurement,None)
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInProcessedMeasurement,{"name":"qH001"})
 
+	def test_get_qhawax_latest_timestamp_processed_valid(self):
+		self.assertAlmostEqual(get_business_helper.getLatestTimeInProcessedMeasurement('qH100'),None)
+		#self.assertAlmostEqual(get_business_helper.getLatestTimeInProcessedMeasurement('qH020'),"")
+
 	def test_get_qhawax_latest_timestamp_valid_processed_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed)
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,40)
@@ -171,6 +197,9 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,4.5)
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,None)
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,{"name":"qH001"})
+
+	def test_get_qhawax_latest_timestamp_valid_processed_valid(self):
+		self.assertAlmostEqual(get_business_helper.getLatestTimeInValidProcessed('qH100'),None)
 
 	def test_get_qhawax_in_field_public_mode_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,40)
@@ -188,6 +217,11 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,None)
 		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"})
 		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"},1)
+
+	def test_get_qhawax_mode_valid(self):
+		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH001'),'Stand By')
+		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH004'),'Cliente')
+		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH100'),None)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

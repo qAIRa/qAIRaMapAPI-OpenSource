@@ -21,8 +21,7 @@ def getQhawaxMode(qhawax_id):
 
     """
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-        qhawax_mode = session.query(Qhawax.mode).filter_by(id=qhawax_id).one()[0]
-        return qhawax_mode
+        return session.query(Qhawax.mode).filter_by(id=qhawax_id).one()[0]
     return None
 
 def getComercialName(qhawax_id):
