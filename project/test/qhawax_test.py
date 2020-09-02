@@ -8,13 +8,13 @@ Test QHAWAX Endpoints
 
 """
 def test_get_inca_qhawax_inca():
-    params = {'name':'qH001'}
+    params = {'name':'qH004'}
     response = requests.get(url+'/api/get_qhawax_inca/',params=params)
     assert response.status_code == 200
     assert json.loads(response.text) == "green"
 
 def test_get_inca_qhawax_inca_not_valid():
-    params = {'no_name':'qH001'}
+    params = {'no_name':'qH004'}
     response = requests.get(url+'/api/get_qhawax_inca/',params=params)
     assert response.status_code == 400
     assert json.loads(response.text) == {"error":"'qHAWAX name None should be string'"}
