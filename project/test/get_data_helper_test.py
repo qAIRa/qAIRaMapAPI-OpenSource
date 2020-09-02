@@ -144,7 +144,10 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript,2)
 
 	def test_get_valid_processed_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryDBValidProcessedByQhawaxScript(100,"",""),None)
+		initial_timestamp = "02-09-2010 00:00:00"
+		last_timestamp = "02-09-2010 00:01:00"
+		self.assertAlmostEqual(get_data_helper.queryDBValidProcessedByQhawaxScript(100,initial_timestamp,last_timestamp),None)
+		self.assertAlmostEqual(get_data_helper.queryDBValidProcessedByQhawaxScript(4,initial_timestamp,last_timestamp),[])
 
 	def test_get_latest_timestamp_valid_processed_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.getLatestTimestampValidProcessed)
@@ -166,7 +169,10 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBDailyValidProcessedByQhawaxScript,1)
 
 	def test_get_measurement_valid_processed_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryDBDailyValidProcessedByQhawaxScript(100,"",""),None)
+		initial_timestamp = "02-09-2010 00:00:00"
+		last_timestamp = "02-09-2010 00:01:00"
+		self.assertAlmostEqual(get_data_helper.queryDBDailyValidProcessedByQhawaxScript(100,initial_timestamp,last_timestamp),None)
+		self.assertAlmostEqual(get_data_helper.queryDBDailyValidProcessedByQhawaxScript(4,initial_timestamp,last_timestamp),[])
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

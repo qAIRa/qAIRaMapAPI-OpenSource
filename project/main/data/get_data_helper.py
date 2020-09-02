@@ -224,6 +224,13 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
                ValidProcessedMeasurement.SPL, ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, 
                ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.lat,ValidProcessedMeasurement.lon, 
                ValidProcessedMeasurement.timestamp_zone)
+
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
     if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
         return session.query(*sensors).\
                        filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
@@ -233,7 +240,8 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
     return None
 
 def getLatestTimestampValidProcessed(qhawax_name):
-    if(same_helper.getInstallationIdBaseName(qhawax_name) is not None):
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
         time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).\
                                   filter_by(qhawax_installation_id=installation_id).first()
         valid_measurement_timestamp=""
@@ -266,6 +274,12 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
                ValidProcessedMeasurement.PM10, ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.SO2_ug_m3,
                ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, 
                ValidProcessedMeasurement.timestamp_zone)
+
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
 
     if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
         return session.query(*sensors). \
