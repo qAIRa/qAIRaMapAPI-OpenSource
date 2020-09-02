@@ -66,34 +66,25 @@ def storeProcessedDataInDB(data):
 def storeValidProcessedDataInDB(data, qhawax_id):
     """
     Helper Processed Measurement function to insert Valid Processed Data
-
-    :type data: json
-    :param data: Valid Processed Measurement detail
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
     """
+
     if(isinstance(data, dict) is not True):
         raise TypeError("Valid Processed variable "+str(data)+" should be Json")
-
+    
     installation_id = same_helper.getInstallationId(qhawax_id)
-    data['timestamp_zone'] = data['timestamp']
-    data['SPL']= data['spl']
     if(installation_id!=None):
-        data.pop('spl', None)
-        data.pop('timestamp', None)
-        data.pop('ID', None)
-        data.pop('zone', None)
-        valid_processed_measurement = ValidProcessedMeasurement(**data, qhawax_installation_id=installation_id)
+        valid_data = {'CO': data['CO'],'CO_ug_m3': data['CO_ug_m3'], 
+                      'H2S': data['H2S'],'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],
+                      'SO2_ug_m3': data['SO2_ug_m3'],'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],
+                      'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'],'PM25': data['PM25'],
+                      'lat':data['lat'],'lon':data['lon'],'PM1': data['PM1'],'PM10': data['PM10'],
+                      'UV': data['UV'],'UVA': data['UVA'],'UVB': data['UVB'],'SPL': data['spl'],
+                      'humidity': data['humidity'],'pressure': data['pressure'],
+                      'temperature': data['temperature'],'timestamp_zone': data['timestamp_zone']}
+        valid_processed_measurement = ValidProcessedMeasurement(**valid_data, qhawax_installation_id=installation_id)
         session.add(valid_processed_measurement)
         session.commit()
                      
-
-def validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value):
-    storeValidProcessedDataInDB(data_json, qhawax_id)
-    if(inca_value==0.0):
-        post_business_helper.updateMainIncaInDB(1,product_id)
 
 def storeAirDailyQualityDataInDB(data):
     """

@@ -25,17 +25,21 @@ def getProcessedData():
     :param interval_minutes: the last N minutes we want it 
 
     """
-    qhawax_name = request.args.get('name')
-    interval_minutes = int(request.args.get('interval_minutes')) \
-        if request.args.get('interval_minutes') is not None else 60 
-    final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
-    initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes) 
-    processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
-    if processed_measurements is not None:
-        processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
-        return make_response(jsonify(processed_measurements_list), 200)
-    else:
-        return make_response(jsonify('Measurements not found'), 404)
+    try:
+        qhawax_name = request.args.get('name')
+        interval_minutes = int(request.args.get('interval_minutes')) \
+            if request.args.get('interval_minutes') is not None else 60 
+        final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+        initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes) 
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, str(initial_timestamp), str(final_timestamp))
+        if processed_measurements is not None:
+            processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
+            return make_response(jsonify(processed_measurements_list), 200)
+        else:
+            return make_response(jsonify('Measurements not found'), 404)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
@@ -94,6 +98,7 @@ def handleProcessedData():
 
     """
     try:
+        flag_email = False
         data_json = request.get_json()
         product_id = data_json['ID']
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
@@ -102,8 +107,6 @@ def handleProcessedData():
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
         mode = get_data_helper.getQhawaxMode(qhawax_id)
-        inca_value = same_helper.getMainIncaQhawaxTable(qhawax_id)
-        socket_json =  json.dumps(data_json)
         if(mode == "Cliente"):
             qhawax_zone = get_data_helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone
@@ -111,13 +114,13 @@ def handleProcessedData():
             if(minutes_difference!=None):
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
-                        socketio.emit('new_data_summary_valid', socket_json) 
+                        post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
+                        socketio.emit('new_data_summary_valid', data_json) 
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
-                        socketio.emit('new_data_summary_valid', socket_json)
-        socketio.emit('new_data_summary_processed', socket_json)
+                        post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
+                        socketio.emit('new_data_summary_valid', data_json) 
+        socketio.emit('new_data_summary_processed', data_json)
         return make_response('OK', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
@@ -139,18 +142,22 @@ def getAverageProcessedMeasurementsTimePeriod():
     :param final_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
 
     """
-    qhawax_name = request.args.get('name')
-    #Recibiendo las horas indicadas a formato UTC 00:00
-    initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
-    final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
-    
-    processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
+    try:
+        qhawax_name = request.args.get('name')
+        #Recibiendo las horas indicadas a formato UTC 00:00
+        initial_timestamp = request.args.get('initial_timestamp')
+        final_timestamp = request.args.get('final_timestamp')
+        
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
 
-    if processed_measurements is not None:
-        processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
-        averaged_measurements_list = util_helper.averageMeasurementsInHours(processed_measurements_list, initial_timestamp_utc, final_timestamp_utc, 1)
-        return make_response(jsonify(averaged_measurements_list), 200)
-    return make_response(jsonify('Measurements not found'), 404)
+        if processed_measurements is not None:
+            processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
+            averaged_measurements_list = util_helper.averageMeasurementsInHours(processed_measurements_list, initial_timestamp, final_timestamp, 1)
+            return make_response(jsonify(averaged_measurements_list), 200)
+        return make_response(jsonify('Measurements not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 
 @app.route('/api/processed_measurements_period/', methods=['GET'])
@@ -168,15 +175,19 @@ def getProcessedMeasurementsTimePeriod():
     :param final_timestamp: timestamp day-month-year hour:minute:second (UTC OO)
 
     """
-    qhawax_name = request.args.get('name')
-    #Recibiendo las horas indicadas a formato UTC 00:00
-    initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
-    final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+    try:
+        qhawax_name = request.args.get('name')
+        #Recibiendo las horas indicadas a formato UTC 00:00
+        initial_timestamp = request.args.get('initial_timestamp')
+        final_timestamp = request.args.get('final_timestamp')
 
-    processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
-    if processed_measurements is not None:
-        processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
-        return make_response(jsonify(processed_measurements_list), 200)
-    return make_response(jsonify('Measurements not found'), 404)
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        if processed_measurements is not None:
+            processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
+            return make_response(jsonify(processed_measurements_list), 200)
+        return make_response(jsonify('Measurements not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 

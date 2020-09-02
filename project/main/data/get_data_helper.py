@@ -167,6 +167,9 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
     if(isinstance(final_timestamp, str) is not True):  
         raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
 
+    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
+
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
 
