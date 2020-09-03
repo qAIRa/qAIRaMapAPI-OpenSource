@@ -223,5 +223,19 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH004'),'Cliente')
 		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH100'),None)
 
+	def test_get_qhawax_status_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,40)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,True)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,4.5)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,None)
+		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,{"name":"qH001"})
+		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,{"name":"qH001"},1)
+
+	def test_get_qhawax_status_valid(self):
+		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH001'),'ON')
+		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH004'),'ON')
+		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH100'),None)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -66,6 +66,7 @@ def getAirQualityMeasurementsTimePeriod():
     initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
     air_quality_measurements = get_data_helper.queryDBAirQuality(qhawax_name, initial_timestamp_utc, final_timestamp_utc)
+    print(air_quality_measurements)
 
     if air_quality_measurements is not None:
         air_quality_measurements_list = [measurement._asdict() for measurement in air_quality_measurements]

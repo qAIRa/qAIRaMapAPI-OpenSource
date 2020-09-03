@@ -73,33 +73,39 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
     :param values_list: array of last time on and last time registration
 
     """
+    if(isinstance(gas_name, str) is not True):  
+        raise TypeError("Gas name "+str(gas_name)+" should be string")
+
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
 
-    initial_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
-    last_timestamp = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=24)
+    if(qhawax_id is not None):
 
-    if(gas_name=='CO'):
-        sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.CO.label('sensor'))
-    elif(gas_name=='H2S'):
-        sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.H2S.label('sensor'))
-    elif(gas_name=='NO2'):
-        sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.NO2.label('sensor'))
-    elif(gas_name=='O3'):
-        sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.O3.label('sensor'))
-    elif(gas_name=='PM25'):
-        sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.PM25.label('sensor'))
-    elif(gas_name=='PM10'):
-        sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.PM10.label('sensor'))
-    elif(gas_name=='SO2'):
-        sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.SO2.label('sensor'))
+        initial_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+        last_timestamp = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=24)
 
-    last_time_turn_on = values_list['last_time_on']
-    last_registration_time = values_list['last_time_registration']
+        if(gas_name=='CO'):
+            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.CO.label('sensor'))
+        elif(gas_name=='H2S'):
+            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.H2S.label('sensor'))
+        elif(gas_name=='NO2'):
+            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.NO2.label('sensor'))
+        elif(gas_name=='O3'):
+            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.O3.label('sensor'))
+        elif(gas_name=='PM25'):
+            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.PM25.label('sensor'))
+        elif(gas_name=='PM10'):
+            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.PM10.label('sensor'))
+        elif(gas_name=='SO2'):
+            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.SO2.label('sensor'))
 
-    return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                               filter(AirQualityMeasurement.timestamp_zone >= last_timestamp). \
-                               filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp). \
-                               order_by(AirQualityMeasurement.timestamp_zone.asc()).all()
+        last_time_turn_on = values_list['last_time_on']
+        last_registration_time = values_list['last_time_registration']
+
+        return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
+                                   filter(AirQualityMeasurement.timestamp_zone >= last_timestamp). \
+                                   filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp). \
+                                   order_by(AirQualityMeasurement.timestamp_zone.asc()).all()
+    return None
 
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp):
     """
@@ -143,24 +149,42 @@ def queryDBGasInca(initial_timestamp, final_timestamp):
     sensors = (GasInca.CO, GasInca.H2S, GasInca.SO2, GasInca.NO2,GasInca.O3, 
                 GasInca.PM25, GasInca.PM10, GasInca.SO2,GasInca.timestamp_zone, GasInca.qhawax_id, GasInca.main_inca)
     
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
     return session.query(*sensors).filter(GasInca.timestamp_zone >= initial_timestamp). \
                                     filter(GasInca.timestamp_zone <= final_timestamp).all()
                                   
 
 def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
+
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
+    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
+
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
 
-    sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S, ProcessedMeasurement.NO,
-                ProcessedMeasurement.NO2, ProcessedMeasurement.O3, ProcessedMeasurement.PM1, ProcessedMeasurement.PM25,
-                ProcessedMeasurement.PM10, ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
-                ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
-                ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
-                ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
+        sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S, ProcessedMeasurement.NO,
+                    ProcessedMeasurement.NO2, ProcessedMeasurement.O3, ProcessedMeasurement.PM1, ProcessedMeasurement.PM25,
+                    ProcessedMeasurement.PM10, ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
+                    ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
+                    ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
+                    ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
 
-    return session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
-                                    filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
-                                    filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
-                                    order_by(ProcessedMeasurement.timestamp).all()
+        return session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
+                                        filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                        filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                        order_by(ProcessedMeasurement.timestamp).all()
+    return None
 
 def getNoiseData(qhawax_name):
     """
@@ -194,7 +218,7 @@ def getHoursDifference(qhawax_id):
             return minutes_difference, values[0]
     return None, None
 
-def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp):
+def queryDBValidProcessedByQhawaxScript(qhawax_id, initial_timestamp, final_timestamp):
     sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.CO_ug_m3,ValidProcessedMeasurement.H2S,
                ValidProcessedMeasurement.H2S_ug_m3,ValidProcessedMeasurement.NO2, ValidProcessedMeasurement.NO2_ug_m3, 
                ValidProcessedMeasurement.O3,ValidProcessedMeasurement.O3_ug_m3, ValidProcessedMeasurement.PM25,
@@ -203,7 +227,19 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
                ValidProcessedMeasurement.SPL, ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, 
                ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.lat,ValidProcessedMeasurement.lon, 
                ValidProcessedMeasurement.timestamp_zone)
-    if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
+
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
+    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
+
+    installation_id = same_helper.getInstallationId(qhawax_id)
+
+    if(installation_id is not None):
         return session.query(*sensors).\
                        filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
                        filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
@@ -212,10 +248,10 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
     return None
 
 def getLatestTimestampValidProcessed(qhawax_name):
-    if(same_helper.getInstallationIdBaseName(qhawax_name) is not None):
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
         time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).\
                                   filter_by(qhawax_installation_id=installation_id).first()
-        valid_measurement_timestamp=""
         valid_processed_measurement_timestamp = []
         if(time_valid_data!=None):
             valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
@@ -245,6 +281,15 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
                ValidProcessedMeasurement.PM10, ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.SO2_ug_m3,
                ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, 
                ValidProcessedMeasurement.timestamp_zone)
+
+    if(isinstance(initial_timestamp, str) is not True):  
+        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
+
+    if(isinstance(final_timestamp, str) is not True):  
+        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
+    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
 
     if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
         return session.query(*sensors). \

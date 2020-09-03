@@ -276,3 +276,11 @@ def getQhawaxMode(qhawax_name):
         return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
     return None
 
+def getQhawaxStatus(qhawax_name):
+    """
+    Get qHAWAX status based on name
+
+    """
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.state).filter_by(name=qhawax_name).one()[0]
+    return None

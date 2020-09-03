@@ -118,6 +118,10 @@ def roundUpThree(data_json):
     return data_json
 
 def averageMeasurementsInHours(measurements, initial_timestamp, final_timestamp, interval_hours):
+
+    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
+
     initial_hour_utc = initial_timestamp.astimezone(tz=dateutil.tz.tzutc()).replace(tzinfo=None)
     final_hour_utc = final_timestamp.astimezone(tz=dateutil.tz.tzutc()).replace(tzinfo=None)
     initial_hour = initial_hour_utc.replace(minute=0, second=0, microsecond=0)
