@@ -309,7 +309,7 @@ def getQhawaxProcessedLatestTimestamp():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
+@app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxValidProcessedLatestTimestamp():
     """
     To get qHAWAX Valid Processed Measurement latest timestamp

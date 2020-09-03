@@ -109,7 +109,7 @@ def saveEndWorkField():
         return make_response('Success: Save qHAWAX last day in field', 200)
 
 
-#@app.route('/api/AllQhawaxInMap/', methods=['GET'])
+@app.route('/api/AllQhawaxInMap/', methods=['GET'])
 def getQhawaxInMap():
     """
     Get list of qHAWAXs filter by company ID
@@ -122,16 +122,13 @@ def getQhawaxInMap():
     """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
+        qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
+        return make_response(jsonify(qhawax_in_field_list), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-    else:
-        if qhawax_in_field is not None:
-            qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
-            return make_response(jsonify(qhawax_in_field_list), 200)
-        return make_response(jsonify('qHAWAXs not found'), 200)
 
-#@app.route('/api/GetInstallationDate/', methods=['GET'])
+@app.route('/api/GetInstallationDate/', methods=['GET'])
 def getInstallationDate():
     """
     Get installation date of qHAWAX in field
@@ -143,7 +140,9 @@ def getInstallationDate():
     try:
         qhawax_id = int(request.args.get('qhawax_id'))
         installation_date = get_business_helper.getInstallationDate(qhawax_id)
+        print(installation_date)
         first_timestamp = get_business_helper.getFirstTimestampValidProcessed(qhawax_id)
+        print(first_timestamp)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

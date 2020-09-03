@@ -160,8 +160,7 @@ def getFirstTimestampValidProcessed(qhawax_id):
     if(installation_id is not None):
         first_timestamp =session.query(ValidProcessedMeasurement.timestamp_zone). \
                                  filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                 order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()           
-        
+                                 order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()
         return None if (first_timestamp==None) else first_timestamp[0]
     return None
 
@@ -187,9 +186,8 @@ def queryGetLastGasSensor():
 
     """
     gas_sensor_list = session.query(GasSensor.id).all()
-    if(gas_sensor_list==[]):
-        return None
-    return session.query(GasSensor.id).order_by(GasSensor.id.desc()).all()[0]
+    return None if(gas_sensor_list==[]) else session.query(GasSensor.id).\
+                                                     order_by(GasSensor.id.desc()).all()[0]
 
 def isItFieldQhawax(qhawax_name):
     """
@@ -237,11 +235,10 @@ def getLatestTimeInValidProcessed(qhawax_name):
         qhawax_time = session.query(ValidProcessedMeasurement.timestamp_zone).\
                               filter_by(qhawax_installation_id=installation_id).first()
         if(qhawax_time!=None):
-            valid_processed_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
+            return session.query(ValidProcessedMeasurement.timestamp_zone).\
                                                 filter_by(qhawax_installation_id=installation_id). \
                                                 order_by(ValidProcessedMeasurement.timestamp_zone.desc()).\
                                                 first().timestamp_zone
-        return valid_processed_timestamp
     return None
 
 
