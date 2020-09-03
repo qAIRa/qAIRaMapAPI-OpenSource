@@ -23,13 +23,35 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.getValidTime,None)
 		self.assertRaises(TypeError,util_helper.getValidTime,True)
 
-	def test_get_average_not_valid(self):
-		self.assertRaises(TypeError,util_helper.getAverage)
-		self.assertRaises(TypeError,util_helper.getAverage,{"name":"qH001"})
-		self.assertRaises(TypeError,util_helper.getAverage,"resultado")
-		self.assertRaises(TypeError,util_helper.getAverage,-1)
-		self.assertRaises(TypeError,util_helper.getAverage,None)
-		self.assertRaises(TypeError,util_helper.getAverage,True)
+	def test_get_gas_sensor_json_not_valid(self):
+		self.assertRaises(TypeError,util_helper.gasSensorJson)
+		self.assertRaises(TypeError,util_helper.gasSensorJson,{"name":"qH001"})
+		self.assertRaises(TypeError,util_helper.gasSensorJson,"resultado")
+		self.assertRaises(TypeError,util_helper.gasSensorJson,None)
+		self.assertRaises(TypeError,util_helper.gasSensorJson,True)
+
+	#def test_get_gas_sensor_json_valid(self):
+	#	json = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}
+	#	sensors = [('NO', 0.0, 0.0, 0.0, 0.0), ('CO', 0.0, 0.0, 0.0, 0.0), ('O3', 0.0, 0.0, 0.0, 0.0),
+	#			   ('H2S', 0.0, 0.0, 0.0, 0.0), ('NO2', 0.0, 0.0, 0.0, 0.0), ('SO2', 0.0, 0.0, 0.0, 0.0)]
+	#	json_output = {'CO': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
+	#				   'SO2': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
+	#				   'H2S': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
+	#				   'O3': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0},
+	#				   'NO': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0},
+	#				   'NO2': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}}
+	#	self.assertAlmostEqual(util_helper.gasSensorJson(json,sensors),json_output)
+
+	#def test_get_color_based_inca_not_valid(self):
+	#	self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue)
+	#	self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,{"name":"qH001"})
+	#	self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,"resultado")
+	#	self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,None)
+	#	self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,True)
+
+	#def test_get_color_based_inca_not_valid(self):
+	#	self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(int(50.0)),'green')
+	#	self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(int(100.0)),'yellow')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

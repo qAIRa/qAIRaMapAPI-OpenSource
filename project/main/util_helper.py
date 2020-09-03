@@ -27,22 +27,15 @@ def getValidTime(minutes_diff, date_util):
         return date_util + datetime.timedelta(minutes=10)
     return date_util + datetime.timedelta(hours=2)
 
-def getAverage(resultado):
-    if(type(resultado) is not [int]):
-        raise TypeError("Variable "+str(resultado)+" should be integer")
-
-    sum = 0        
-
-    if len(resultado) == 0 :
-        return 0
-    else :
-        for i in range(len(resultado)):
-            sum = sum + resultado[i][0]
-        return (sum /len(resultado))
-
 def gasSensorJson(json,sensors):
     all_sensors=['CO','SO2','H2S','O3','NO','NO2']
-    
+
+    if(isinstance(json, dict) is not True):
+        raise TypeError("json "+str(json)+" should be Json Format")
+
+    if(isinstance(sensors, list) is not True):
+        raise TypeError("sensors "+str(sensors)+" should be List Format")
+
     initial = {}
 
     for sensor in all_sensors:
@@ -57,6 +50,7 @@ def gasSensorJson(json,sensors):
 def getColorBaseOnIncaValue(qhawax_inca):
     #if(type(qhawax_inca) is not [int]):
     #    raise TypeError("Variable "+str(qhawax_inca)+" should be integer")
+
     if qhawax_inca == 50:
         return 'green'
     elif qhawax_inca == 100:

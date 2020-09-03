@@ -81,8 +81,7 @@ def getOffsetsFromProductID(qhawax_name):
     if(qhawax_id is not None):
         offsets_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
         offset_json = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}
-        initial_offset_json = util_helper.gasSensorJson(offset_json,offsets_sensors)
-        return initial_offset_json
+        return util_helper.gasSensorJson(offset_json,offsets_sensors)
     return None
 
 
@@ -100,8 +99,7 @@ def getControlledOffsetsFromProductID(qhawax_name):
     if(qhawax_id is not None):
         controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
         controlled_offset_json = {'C0': 0.0, 'C1': 0.0, 'C2': 0.0}
-        initial_controlled_offsets = util_helper.gasSensorJson(controlled_offset_json,controlled_sensors)
-        return initial_controlled_offsets
+        return util_helper.gasSensorJson(controlled_offset_json,controlled_sensors)
     return None
 
 def getNonControlledOffsetsFromProductID(qhawax_name):
@@ -117,8 +115,7 @@ def getNonControlledOffsetsFromProductID(qhawax_name):
     if(qhawax_id is not None):
         non_controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
         non_controlled_offsets = {'NC1': 0.0, 'NC0': 0.0}
-        initial_non_controlled_offsets = util_helper.gasSensorJson(non_controlled_offsets,non_controlled_sensors)
-        return initial_non_controlled_offsets
+        return util_helper.gasSensorJson(non_controlled_offsets,non_controlled_sensors)
     return None
 
 

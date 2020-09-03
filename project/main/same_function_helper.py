@@ -81,7 +81,6 @@ def getQhawaxID(qhawax_name):
 
 def getInstallationId(qhawax_id):
     """ Helper function to get qHAWAX Installation ID base on qHAWAX ID """
-
     if(qhawaxExistBasedOnID(qhawax_id)):
         installation_id= session.query(QhawaxInstallationHistory.id).\
                                  filter_by(qhawax_id=qhawax_id).\
