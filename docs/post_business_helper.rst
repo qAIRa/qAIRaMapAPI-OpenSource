@@ -1,7 +1,7 @@
-processed\_measurement module
+post\_business\_helper module
 =============================
 
-.. automodule:: processed_measurement
+.. automodule:: post_business_helper
    :members:
    :undoc-members:
    :show-inheritance:
