@@ -218,7 +218,7 @@ def getHoursDifference(qhawax_id):
             return minutes_difference, values[0]
     return None, None
 
-def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp):
+def queryDBValidProcessedByQhawaxScript(qhawax_id, initial_timestamp, final_timestamp):
     sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.CO_ug_m3,ValidProcessedMeasurement.H2S,
                ValidProcessedMeasurement.H2S_ug_m3,ValidProcessedMeasurement.NO2, ValidProcessedMeasurement.NO2_ug_m3, 
                ValidProcessedMeasurement.O3,ValidProcessedMeasurement.O3_ug_m3, ValidProcessedMeasurement.PM25,
@@ -234,7 +234,12 @@ def queryDBValidProcessedByQhawaxScript(installation_id, initial_timestamp, fina
     if(isinstance(final_timestamp, str) is not True):  
         raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
 
-    if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
+    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
+
+    installation_id = same_helper.getInstallationId(qhawax_id)
+
+    if(installation_id is not None):
         return session.query(*sensors).\
                        filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
                        filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
@@ -247,7 +252,6 @@ def getLatestTimestampValidProcessed(qhawax_name):
     if(installation_id is not None):
         time_valid_data = session.query(ValidProcessedMeasurement.timestamp_zone).\
                                   filter_by(qhawax_installation_id=installation_id).first()
-        valid_measurement_timestamp=""
         valid_processed_measurement_timestamp = []
         if(time_valid_data!=None):
             valid_processed_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).\
@@ -283,6 +287,9 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
 
     if(isinstance(final_timestamp, str) is not True):  
         raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
+
+    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
 
     if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
         return session.query(*sensors). \

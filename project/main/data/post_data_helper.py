@@ -94,6 +94,9 @@ def storeAirDailyQualityDataInDB(data):
     :param data: json of average of daily measurement
 
     """
+    if(isinstance(data, dict) is not True):
+        raise TypeError("Valid Processed variable "+str(data)+" should be Json")
+        
     qhawax_name = data.pop('ID', None)
     qhawax_id = session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0]
     
