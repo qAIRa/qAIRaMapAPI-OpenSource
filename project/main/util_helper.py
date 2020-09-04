@@ -8,6 +8,17 @@ pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
 pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
 pollutant_25C=[2.62,1.88,1.96,1.15,1.39]
 
+array_ppb = ['CO','H2S','NO2','O3','SO2',\
+             'PM1','PM10','PM25','spl','UV',\
+             'UVA','UVB','humidity','pressure','temperature']
+
+array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
+               'O3_ug_m3','PM1','PM10','PM25','SO2','SO2_ug_m3','spl','UV',\
+               'humidity','pressure']
+
+array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_id',\
+                         'connection_type','season','is_public','person_in_charge']
+
 def check_valid_date(date):
     """
     Check if it's a valid date.
@@ -65,7 +76,7 @@ def validAndBeautyJsonProcessed(data_json):
     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
     data_json = checkNumberValues(data_json)
     data_json = gasConversionPPBtoMG(data_json, arr_season)
-    data_json = roundUpThree(data_json)   
+    data_json = roundUpThree(data_json)  
     data_json["timestamp_zone"] = data_json["timestamp"]
     return data_json
 
@@ -92,24 +103,55 @@ def gasConversionPPBtoMG(data_json,season):
     return data
 
 def roundUpThree(data_json):
-    data_json['CO']= round(data_json['CO'],3)
-    data_json['CO_ug_m3']= round(data_json['CO_ug_m3'],3)
-    data_json['H2S']= round(data_json['H2S'],3)
-    data_json['H2S_ug_m3']= round(data_json['H2S_ug_m3'],3)
-    data_json['NO2']= round(data_json['NO2'],3)
-    data_json['NO2_ug_m3']= round(data_json['NO2_ug_m3'],3)
-    data_json['O3']= round(data_json['O3'],3)
-    data_json['O3_ug_m3']= round(data_json['O3_ug_m3'],3)
-    data_json['PM1']= round(data_json['PM1'],3)
-    data_json['PM10']= round(data_json['PM10'],3)
-    data_json['PM25']= round(data_json['PM25'],3)
-    data_json['SO2']= round(data_json['SO2'],3)
-    data_json['SO2_ug_m3']= round(data_json['SO2_ug_m3'],3)
-    data_json['spl']= round(data_json['spl'],3)
-    data_json['UV']= round(data_json['UV'],3)
-    data_json['humidity']= round(data_json['humidity'],3)
-    data_json['pressure']= round(data_json['pressure'],3)
+    if(isinstance(data_json, dict) is not True):
+        raise TypeError("Measurement variable "+str(data_json)+" should be Json Format")
+
+    for i in range(len(array_ug_m3)):
+        data_json[array_ug_m3[i]] = round(data_json[array_ug_m3[i]],3)
     return data_json
+
+
+def checkNumberValues(data_json):
+    """
+    Helper Processed Measurement function to check number values
+
+    :type data_json: json
+    :param data_json: json of measurement
+
+    """
+    if(isinstance(data_json, dict) is not True):
+        raise TypeError("Measurement variable "+str(data_json)+" should be Json Format")
+    for i in range(len(array_ppb)):
+        if(data_json[array_ppb[i]]=="Nan"):
+            data_json[array_ppb[i]] = 0
+    return data_json
+
+def checkNegatives(data_json):
+    """
+    Helper Processed Measurement function to valid negatives values
+
+    :type data_json: json
+    :param data_json: json of measurement
+
+    """
+    if(isinstance(data_json, dict) is not True):
+        raise TypeError("Measurement variable "+str(data_json)+" should be Json Format")
+
+    for i in range(len(array_ppb)):
+        if(data_json[array_ppb[i]]<0):
+            data_json[array_ppb[i]] = 0
+
+    return data_json
+
+
+def areFieldsValid(data):
+    if(isinstance(data, dict) is not True):
+        raise TypeError("qHAWAX installation variable "+str(data)+" should be Json Format")
+
+    for i in range(len(array_installation)):
+        if(data[array_installation[i]]=='' or data[array_installation[i]]==None):
+            return False
+    return True
 
 def averageMeasurementsInHours(measurements, initial_timestamp, final_timestamp, interval_hours):
 
@@ -152,6 +194,9 @@ def averageMeasurementsInHours(measurements, initial_timestamp, final_timestamp,
 def averageMeasurements(measurements):
     SKIP_KEYS = ['timestamp', 'lat', 'lon']
 
+    if(isinstance(measurements, dict) is not True):
+        raise TypeError("Measurement variable "+str(measurements)+" should be Json Format")
+
     average_measurement = {}
 
     for sensor_name in measurements[0]:
@@ -170,146 +215,3 @@ def averageMeasurements(measurements):
     average_measurement['lon'] = measurements[-1]['lon']
 
     return average_measurement
-
-def checkNumberValues(data_json):
-    """
-    Helper Processed Measurement function to check number values
-
-    :type data_json: json
-    :param data_json: json of measurement
-
-    """
-    if(data_json["temperature"]=="Nan"):
-        data_json["temperature"] = 0
-
-    if(data_json["pressure"]=="Nan"):
-        data_json["pressure"] = 0
-
-    if(data_json["humidity"]=="Nan"):
-        data_json["humidity"] = 0
-
-    if(data_json["spl"]=="Nan"):
-        data_json["spl"] = 0
-
-    if(data_json["UV"]=="Nan"):
-        data_json["UV"] = 0
-
-    if(data_json["UVA"]=="Nan"):
-        data_json["UVA"] = 0
-
-    if(data_json["UVB"]=="Nan"):
-        data_json["UVB"] = 0
-
-    if(data_json["CO"]=="Nan"):
-        data_json["CO"] = 0
-
-    if(data_json["H2S"]=="Nan"):
-        data_json["H2S"] = 0
-
-    if(data_json["NO2"]=="Nan"):
-        data_json["NO2"] = 0
-
-    if(data_json["O3"]=="Nan"):
-        data_json["O3"] = 0
-
-    if(data_json["SO2"]=="Nan"):
-        data_json["SO2"] = 0
-
-    if(data_json["PM1"]=="Nan"):
-        data_json["PM1"] = 0
-
-    if(data_json["PM25"]=="Nan"):
-        data_json["PM25"] = 0
-
-    if(data_json["PM10"]=="Nan"):
-        data_json["PM10"] = 0
-
-    return data_json
-
-def checkNegatives(data_json):
-    """
-    Helper Processed Measurement function to valid negatives values
-
-    :type data_json: json
-    :param data_json: json of measurement
-
-    """
-    if(data_json["temperature"]<0):
-        data_json["temperature"] = 0
-
-    if(data_json["pressure"]<0):
-        data_json["pressure"] = 0
-
-    if(data_json["humidity"]<0):
-        data_json["humidity"] = 0
-
-    if(data_json["spl"]<0):
-        data_json["spl"] = 0
-
-    if(data_json["UV"]<0):
-        data_json["UV"] = 0
-
-    if(data_json["UVA"]<0):
-        data_json["UVA"] = 0
-
-    if(data_json["UVB"]<0):
-        data_json["UVB"] = 0
-
-    if(data_json["CO"]<0):
-        data_json["CO"] = 0
-
-    if(data_json["H2S"]<0):
-        data_json["H2S"] = 0
-
-    if(data_json["NO2"]<0):
-        data_json["NO2"] = 0
-
-    if(data_json["O3"]<0):
-        data_json["O3"] = 0
-
-    if(data_json["SO2"]<0):
-        data_json["SO2"] = 0
-
-    if(data_json["PM1"]<0):
-        data_json["PM1"] = 0
-
-    if(data_json["PM25"]<0):
-        data_json["PM25"] = 0
-
-    if(data_json["PM10"]<0):
-        data_json["PM10"] = 0
-
-    return data_json
-
-def areFieldsValid(data):
-    if(data['lat']=='' or data['lat']==None):
-        return False
-
-    if(data['lon']=='' or data['lon']==None):
-        return False
-
-    if(data['comercial_name']=='' or data['comercial_name']==None):
-        return False
-
-    if(data['company_id']=='' or data['company_id']==None):
-        return False
-
-    if(data['eca_noise_id']=='' or data['eca_noise_id']==None):
-        return False
-
-    if(data['qhawax_id']=='' or data['qhawax_id']==None):
-        return False
-
-    if(data['connection_type']=='' or data['connection_type']==None):
-        return False
-
-    if(data['season']=='' or data['season']==None):
-        return False
-
-    if(data['is_public']=='' or data['is_public']==None):
-        return False
-
-    if(data['person_in_charge']=='' or data['person_in_charge']==None):
-        return False
-
-    return True

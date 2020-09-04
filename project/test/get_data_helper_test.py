@@ -31,6 +31,7 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.getComercialName,"String_")
 
 	def test_query_comercial_name_valid(self):
+		self.assertAlmostEqual(get_data_helper.getComercialName(4),"Test Aguitas 2.0")
 		self.assertAlmostEqual(get_data_helper.getComercialName(20),None)
 
 	def test_query_air_quality_not_valid(self):
@@ -70,6 +71,12 @@ class TestGetDataHelper(unittest.TestCase):
 	def test_query_gas_average_measurement_valid(self):
 		values_date = {'last_time_on': "02-09-2020 01:00:00", 'last_time_registration': "02-09-2020 00:01:00"} 
 		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","CO",values_date),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","H2S",values_date),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","NO2",values_date),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","O3",values_date),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","PM25",values_date),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","PM10",values_date),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH001","SO2",values_date),[])
 		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH100","CO",values_date),None)
 
 	def test_query_valid_air_quality_not_valid(self):
@@ -92,7 +99,8 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,True)
 		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,-5.0)
 		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,None)
-		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,"qH001",1,2)
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,"qH001",1)
+		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,1,"qH001")
 
 	def test_query_valid_air_quality_valid(self):
 		initial_timestamp = "02-09-2010 00:00:00"
@@ -105,7 +113,8 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,True)
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,-5.0)
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,None)
-		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001",1,2)
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001",1)
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001","",1)
 
 	def test_query_processed_valid(self):
 		initial_timestamp = "02-09-2010 00:00:00"
@@ -143,7 +152,8 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript,-5.0)
 		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript,None)
 		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript,1,2)
-		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript,2)
+		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript,2,"",5)
+		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript,2,5,"")
 
 	def test_get_valid_processed_valid(self):
 		initial_timestamp = "02-09-2010 00:00:00"
@@ -169,6 +179,8 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBDailyValidProcessedByQhawaxScript,-5.0)
 		self.assertRaises(TypeError,get_data_helper.queryDBDailyValidProcessedByQhawaxScript,None)
 		self.assertRaises(TypeError,get_data_helper.queryDBDailyValidProcessedByQhawaxScript,1)
+		self.assertRaises(TypeError,get_data_helper.queryDBDailyValidProcessedByQhawaxScript,1,"",1)
+		self.assertRaises(TypeError,get_data_helper.queryDBDailyValidProcessedByQhawaxScript,1,1,"")
 
 	def test_get_measurement_valid_processed_valid(self):
 		initial_timestamp = "02-09-2010 00:00:00"
