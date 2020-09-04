@@ -1,8 +1,4 @@
-import datetime
-import dateutil
-import dateutil.parser
-import time
-from project import app, db, socketio
+from project import app, db
 from project.database.models import  Qhawax, QhawaxInstallationHistory, EcaNoise, Company
 import project.main.util_helper as util_helper
 
@@ -81,7 +77,6 @@ def getQhawaxID(qhawax_name):
 
 def getInstallationId(qhawax_id):
     """ Helper function to get qHAWAX Installation ID base on qHAWAX ID """
-
     if(qhawaxExistBasedOnID(qhawax_id)):
         installation_id= session.query(QhawaxInstallationHistory.id).\
                                  filter_by(qhawax_id=qhawax_id).\

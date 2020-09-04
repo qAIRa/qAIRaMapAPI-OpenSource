@@ -4,9 +4,17 @@
    contain the root `toctree` directive.
 
 Welcome to qAIRaMap-OpenSource's documentation!
-===============================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 qAIRa Map API is an API to connect our web, our qHAWAXs and our database. We work with modules, called qHAWAXs, that capture data from gases, dust and environmental sensors (temperature, pressure, ultraviolet and noise).
+
+.. toctree::
+    :maxdepth: 2
+    :name: about
+    :caption: About:
+    :glob:
+
+    about/*
 
 .. toctree::
     :maxdepth: 3
@@ -18,12 +26,19 @@ qAIRa Map API is an API to connect our web, our qHAWAXs and our database. We wor
 
 
 Guide
-=======
+^^^^^^
 
 .. toctree::
     :maxdepth: 2
 
     license
+
+
+Getting Started with installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Clone or download the project to the device where it will be used.
+
+git clone https://github.com/qAIRa/qAIRaMapAPI-OpenSource.git
 
 
 ***********************************************************

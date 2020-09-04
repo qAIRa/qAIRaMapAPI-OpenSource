@@ -2,7 +2,7 @@ from flask import jsonify, make_response, request
 import project.main.business.get_business_helper as get_business_helper
 from project import app
 
-@app.route('/api/get_eca_noise_limit/', methods=['GET'])
+#@app.route('/api/get_eca_noise_limit/', methods=['GET'])
 def getEcaNoiseLimitById():
     """
     To get eca noise minimun and maximun
@@ -23,7 +23,7 @@ def getEcaNoiseLimitById():
         else:
             return make_response(jsonify({'Warning':'Eca noise ID has not been found'}), 200)
 
-@app.route('/api/get_all_areas/', methods=['GET'])
+#@app.route('/api/get_all_areas/', methods=['GET'])
 def getAllAreas():
     """
     To list all areas in a combo box

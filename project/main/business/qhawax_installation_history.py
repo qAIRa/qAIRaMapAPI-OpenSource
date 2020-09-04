@@ -4,7 +4,7 @@ import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app
 
-@app.route('/api/newQhawaxInstallation/', methods=['POST'])
+#@app.route('/api/newQhawaxInstallation/', methods=['POST'])
 def newQhawaxInstallation():
     """
     To create a qHAWAX in Field 
@@ -77,7 +77,7 @@ def newQhawaxInstallation():
         return make_response({'Success': 'Save new qHAWAX in field'}, 200)
 
 
-@app.route('/api/saveEndWorkField/', methods=['POST'])
+#@app.route('/api/saveEndWorkField/', methods=['POST'])
 def saveEndWorkField():
     """
     Save last date of qHAWAX in field
@@ -122,14 +122,11 @@ def getQhawaxInMap():
     """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
+        qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
+        return make_response(jsonify(qhawax_in_field_list), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-    else:
-        if qhawax_in_field is not None:
-            qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
-            return make_response(jsonify(qhawax_in_field_list), 200)
-        return make_response(jsonify('qHAWAXs not found'), 200)
 
 @app.route('/api/GetInstallationDate/', methods=['GET'])
 def getInstallationDate():
@@ -143,7 +140,9 @@ def getInstallationDate():
     try:
         qhawax_id = int(request.args.get('qhawax_id'))
         installation_date = get_business_helper.getInstallationDate(qhawax_id)
+        print(installation_date)
         first_timestamp = get_business_helper.getFirstTimestampValidProcessed(qhawax_id)
+        print(first_timestamp)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -156,7 +155,7 @@ def getInstallationDate():
             return str(installation_date)
         return make_response({'Success ':'qHAWAX ID '+str(qhawax_id)+' has not been found in field'}, 200)
 
-@app.route('/api/updateQhawaxInstallation/', methods=['POST'])
+#@app.route('/api/updateQhawaxInstallation/', methods=['POST'])
 def updateQhawaxInstallation():
     """
     To create a qHAWAX in Field 

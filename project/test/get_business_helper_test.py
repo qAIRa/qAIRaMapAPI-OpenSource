@@ -1,5 +1,6 @@
 import unittest
 import datetime
+import pytz
 from datetime import timedelta
 import project.main.business.get_business_helper as get_business_helper
 
@@ -140,7 +141,13 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,"342")
 
 	def test_get_installation_date_valid(self):
+		naive_time = datetime.time(4,48,32,919000)
+		date = datetime.date(2020, 8, 9)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		aware_datetime = timezone.localize(naive_datetime)
 		self.assertAlmostEqual(get_business_helper.getInstallationDate(1),None)
+		self.assertAlmostEqual(get_business_helper.getInstallationDate(4),aware_datetime)
 
 	def test_get_first_time_valid_processed_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed)
@@ -150,7 +157,13 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed,"342")
 
 	def test_get_first_time_valid_processed_valid(self):
+		naive_time = datetime.time(17,5,17)
+		date = datetime.date(2020, 8, 19)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		aware_datetime = timezone.localize(naive_datetime) 
 		self.assertAlmostEqual(get_business_helper.getFirstTimestampValidProcessed(1),None)
+		self.assertAlmostEqual(get_business_helper.getFirstTimestampValidProcessed(4),aware_datetime)
 
 	def test_get_last_qhawax_id_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastQhawax,40)
@@ -159,12 +172,18 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastQhawax,None)
 		self.assertRaises(TypeError,get_business_helper.queryGetLastQhawax,"342")
 
+	def test_get_last_qhawax_id_valid(self):
+		self.assertAlmostEqual(get_business_helper.queryGetLastQhawax()[0],30)
+
 	def test_get_last_gas_sensor_id_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,40)
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,True)
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,4.5)
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,None)
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,"342")
+
+	def test_get_last_gas_sensor_id(self):
+		self.assertAlmostEqual(get_business_helper.queryGetLastGasSensor()[0],156)
 
 	def test_qhawax_in_field_valid(self):
 		self.assertAlmostEqual(get_business_helper.isItFieldQhawax("qH002"),False)
@@ -188,7 +207,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_get_qhawax_latest_timestamp_processed_valid(self):
 		self.assertAlmostEqual(get_business_helper.getLatestTimeInProcessedMeasurement('qH100'),None)
-		#self.assertAlmostEqual(get_business_helper.getLatestTimeInProcessedMeasurement('qH020'),"")
 
 	def test_get_qhawax_latest_timestamp_valid_processed_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed)
@@ -201,6 +219,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 	def test_get_qhawax_latest_timestamp_valid_processed_valid(self):
 		self.assertAlmostEqual(get_business_helper.getLatestTimeInValidProcessed('qH100'),None)
 
+
 	def test_get_qhawax_in_field_public_mode_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,40)
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,True)
@@ -208,6 +227,11 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,None)
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"})
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
+
+	def test_get_qhawax_in_field_public_mode_valid(self):
+		y = [('qH004', 'Cliente', 'ON', 'STATIC', 50.0, 51, 4, 1, 'Test Aguitas 2.0', \
+			  -12.042111, -77.028233, 'Zona de Protección Especial')]
+		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
 
 	def test_get_qhawax_mode_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getQhawaxMode)

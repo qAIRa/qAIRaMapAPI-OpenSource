@@ -4,7 +4,7 @@ import project.main.business.post_business_helper as post_business_helper
 import project.main.exceptions as exception_helper
 from project import app
 
-@app.route('/api/create_company/', methods=['POST'])
+#@app.route('/api/create_company/', methods=['POST'])
 def createCompany():
     """
     adds a company 
