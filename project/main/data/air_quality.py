@@ -6,7 +6,7 @@ from project import app, db
 import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
 
-#app.route('/api/air_quality_measurements/', methods=['GET', 'POST'])
+@app.route('/api/air_quality_measurements/', methods=['GET', 'POST'])
 def storeAirQualityData():
     """
     GET: To list all measurement in ppb of air quality measurement table
@@ -46,7 +46,7 @@ def storeAirQualityData():
             print(e)
             return make_response('Invalid format. Exception="%s"' % (e), 400)
 
-#@app.route('/api/air_quality_measurements_period/', methods=['GET'])
+@app.route('/api/air_quality_measurements_period/', methods=['GET'])
 def getAirQualityMeasurementsTimePeriod():
     """
     To list all measurement in ppb of air quality measurement table in a define period of time
@@ -74,7 +74,7 @@ def getAirQualityMeasurementsTimePeriod():
     else:
         return make_response(jsonify('Measurements not found'), 404)
 
-#@app.route('/api/gas_average_measurement/', methods=['GET'])
+@app.route('/api/gas_average_measurement/', methods=['GET'])
 def getGasAverageMeasurementsEvery24():
     """
     To list all values by a define gas or dust in ug/m3 of air quality measurement table of the last 24 hours
@@ -118,7 +118,7 @@ def getGasAverageMeasurementsEvery24():
     else:
         return make_response(jsonify('Measurements not found'), 404)
 
-#@app.route('/api/average_valid_processed_period/', methods=['GET'])
+@app.route('/api/average_valid_processed_period/', methods=['GET'])
 def getAverageValidProcessedMeasurementsTimePeriod():
     """
     To list all average measurement of valid processed measurement table in a define period of time and company

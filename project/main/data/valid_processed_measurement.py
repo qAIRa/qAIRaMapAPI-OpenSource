@@ -9,7 +9,7 @@ import project.main.data.get_data_helper as get_data_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 
-#@app.route('/api/valid_processed_measurements_period/', methods=['GET'])
+@app.route('/api/valid_processed_measurements_period/', methods=['GET'])
 def getValidProcessedMeasurementsTimePeriod():
     """
     To list all measurement of valid processed measurement table in a define period of time and company
@@ -39,7 +39,7 @@ def getValidProcessedMeasurementsTimePeriod():
         return make_response(json_message, 400)
 
 
-#@app.route('/api/valid_processed_measurements/', methods=['GET'])
+@app.route('/api/valid_processed_measurements/', methods=['GET'])
 def getValidProcessedData():
     """
     To list all measurement of valid processed measurement table record the last N minutes
@@ -72,7 +72,7 @@ def getValidProcessedData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/get_time_valid_data_active_qhawax/', methods=['GET'])
+@app.route('/api/get_time_valid_data_active_qhawax/', methods=['GET'])
 def getTimeOfValidProcessed():
     """
     Get the time of the last record in valid processed measurement table

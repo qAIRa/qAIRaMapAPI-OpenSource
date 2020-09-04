@@ -13,7 +13,7 @@ import project.main.business.post_business_helper as post_business_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 
-#@app.route('/api/processed_measurements/', methods=['GET'])
+@app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
     """
     To list all measurement of processed measurement table record the last N minutes
@@ -44,7 +44,7 @@ def getProcessedData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/dataProcessed/', methods=['POST'])
+@app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
     """
     To record processed measurement and valid processed measurement every five seconds
@@ -130,7 +130,7 @@ def handleProcessedData():
         return make_response(json_message, 400)
 
 
-#@app.route('/api/average_processed_measurements_period/', methods=['GET'])
+@app.route('/api/average_processed_measurements_period/', methods=['GET'])
 def getAverageProcessedMeasurementsTimePeriod():
     """
     To list all average measurement of processed measurement table in a define period of time
@@ -163,7 +163,7 @@ def getAverageProcessedMeasurementsTimePeriod():
         return make_response(json_message, 400)
 
 
-#@app.route('/api/processed_measurements_period/', methods=['GET'])
+@app.route('/api/processed_measurements_period/', methods=['GET'])
 def getProcessedMeasurementsTimePeriod():
     """
     To list all measurement of processed measurement table in a define period of time

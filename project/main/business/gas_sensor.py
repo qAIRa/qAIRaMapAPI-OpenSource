@@ -7,7 +7,7 @@ import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app
 
-#@app.route('/api/request_offsets/', methods=['GET'])
+@app.route('/api/request_offsets/', methods=['GET'])
 def requestOffsets():
     """
     endpoint to list offsets variable filter by qHAWAX ID
@@ -28,7 +28,7 @@ def requestOffsets():
         else:
             return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
-#@app.route('/api/request_controlled_offsets/', methods=['GET'])
+@app.route('/api/request_controlled_offsets/', methods=['GET'])
 def requestControlledOffsets():
     """
     endpoint to list controlled offsets variable filter by qHAWAX ID
@@ -49,7 +49,7 @@ def requestControlledOffsets():
         else:
             return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
-#@app.route('/api/request_non_controlled_offsets/', methods=['GET'])
+@app.route('/api/request_non_controlled_offsets/', methods=['GET'])
 def requestNonControlledOffsets():
     """
     endpoint to list non-controlled offsets variable filter by qHAWAX ID
@@ -71,7 +71,7 @@ def requestNonControlledOffsets():
             return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
 
-#@app.route('/api/save_offsets/', methods=['POST'])
+@app.route('/api/save_offsets/', methods=['POST'])
 def saveOffsets():
     """
     endpoint to save offset variables
@@ -104,7 +104,7 @@ def saveOffsets():
     else:
         return make_response({'Success':'Offsets have been updated'}, 200)
 
-#@app.route('/api/save_controlled_offsets/', methods=['POST'])
+@app.route('/api/save_controlled_offsets/', methods=['POST'])
 def saveControlledOffsets():
     """
     endpoint to save controlled offset variables
@@ -132,7 +132,7 @@ def saveControlledOffsets():
     else:
         return make_response({'Success':'Controlled offsets have been updated'}, 200)
 
-#@app.route('/api/save_non_controlled_offsets/', methods=['POST'])
+@app.route('/api/save_non_controlled_offsets/', methods=['POST'])
 def saveNonControlledOffsets():
     """
     endpoint to save non controlled offset variables
