@@ -74,6 +74,61 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertAlmostEqual(same_helper.companyExistBasedOnRUC("10005678112"),True)
 		self.assertAlmostEqual(same_helper.companyExistBasedOnRUC("12345678119"),False)
 
+	def test_get_qhawax_id_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getQhawaxID)
+		self.assertRaises(TypeError,same_helper.getQhawaxID,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getQhawaxID,4.55)
+		self.assertRaises(TypeError,same_helper.getQhawaxID,None)
+		self.assertRaises(TypeError,same_helper.getQhawaxID,True)
+
+	def test_get_qhawax_id_valid(self):
+		self.assertAlmostEqual(same_helper.getQhawaxID("qH001"),1)
+		self.assertAlmostEqual(same_helper.getQhawaxID("qH100"),None)
+
+	def test_get_installation_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getInstallationId)
+		self.assertRaises(TypeError,same_helper.getInstallationId,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getInstallationId,"4.55")
+		self.assertRaises(TypeError,same_helper.getInstallationId,None)
+		self.assertRaises(TypeError,same_helper.getInstallationId,True)
+
+	def test_get_installation_valid(self):
+		self.assertAlmostEqual(same_helper.getInstallationId(4),51)
+		self.assertAlmostEqual(same_helper.getInstallationId(100),None)
+
+	def test_get_qhawax_name_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getQhawaxName)
+		self.assertRaises(TypeError,same_helper.getQhawaxName,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getQhawaxName,"4.55")
+		self.assertRaises(TypeError,same_helper.getQhawaxName,None)
+		self.assertRaises(TypeError,same_helper.getQhawaxName,True)
+
+	def test_get_qhawax_name_valid(self):
+		self.assertAlmostEqual(same_helper.getQhawaxName(1),"qH001")
+		self.assertAlmostEqual(same_helper.getQhawaxName(100),None)
+
+	def test_get_installation_id_based_name_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName)
+		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName,4.55)
+		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName,None)
+		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName,True)
+
+	def test_get_installation_id_based_name_valid(self):
+		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH004"),51)
+		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH100"),None)
+
+	def test_get_main_inca_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable)
+		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,"4.55")
+		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,None)
+		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,True)
+
+	def test_get_main_inca_valid(self):
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(4),50)
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(100),None)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

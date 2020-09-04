@@ -17,7 +17,7 @@ qAIRa Map API is an API to connect our web, our qHAWAXs and our database. We wor
     about/*
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 4
     :name: content
     :caption: Content:
     :glob:
@@ -32,13 +32,6 @@ Guide
     :maxdepth: 2
 
     license
-
-
-Getting Started with installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Clone or download the project to the device where it will be used.
-
-git clone https://github.com/qAIRa/qAIRaMapAPI-OpenSource.git
 
 
 ***********************************************************
