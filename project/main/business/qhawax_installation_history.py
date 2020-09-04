@@ -4,7 +4,7 @@ import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app
 
-#@app.route('/api/newQhawaxInstallation/', methods=['POST'])
+@app.route('/api/newQhawaxInstallation/', methods=['POST'])
 def newQhawaxInstallation():
     """
     To create a qHAWAX in Field 
@@ -77,7 +77,7 @@ def newQhawaxInstallation():
         return make_response({'Success': 'Save new qHAWAX in field'}, 200)
 
 
-#@app.route('/api/saveEndWorkField/', methods=['POST'])
+@app.route('/api/saveEndWorkField/', methods=['POST'])
 def saveEndWorkField():
     """
     Save last date of qHAWAX in field
@@ -155,7 +155,7 @@ def getInstallationDate():
             return str(installation_date)
         return make_response({'Success ':'qHAWAX ID '+str(qhawax_id)+' has not been found in field'}, 200)
 
-#@app.route('/api/updateQhawaxInstallation/', methods=['POST'])
+@app.route('/api/updateQhawaxInstallation/', methods=['POST'])
 def updateQhawaxInstallation():
     """
     To create a qHAWAX in Field 

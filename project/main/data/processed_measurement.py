@@ -29,9 +29,12 @@ def getProcessedData():
         qhawax_name = request.args.get('name')
         interval_minutes = int(request.args.get('interval_minutes')) \
             if request.args.get('interval_minutes') is not None else 60 
-        final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+        final_timestamp = datetime.datetime.now()
+        #hay que probar la hora del servidor, porque esto debe estar en UTC 00
         initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes) 
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, str(initial_timestamp), str(final_timestamp))
+        date_format = '%Y-%m-%d %H:%M:%S.%f'
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, str(initial_timestamp), \
+                                                                  str(final_timestamp),date_format)
         if processed_measurements is not None:
             processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
             return make_response(jsonify(processed_measurements_list), 200)
@@ -147,8 +150,8 @@ def getAverageProcessedMeasurementsTimePeriod():
         #Recibiendo las horas indicadas a formato UTC 00:00
         initial_timestamp = request.args.get('initial_timestamp')
         final_timestamp = request.args.get('final_timestamp')
-        
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        date_format = '%d-%m-%Y %H:%M:%S'
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format)
 
         if processed_measurements is not None:
             processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
@@ -180,8 +183,8 @@ def getProcessedMeasurementsTimePeriod():
         #Recibiendo las horas indicadas a formato UTC 00:00
         initial_timestamp = request.args.get('initial_timestamp')
         final_timestamp = request.args.get('final_timestamp')
-
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        date_format = '%d-%m-%Y %H:%M:%S'
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format)
         if processed_measurements is not None:
             processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
             return make_response(jsonify(processed_measurements_list), 200)

@@ -5,7 +5,7 @@ import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app, socketio
 
-#@app.route('/api/get_qhawax_inca/', methods=['GET'])
+@app.route('/api/get_qhawax_inca/', methods=['GET'])
 def getIncaQhawaxInca():
     """
     To get qHAWAX Inca Value 
@@ -24,7 +24,7 @@ def getIncaQhawaxInca():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/get_qhawaxs_active_mode_customer/', methods=['GET'])
+@app.route('/api/get_qhawaxs_active_mode_customer/', methods=['GET'])
 def getActiveQhawaxModeCustomer():
     """
     To get all active qHAWAXs that are in field in mode costumer
@@ -42,7 +42,7 @@ def getActiveQhawaxModeCustomer():
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/save_main_inca/', methods=['POST'])
+@app.route('/api/save_main_inca/', methods=['POST'])
 def updateIncaData():
     """
     To save qHAWAX inca value
@@ -73,7 +73,7 @@ def updateIncaData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/qhawax_change_status_off/', methods=['POST'])
+@app.route('/api/qhawax_change_status_off/', methods=['POST'])
 def sendQhawaxStatusOff():
     """
     Endpoint to set qHAWAX OFF because script detect no new data within five minutes
@@ -114,7 +114,7 @@ def sendQhawaxStatusOff():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/qhawax_change_status_on/', methods=['POST'])
+@app.route('/api/qhawax_change_status_on/', methods=['POST'])
 def sendQhawaxStatusOn():
     """
     Set qHAWAX ON due to module reset (sensors reset) 
@@ -150,7 +150,7 @@ def sendQhawaxStatusOn():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/get_time_all_active_qhawax/', methods=['GET'])
+@app.route('/api/get_time_all_active_qhawax/', methods=['GET'])
 def getTimeAllActiveQhawax():
     """
     Get Time All Active qHAWAX - Script   
@@ -170,7 +170,7 @@ def getTimeAllActiveQhawax():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/create_qhawax/', methods=['POST'])
+@app.route('/api/create_qhawax/', methods=['POST'])
 def createQhawax():
     """
     To create a qHAWAX 
@@ -216,7 +216,7 @@ def createQhawax():
         json_message = jsonify({'database error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/change_to_calibration/', methods=['POST'])
+@app.route('/api/change_to_calibration/', methods=['POST'])
 def qhawaxChangeToCalibration():
     """
     qHAWAX update to Calibration mode, set main inca -2 value
@@ -251,7 +251,7 @@ def qhawaxChangeToCalibration():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/end_calibration/', methods=['POST'])
+@app.route('/api/end_calibration/', methods=['POST'])
 def qhawaxEndCalibration():
     """
     qHAWAX update end calibration mode, set main inca original, depends of mode (customer or stand by)
@@ -288,7 +288,7 @@ def qhawaxEndCalibration():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
         
-#@app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
+@app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxProcessedLatestTimestamp():
     """
     To get qHAWAX Processed Measurement latest timestamp
@@ -330,7 +330,7 @@ def getQhawaxValidProcessedLatestTimestamp():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-#@app.route('/api/qhawax_status/', methods=['GET'])
+@app.route('/api/qhawax_status/', methods=['GET'])
 def getQhawaxStatus():
     """
     Get qHAWAX Status   
