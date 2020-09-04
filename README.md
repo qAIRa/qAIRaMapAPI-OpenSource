@@ -17,7 +17,7 @@ git clone https://github.com/qAIRa/qAIRaMapAPI-OpenSource.git
 
 ### Prerequisites Ubuntu & Mac
 Now you have to open terminal
-You must have an isolated environment by executing the following command: py -3 -m pip install virtualenv
+You must have an isolated environment by executing the following command:
 
 ```
 python3 -m pip install virtualenv
@@ -83,6 +83,10 @@ If you're encountering some oddities in the API, here's a list of resolutions to
 
 Why am I getting a 404?
 The request could not be understood by the server due to malformed syntax. The client should not repeat the request without modifications
+
+Why am I getting a 405?
+
+Not Allowed - It occurs when web server is configured in a way that does not allow you to perform an action for a particular URL. Maybe when you run an endpoint with GET instead of POST
 
 Why am I not seeing all my results?
 Most API calls accessing a list of resources (e.g., users, issues, etc.). If you're making requests and receiving an incomplete set of results, a response is specified in an unsupported content type.
