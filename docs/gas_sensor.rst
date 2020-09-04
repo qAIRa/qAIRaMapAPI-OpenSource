@@ -1,5 +1,8 @@
-gas\_sensor module
-==================
+####################################
+Gas Sensor Module
+####################################
+
+This file shows all endpoints related to Gas Sensor table.
 
 .. automodule:: gas_sensor
    :members:

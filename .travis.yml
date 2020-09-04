@@ -8,7 +8,7 @@ install:
 script:
 - pytest -v --cov=project/main/
 - coverage run -m pytest project/test/
-after_success: coveralls
+after_success: coveralls project/
 env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgres://qaira:$3cq4IR4@qairamap-db-dev.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/qairamap_db'

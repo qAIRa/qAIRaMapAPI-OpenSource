@@ -1,10 +1,10 @@
 ####################################
-Eca Noise Module
+Air Daily Quality Module
 ####################################
 
-This file shows all endpoints related to Eca Noise table.
+This file shows all endpoints related to Air Daily Quality table.
 
-.. automodule:: eca_noise
+.. automodule:: air_daily_quality
    :members:
    :undoc-members:
    :show-inheritance:

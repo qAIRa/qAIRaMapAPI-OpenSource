@@ -7,7 +7,7 @@ import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
 
 
-@app.route('/api/air_daily_quality_measurements/', methods=['POST'])
+#app.route('/api/air_daily_quality_measurements/', methods=['POST'])
 def storeAirDailyData():
     """
     Air Daily Measurement function to record daily average measurement 
@@ -24,7 +24,7 @@ def storeAirDailyData():
         print(e)
         return make_response('Invalid format. Exception="%s"' % (e), 400)
 
-@app.route('/api/air_daily_measurements_period/', methods=['GET'])
+#app.route('/api/air_daily_measurements_period/', methods=['GET'])
 def getAirDailyMeasurementsTimePeriod():
     """
     Air Daily Measurement function to get daily average measurement based on week number and year 

@@ -13,7 +13,7 @@ import project.main.business.post_business_helper as post_business_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 
-@app.route('/api/processed_measurements/', methods=['GET'])
+#@app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
     """
     To list all measurement of processed measurement table record the last N minutes
@@ -29,9 +29,12 @@ def getProcessedData():
         qhawax_name = request.args.get('name')
         interval_minutes = int(request.args.get('interval_minutes')) \
             if request.args.get('interval_minutes') is not None else 60 
-        final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+        final_timestamp = datetime.datetime.now()
+        #hay que probar la hora del servidor, porque esto debe estar en UTC 00
         initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes) 
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, str(initial_timestamp), str(final_timestamp))
+        date_format = '%Y-%m-%d %H:%M:%S.%f'
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, str(initial_timestamp), \
+                                                                  str(final_timestamp),date_format)
         if processed_measurements is not None:
             processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
             return make_response(jsonify(processed_measurements_list), 200)
@@ -41,7 +44,7 @@ def getProcessedData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-@app.route('/api/dataProcessed/', methods=['POST'])
+#@app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
     """
     To record processed measurement and valid processed measurement every five seconds
@@ -127,7 +130,7 @@ def handleProcessedData():
         return make_response(json_message, 400)
 
 
-@app.route('/api/average_processed_measurements_period/', methods=['GET'])
+#@app.route('/api/average_processed_measurements_period/', methods=['GET'])
 def getAverageProcessedMeasurementsTimePeriod():
     """
     To list all average measurement of processed measurement table in a define period of time
@@ -147,8 +150,8 @@ def getAverageProcessedMeasurementsTimePeriod():
         #Recibiendo las horas indicadas a formato UTC 00:00
         initial_timestamp = request.args.get('initial_timestamp')
         final_timestamp = request.args.get('final_timestamp')
-        
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        date_format = '%d-%m-%Y %H:%M:%S'
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format)
 
         if processed_measurements is not None:
             processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
@@ -160,7 +163,7 @@ def getAverageProcessedMeasurementsTimePeriod():
         return make_response(json_message, 400)
 
 
-@app.route('/api/processed_measurements_period/', methods=['GET'])
+#@app.route('/api/processed_measurements_period/', methods=['GET'])
 def getProcessedMeasurementsTimePeriod():
     """
     To list all measurement of processed measurement table in a define period of time
@@ -180,8 +183,8 @@ def getProcessedMeasurementsTimePeriod():
         #Recibiendo las horas indicadas a formato UTC 00:00
         initial_timestamp = request.args.get('initial_timestamp')
         final_timestamp = request.args.get('final_timestamp')
-
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        date_format = '%d-%m-%Y %H:%M:%S'
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format)
         if processed_measurements is not None:
             processed_measurements_list = [measurement._asdict() for measurement in processed_measurements]
             return make_response(jsonify(processed_measurements_list), 200)

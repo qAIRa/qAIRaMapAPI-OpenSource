@@ -109,7 +109,7 @@ def saveEndWorkField():
         return make_response('Success: Save qHAWAX last day in field', 200)
 
 
-@app.route('/api/AllQhawaxInMap/', methods=['GET'])
+#@app.route('/api/AllQhawaxInMap/', methods=['GET'])
 def getQhawaxInMap():
     """
     Get list of qHAWAXs filter by company ID
@@ -128,7 +128,7 @@ def getQhawaxInMap():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-@app.route('/api/GetInstallationDate/', methods=['GET'])
+#@app.route('/api/GetInstallationDate/', methods=['GET'])
 def getInstallationDate():
     """
     Get installation date of qHAWAX in field

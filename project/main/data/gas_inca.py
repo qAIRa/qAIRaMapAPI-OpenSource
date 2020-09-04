@@ -6,7 +6,7 @@ from project import app, db, socketio
 import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
 
-@app.route('/api/saveGasInca/', methods=['POST'])
+#@app.route('/api/saveGasInca/', methods=['POST'])
 def handleGasInca():
     """
     POST: To record gas and dust measurement in gas inca table
@@ -52,7 +52,7 @@ def handleGasInca():
         print(e)
         return make_response('Invalid format', 400)
 
-@app.route('/api/last_gas_inca_data/', methods=['GET'])
+#@app.route('/api/last_gas_inca_data/', methods=['GET'])
 def getLastGasIncaData():
     """
     To list all measurement of the last hour from the gas inca table

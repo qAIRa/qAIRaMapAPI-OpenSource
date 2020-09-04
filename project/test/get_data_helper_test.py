@@ -115,12 +115,14 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,None)
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001",1)
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001","",1)
+		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001",1,"")
 
 	def test_query_processed_valid(self):
 		initial_timestamp = "02-09-2010 00:00:00"
 		last_timestamp = "02-09-2010 00:01:00"
-		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH001",initial_timestamp,last_timestamp),[])
-		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH100",initial_timestamp,last_timestamp),None)
+		date_format = '%d-%m-%Y %H:%M:%S'
+		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH001",initial_timestamp,last_timestamp,date_format),[])
+		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH100",initial_timestamp,last_timestamp,date_format),None)
 
 	def test_query_noise_data_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.getNoiseData)

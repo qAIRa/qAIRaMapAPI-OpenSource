@@ -183,7 +183,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,"342")
 
 	def test_get_last_gas_sensor_id(self):
-		self.assertAlmostEqual(get_business_helper.queryGetLastGasSensor()[0],156)
+		self.assertAlmostEqual(get_business_helper.queryGetLastGasSensor()[0],159)
 
 	def test_qhawax_in_field_valid(self):
 		self.assertAlmostEqual(get_business_helper.isItFieldQhawax("qH002"),False)
