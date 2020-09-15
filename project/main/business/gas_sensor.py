@@ -25,8 +25,7 @@ def requestOffsets():
     else:
         if(offsets is not None):
             return make_response(jsonify(offsets), 200)
-        else:
-            return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
+        return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
 @app.route('/api/request_controlled_offsets/', methods=['GET'])
 def requestControlledOffsets():
@@ -46,8 +45,7 @@ def requestControlledOffsets():
     else:
         if(controlled_offsets is not None):
             return make_response(jsonify(controlled_offsets), 200)
-        else:
-            return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
+        return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
 @app.route('/api/request_non_controlled_offsets/', methods=['GET'])
 def requestNonControlledOffsets():
@@ -67,8 +65,7 @@ def requestNonControlledOffsets():
     else:
         if(non_controlled_offsets is not None):
             return make_response(jsonify(non_controlled_offsets), 200)
-        else:
-            return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
+        return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
 
 @app.route('/api/save_offsets/', methods=['POST'])

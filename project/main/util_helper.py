@@ -189,3 +189,20 @@ def averageMeasurements(measurements):
     average_measurement['lon'] = measurements[-1]['lon']
 
     return average_measurement
+
+def getDateRangeFromWeek(p_year,p_week):
+    """
+    Helper to get date range from week
+
+    :type p_year: integer
+    :param p_year: year 
+
+    :type p_week: integer
+    :param p_week: week number
+
+    """
+    d = str(p_year)+'-W'+str((int(p_week)- 1))+'-1'
+
+    firstdayofweek = datetime.datetime.strptime(d, "%Y-W%W-%w").date()
+    lastdayofweek = firstdayofweek + datetime.timedelta(days=6.9)
+    return firstdayofweek, lastdayofweek

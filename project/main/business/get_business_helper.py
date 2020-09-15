@@ -34,12 +34,12 @@ def queryQhawaxModeCustomer():
                      QhawaxInstallationHistory.comercial_name, EcaNoise.area_name)
 
     return session.query(*qhawax_column).\
-                          join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
-                          join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
-                          group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                          filter(Qhawax.mode =="Cliente", \
-                                 Qhawax.state =="ON", \
-                                 QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
+                   join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                   join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                   group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                   filter(Qhawax.mode =="Cliente", \
+                          Qhawax.state =="ON", \
+                          QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
 
 def queryGetAreas():
     """

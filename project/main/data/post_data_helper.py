@@ -11,7 +11,6 @@ import project.main.same_function_helper as same_helper
 import project.main.business.post_business_helper as post_business_helper
 
 session = db.session
-
 def storeAirQualityDataInDB(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("Air Quality variable "+str(data)+" should be Json")
@@ -25,7 +24,6 @@ def storeAirQualityDataInDB(data):
     air_quality_measurement = AirQualityMeasurement(**data, qhawax_id=qhawax_id)
     session.add(air_quality_measurement)
     session.commit()
-
 
 def storeGasIncaInDB(data):
     """
@@ -44,7 +42,6 @@ def storeGasIncaInDB(data):
     session.add(gas_inca_processed)
     session.commit()
                                   
-
 def storeProcessedDataInDB(data):
     """
     Helper Processed Measurement function to store Processed Data
@@ -61,7 +58,6 @@ def storeProcessedDataInDB(data):
     processed_measurement = ProcessedMeasurement(**data, qhawax_id=qhawax_id)
     session.add(processed_measurement)
     session.commit()
-
 
 def storeValidProcessedDataInDB(data, qhawax_id):
     """

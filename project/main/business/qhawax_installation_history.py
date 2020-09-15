@@ -8,56 +8,6 @@ from project import app
 def newQhawaxInstallation():
     """
     To create a qHAWAX in Field 
-    
-    Json input of following fields:
-    
-    :type  qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type  lat: double
-    :param lat: latitude of qHAWAX location
-
-    :type  lon: double
-    :param lon: longitude of qHAWAX location
-
-    :type  instalation_date: timestamp
-    :param instalation_date: qHAWAX Installation Date
-
-    :type  link_report: string
-    :param link_report: link of installation report
-
-    :type  observations: string
-    :param observations: installation detail
-
-    :type  district: string
-    :param district: district where qHAWAX is located
-
-    :type  comercial_name: string
-    :param comercial_name: qHAWAX comercial name
-
-    :type  address: string
-    :param address: address where qHAWAX is located
-
-    :type  company_id: integer
-    :param company_id: company ID to which qHAWAX belongs
-
-    :type  eca_noise_id: integer
-    :param eca_noise_id: ID of type of qHAWAX zone
-
-    :type  qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type  connection_type: string
-    :param connection_type: Type of qHAWAX connection
-
-    :type  index_type: string
-    :param index_type: Type of qHAWAX index
-
-    :type  measuring_height: integer
-    :param measuring_height: Height of qHAWAX in field
-
-    :type  season: string
-    :param season: season of the year when the module was deployed
 
     """
     data_json = request.get_json()
@@ -81,14 +31,6 @@ def newQhawaxInstallation():
 def saveEndWorkField():
     """
     Save last date of qHAWAX in field
-    
-    Json input of following fields:
-
-    :type  qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type  end_date: timestamp
-    :param end_date: end date of qHAWAX installation
 
     """
     data_json = request.get_json()
@@ -114,11 +56,6 @@ def getQhawaxInMap():
     """
     Get list of qHAWAXs filter by company ID
 
-    Filter by company ID, the response will refer to the modules of that company
-
-    :type  company_id: integer
-    :param company_id: company ID
-
     """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
@@ -132,17 +69,12 @@ def getQhawaxInMap():
 def getInstallationDate():
     """
     Get installation date of qHAWAX in field
-
-    :type  qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
     
     """
     try:
         qhawax_id = int(request.args.get('qhawax_id'))
         installation_date = get_business_helper.getInstallationDate(qhawax_id)
-        print(installation_date)
         first_timestamp = get_business_helper.getFirstTimestampValidProcessed(qhawax_id)
-        print(first_timestamp)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -159,50 +91,6 @@ def getInstallationDate():
 def updateQhawaxInstallation():
     """
     To create a qHAWAX in Field 
-    
-    Json input of following fields:
-    
-    :type  qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type  lat: double
-    :param lat: latitude of qHAWAX location
-
-    :type  lon: double
-    :param lon: longitude of qHAWAX location
-
-    :type  link_report: string
-    :param link_report: link of installation report
-
-    :type  observations: string
-    :param observations: installation detail
-
-    :type  district: string
-    :param district: district where qHAWAX is located
-
-    :type  comercial_name: string
-    :param comercial_name: qHAWAX comercial name
-
-    :type  address: string
-    :param address: address where qHAWAX is located
-
-    :type  company_id: integer
-    :param company_id: company ID to which qHAWAX belongs
-
-    :type  eca_noise_id: integer
-    :param eca_noise_id: ID of type of qHAWAX zone
-
-    :type  qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type  connection_type: string
-    :param connection_type: Type of qHAWAX connection
-
-    :type  measuring_height: integer
-    :param measuring_height: Height of qHAWAX in field
-
-    :type  season: string
-    :param season: season of the year when the module was deployed
 
     """
     try:

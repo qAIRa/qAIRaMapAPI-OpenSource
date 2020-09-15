@@ -126,7 +126,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,True)
 
 	def test_get_main_inca_valid(self):
-		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(4),50)
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(4),-2)
 		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(100),None)
 
 

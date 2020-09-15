@@ -32,7 +32,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_query_qhawax_mode_customer_valid(self):
 		y = [(4, 'qH004', 50.0, 'STATIC', 'Test Aguitas 2.0', 'Zona de Protección Especial')]
-		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
+		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),[])
 
 	def test_query_get_areas_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetAreas,{"name":"qH001"})
@@ -93,12 +93,12 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_query_get_controlled_offsets_from_productID(self):
 		qhawax_name= 'qH004'
-		offset_sensor ={'CO': {'C2': 0.0, 'C1': 0.0, 'C0': 1.0}, 
-		                'SO2': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
-		                'H2S': {'C2': 0.0, 'C1': 0.0, 'C0': 2.0}, 
-		                'O3': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
-		                'NO': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}, 
-		                'NO2': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}}
+		offset_sensor ={'CO': {'C2': 0.0, 'C1': 0.0, 'C0': -100.0}, 
+						'SO2': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
+						'H2S': {'C2': 0.0, 'C1': 0.0, 'C0': -200.0}, 
+						'O3': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
+						'NO': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}, 
+						'NO2': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}}
 		self.assertAlmostEqual(get_business_helper.getControlledOffsetsFromProductID(qhawax_name),offset_sensor)
 		self.assertAlmostEqual(get_business_helper.getControlledOffsetsFromProductID('qH100'),None)
 
@@ -173,7 +173,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastQhawax,"342")
 
 	def test_get_last_qhawax_id_valid(self):
-		self.assertAlmostEqual(get_business_helper.queryGetLastQhawax()[0],30)
+		self.assertAlmostEqual(get_business_helper.queryGetLastQhawax()[0],35)
 
 	def test_get_last_gas_sensor_id_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,40)
@@ -183,7 +183,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastGasSensor,"342")
 
 	def test_get_last_gas_sensor_id(self):
-		self.assertAlmostEqual(get_business_helper.queryGetLastGasSensor()[0],159)
+		self.assertAlmostEqual(get_business_helper.queryGetLastGasSensor()[0],204)
 
 	def test_qhawax_in_field_valid(self):
 		self.assertAlmostEqual(get_business_helper.isItFieldQhawax("qH002"),False)
@@ -229,8 +229,11 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
-		y = [('qH004', 'Cliente', 'ON', 'STATIC', 50.0, 51, 4, 1, 'Test Aguitas 2.0', \
-			  -12.042111, -77.028233, 'Zona de Protección Especial')]
+		y = [('qH004', 'Firmware Update', 'ON', 'STATIC', -2.0, 51, 4, 1, 'Test Aguitas 2.0',\
+		 -12.042111, -77.028233, 'Zona de Protección Especial'), ('qH021', 'Cliente', 'OFF', \
+		 'STATIC', -1.0, 53, 21, 2, 'UNICEF ESTATICO', -12.04325, -77.02855, 'Zona Residencial'), \
+		 ('qH034', 'Cliente', 'OFF', 'STATIC', 0.0, 52, 34, 1, 'Prueba en la Oficina', -12.139502, \
+		 	-77.022529, 'Zona de Protección Especial')]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
 
 	def test_get_qhawax_mode_not_valid(self):
@@ -244,7 +247,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_get_qhawax_mode_valid(self):
 		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH001'),'Stand By')
-		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH004'),'Cliente')
+		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH004'),'Firmware Update')
 		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH100'),None)
 
 	def test_get_qhawax_status_not_valid(self):
