@@ -180,10 +180,13 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format
                     ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
                     ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
 
-        return session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
-                                        filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
-                                        filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
-                                        order_by(ProcessedMeasurement.timestamp).all()
+        processed_measurements = session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
+                                         filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
+                                         filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
+                                         order_by(ProcessedMeasurement.timestamp).all()
+        if(processed_measurements is not []):                                 
+            return [measurement._asdict() for measurement in processed_measurements]
+        return []
     return None
 
 def getNoiseData(qhawax_name):
