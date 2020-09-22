@@ -11,7 +11,7 @@ from flask_cors import CORS, cross_origin
 # Config
 app = Flask(__name__)
 app.config.from_object('config')
-socketio = SocketIO(app,cors_allowed_origins="*")
+socketio = SocketIO(app,cors_allowed_origins="*",async_handlers=True) 
 CORS(app)
 
 # Extensions
