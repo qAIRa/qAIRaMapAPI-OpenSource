@@ -60,35 +60,36 @@ def getTimeQhawaxHistory(qhawax_name):
                        filter(QhawaxInstallationHistory.id == installation_id).first()
     return None
 
-def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
-    """
-    Helper function to get gas average measurement
 
+def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     """
+    Helper function to get gas average measurement based on qHAWAX name and sensor name
+    """
+    sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
+
     if(isinstance(gas_name, str) is not True):  
-        raise TypeError("Gas name "+str(gas_name)+" should be string")
+        raise TypeError("Sensor name "+str(gas_name)+" should be string")
+
+    if(gas_name not in sensor_array):
+        raise ValueError("Sensor name "+str(gas_name)+" should be CO, H2S, NO2, O3, PM25, PM10 or SO2")
 
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
-
     if(qhawax_id is not None):
+        installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+        values = getTimeQhawaxHistory(installation_id)
+        values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
+        
+        initial_timestamp = datetime.datetime.now()
+        last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
+        
+        column_array = [AirQualityMeasurement.CO.label('sensor'), AirQualityMeasurement.H2S.label('sensor'), 
+                        AirQualityMeasurement.NO2.label('sensor'), AirQualityMeasurement.O3.label('sensor'),
+                        AirQualityMeasurement.PM25.label('sensor'), AirQualityMeasurement.PM10.label('sensor'),
+                        AirQualityMeasurement.SO2.label('sensor')]
 
-        initial_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
-        last_timestamp = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=24)
-
-        if(gas_name=='CO'):
-            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.CO.label('sensor'))
-        elif(gas_name=='H2S'):
-            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.H2S.label('sensor'))
-        elif(gas_name=='NO2'):
-            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.NO2.label('sensor'))
-        elif(gas_name=='O3'):
-            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.O3.label('sensor'))
-        elif(gas_name=='PM25'):
-            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.PM25.label('sensor'))
-        elif(gas_name=='PM10'):
-            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.PM10.label('sensor'))
-        elif(gas_name=='SO2'):
-            sensors = (AirQualityMeasurement.timestamp_zone, AirQualityMeasurement.SO2.label('sensor'))
+        for i in range(len(sensor_array)):
+            if(gas_name==sensor_array[i]):
+                sensors = (AirQualityMeasurement.timestamp_zone, column_array[i])
 
         last_time_turn_on = values_list['last_time_on']
         last_registration_time = values_list['last_time_registration']
@@ -98,6 +99,7 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name, values_list):
                                    filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp). \
                                    order_by(AirQualityMeasurement.timestamp_zone.asc()).all()
     return None
+
 
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp,date_format):
     """

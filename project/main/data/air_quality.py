@@ -8,8 +8,6 @@ import project.main.data.get_data_helper as get_data_helper
 def storeAirQualityData():
     """
     POST: To record processed measurement and valid processed measurement every five seconds
-    
-    Json input of Air Quality Measurement
 
     """
     try:
@@ -46,44 +44,16 @@ def getGasAverageMeasurementsEvery24():
     """
     To list all values by a define gas or dust in ug/m3 of air quality measurement table of the last 24 hours
 
-    :type qhawax: string
-    :param qhawax: qHAWAX name
-
-    :type gas: string
-    :param gas: gas or dust name (CO,H2S,O3,NO2,SO2,PM25,PM10)
-
     """
-    qhawax_name = request.args.get('qhawax')
-    gas_name = request.args.get('gas')
     try:
-        values = get_data_helper.getTimeQhawaxHistory(gas_name)
-        values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
-        gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement(qhawax_name, gas_name,values_list)
-        gas_average_measurement_list = []
-        if gas_average_measurement is not None:
-            next_hour = -1
-            for measurement in gas_average_measurement:
-                gas_measurement = measurement._asdict() 
-                hour = gas_measurement["timestamp"].hour
-                if(next_hour == -1): 
-                    gas_average_measurement_list.append(gas_measurement)
-                    next_hour = hour + 1
-                else:
-                    last_date = gas_measurement["timestamp"]
-                    if(hour == next_hour): 
-                        gas_average_measurement_list.append(gas_measurement)                   
-                    else:
-                        diff = hour - next_hour
-                        for i in range(1,diff+2):
-                            new_variable ={"timestamp":last_date + datetime.timedelta(hours=i),"sensor":""}
-                            gas_average_measurement_list.append(new_variable)
-                    next_hour = hour + 1
-
-                if(next_hour == 24): next_hour = 0
-
+        qhawax_name = request.args.get('qhawax')
+        gas_name = request.args.get('gas')
+        gas_average_measurement = helper.queryDBGasAverageMeasurement(qhawax_name, gas_name)
+        gas_average_measurement_list = util_helper.getFormatData(gas_average_measurement)
+        if(gas_average_measurement_list is not None):
             return make_response(jsonify(gas_average_measurement_list), 200)
         return make_response(jsonify('Measurements not found'), 200)
-    except TypeError as e:
+    except (ValueError,TypeError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 

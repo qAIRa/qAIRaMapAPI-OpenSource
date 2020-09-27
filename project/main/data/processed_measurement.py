@@ -8,6 +8,8 @@ from project import app, db, socketio
 import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
 import project.main.util_helper as util_helper
+import project.main.same_function_helper as same_helper
+import project.main.business.get_business_helper as get_business_helper
 
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
@@ -43,11 +45,11 @@ def handleProcessedData():
         product_id = data_json['ID']
         data_json = util_helper.validTimeJsonProcessed(data_json)
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
-        helper.storeProcessedDataInDB(data_json)
+        post_data_helper.storeProcessedDataInDB(data_json)
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
-        qhawax_id = helper.getQhawaxId(product_id)
-        mode = helper.getQhawaxMode(qhawax_id)
+        qhawax_id = same_helper.getQhawaxID(product_id)
+        mode = get_data_helper.getQhawaxMode(qhawax_id)
         if(mode == "Cliente"):
             qhawax_zone = get_data_helper.getNoiseData(product_id)
             data_json['zone'] = qhawax_zone
@@ -88,4 +90,22 @@ def getProcessedMeasurementsTimePeriod():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+
+@app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
+def getQhawaxProcessedLatestTimestamp():
+    """
+    To get qHAWAX Processed Measurement latest timestamp
+
+    """
+    try:
+        qhawax_name = request.args.get('qhawax_name')
+        processed_timestamp = get_business_helper.getLatestTimeInProcessedMeasurement(qhawax_name)
+        if(processed_timestamp is not None):
+            if(processed_timestamp is ""):
+                return make_response({'Warning':' qHAWAX name has not been found in Processed Measurement'},200)
+            return make_response(str(processed_timestamp),200)
+        return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 

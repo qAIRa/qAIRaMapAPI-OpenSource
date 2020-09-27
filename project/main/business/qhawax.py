@@ -10,9 +10,6 @@ def getIncaQhawaxInca():
     """
     To get qHAWAX Inca Value 
 
-    :type name: string
-    :param name: qHAWAX name
-
     """
     try:
         name = request.args.get('name')
@@ -28,9 +25,7 @@ def getIncaQhawaxInca():
 def getActiveQhawaxModeCustomer():
     """
     To get all active qHAWAXs that are in field in mode costumer
-    
     No parameters required
-
     """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
@@ -46,15 +41,6 @@ def getActiveQhawaxModeCustomer():
 def updateIncaData():
     """
     To save qHAWAX inca value
-
-    Json input of following fields:
-
-    :type name: string
-    :param name: qHAWAX name
-
-    :type value_inca: integer
-    :param value_inca: qHAWAX inca value
-
     """
     jsonsend = {}
     try:
@@ -78,22 +64,7 @@ def sendQhawaxStatusOff():
     """
     Endpoint to set qHAWAX OFF because script detect no new data within five minutes
 
-    Json input of following fields:
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type qhawax_lost_timestamp: string
-    :param qhawax_lost_timestamp: the last time qHAWAX send measurement with timezone
-
-    :type description: string
-    :param description: qHAWAX description
-
-    :type person_in_charge: string
-    :param person_in_charge: person who did this action
-
     """
-    
     jsonsend = {}
     try:
         req_json = request.get_json()
@@ -119,19 +90,7 @@ def sendQhawaxStatusOn():
     """
     Set qHAWAX ON due to module reset (sensors reset) 
 
-    Json input of following fields:
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type description: string
-    :param description: qHAWAX description
-
-    :type person_in_charge: string
-    :param person_in_charge: person who did this action
-
     """
-    
     jsonsend = {}
     try:
         req_json = request.get_json()
@@ -155,9 +114,6 @@ def getTimeAllActiveQhawax():
     """
     Get Time All Active qHAWAX - Script   
 
-    :type name: string
-    :param name: qHAWAX name
-
     """
     try:
         name = request.args.get('name')
@@ -174,20 +130,6 @@ def getTimeAllActiveQhawax():
 def createQhawax():
     """
     To create a qHAWAX 
-    
-    Json input of following fields:
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type qhawax_type: string
-    :param qhawax_type: qHAWAX type (it could be STATIC or AEREO)
-    
-    :type description: string
-    :param description: qHAWAX description
-
-    :type person_in_charge: string
-    :param person_in_charge: person who did this action
 
     """
     try:
@@ -221,17 +163,6 @@ def qhawaxChangeToCalibration():
     """
     qHAWAX update to Calibration mode, set main inca -2 value
 
-    Json input of following fields:
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type description: string
-    :param description: qHAWAX description
-
-    :type person_in_charge: string
-    :param person_in_charge: username who change mode
-
     """
     req_json = request.get_json()
     try:
@@ -255,14 +186,6 @@ def qhawaxChangeToCalibration():
 def qhawaxEndCalibration():
     """
     qHAWAX update end calibration mode, set main inca original, depends of mode (customer or stand by)
-
-    Json input of following fields:
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type person_in_charge: string
-    :param person_in_charge: username who change mode
 
     """
     req_json = request.get_json()
@@ -288,55 +211,11 @@ def qhawaxEndCalibration():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
         
-@app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
-def getQhawaxProcessedLatestTimestamp():
-    """
-    To get qHAWAX Processed Measurement latest timestamp
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    try:
-        qhawax_name = request.args.get('qhawax_name')
-        processed_timestamp = get_business_helper.getLatestTimeInProcessedMeasurement(qhawax_name)
-        if(processed_timestamp is not None):
-            if(processed_timestamp is ""):
-                return make_response({'Warning':' qHAWAX name has not been found in Processed Measurement'},200)
-            return make_response(str(processed_timestamp),200)
-        return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-
-@app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
-def getQhawaxValidProcessedLatestTimestamp():
-    """
-    To get qHAWAX Valid Processed Measurement latest timestamp
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    """
-    try:
-        qhawax_name = request.args.get('qhawax_name')
-        valid_processed_timestamp = get_business_helper.getLatestTimeInValidProcessed(qhawax_name)
-        if(valid_processed_timestamp is not None):
-            if(valid_processed_timestamp is ""):
-                return make_response({'Warning':' qHAWAX name has not been found in Valid Processed Measurement'},200)
-            return make_response(str(valid_processed_timestamp),200)
-        return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
 
 @app.route('/api/qhawax_status/', methods=['GET'])
 def getQhawaxStatus():
     """
-    Get qHAWAX Status   
-
-    :type name: string
-    :param name: qHAWAX name
+    Get qHAWAX Status
 
     """
     try:

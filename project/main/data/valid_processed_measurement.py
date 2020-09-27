@@ -5,6 +5,7 @@ import dateutil.tz
 from project import app, db
 import project.main.data.get_data_helper as get_data_helper
 import project.main.same_function_helper as same_helper
+import project.main.business.get_business_helper as get_business_helper
 
 @app.route('/api/valid_processed_measurements_period/', methods=['GET'])
 def getValidProcessedMeasurementsTimePeriod():
@@ -97,6 +98,25 @@ def getDailyValidProcessedData():
                 return make_response(jsonify(valid_processed_measurements), 200)
             return make_response(jsonify('Daily Valid Measurements not found'), 200)
         return make_response(jsonify('qHAWAX ID does not exist in field'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+
+@app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
+def getQhawaxValidProcessedLatestTimestamp():
+    """
+    To get qHAWAX Valid Processed Measurement latest timestamp
+
+    """
+    try:
+        qhawax_name = request.args.get('qhawax_name')
+        valid_processed_timestamp = get_business_helper.getLatestTimeInValidProcessed(qhawax_name)
+        if(valid_processed_timestamp is not None):
+            if(valid_processed_timestamp is ""):
+                return make_response({'Warning':' qHAWAX name has not been found in Valid Processed Measurement'},200)
+            return make_response(str(valid_processed_timestamp),200)
+        return make_response({'Warning': 'qHAWAX name has not been found qHAWAX table'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

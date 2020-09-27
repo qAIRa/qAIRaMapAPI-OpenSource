@@ -1,4 +1,5 @@
 from project import db
+from sqlalchemy.ext.declarative import declared_attr
 
 class Company(db.Model):
     __tablename__ = 'company'
@@ -13,7 +14,6 @@ class Company(db.Model):
     contact_person = db.Column(db.String(100), nullable=False, unique=True)
     installations = db.relationship('QhawaxInstallationHistory', backref='company', lazy='subquery',
                              cascade='delete, delete-orphan')
-
 class Qhawax(db.Model):
     __tablename__ = 'qhawax'
 
@@ -39,8 +39,6 @@ class Qhawax(db.Model):
                                                 cascade='delete, delete-orphan')
     bitacoras = db.relationship('Bitacora', backref='qhawax', lazy='subquery',
                                                 cascade='delete, delete-orphan')
-
-
 class GasSensor(db.Model):
     __tablename__ = 'gas_sensor'
 
@@ -58,41 +56,6 @@ class GasSensor(db.Model):
     C0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
     NC1 = db.Column(db.Float, nullable=False, default=1, server_default='1')
     NC0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
-class ProcessedMeasurement(db.Model):
-    __tablename__ = 'processed_measurement'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
-    timestamp_zone = db.Column(db.DateTime, nullable=False)
-    CO = db.Column(db.Float)
-    CO_ug_m3 = db.Column(db.Float)
-    CO2 = db.Column(db.Float)
-    H2S = db.Column(db.Float)
-    H2S_ug_m3 = db.Column(db.Float)
-    NO = db.Column(db.Float)
-    NO2 = db.Column(db.Float)
-    NO2_ug_m3 = db.Column(db.Float)
-    O3 = db.Column(db.Float)
-    O3_ug_m3 = db.Column(db.Float)
-    PM1 = db.Column(db.Float)
-    PM25 = db.Column(db.Float)
-    PM10 = db.Column(db.Float)
-    SO2 = db.Column(db.Float)
-    SO2_ug_m3 = db.Column(db.Float)
-    VOC = db.Column(db.Float)
-    UV = db.Column(db.Float)
-    UVA = db.Column(db.Float)
-    UVB = db.Column(db.Float)
-    spl = db.Column(db.Float)
-    humidity = db.Column(db.Float)
-    pressure = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    lat = db.Column(db.Float)
-    lon = db.Column(db.Float)
-    alt = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 class GasInca(db.Model):
@@ -114,37 +77,6 @@ class GasInca(db.Model):
     SO2 = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
     main_inca = db.Column(db.Float)
-
-
-class AirQualityMeasurement(db.Model):
-    __tablename__ = 'air_quality_measurement'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp_zone = db.Column(db.DateTime, nullable=False)
-    CO = db.Column(db.Float)
-    CO_ug_m3 = db.Column(db.Float)
-    H2S = db.Column(db.Float)
-    H2S_ug_m3 = db.Column(db.Float)
-    NO2 = db.Column(db.Float)
-    NO2_ug_m3 = db.Column(db.Float)
-    O3 = db.Column(db.Float)
-    O3_ug_m3 = db.Column(db.Float)
-    PM25 = db.Column(db.Float)
-    PM10 = db.Column(db.Float)
-    SO2 = db.Column(db.Float)
-    SO2_ug_m3 = db.Column(db.Float)
-    uv = db.Column(db.Float)
-    uva = db.Column(db.Float)
-    uvb = db.Column(db.Float)
-    spl = db.Column(db.Float)
-    humidity = db.Column(db.Float)
-    pressure = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    lat = db.Column(db.Float)
-    lon = db.Column(db.Float)
-    alt = db.Column(db.Float)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
     
 class EcaNoise(db.Model):
     __tablename__ = 'eca_noise'
@@ -187,6 +119,112 @@ class QhawaxInstallationHistory(db.Model):
                                                    backref='qhawax_installation_history', 
                                                    lazy='subquery',
                                                    cascade='delete, delete-orphan')
+class Bitacora(db.Model):
+    __tablename__ = 'bitacora'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    observation_type = db.Column(db.String(100))
+    description = db.Column(db.String(800))
+    solution = db.Column(db.String(800))
+    person_in_charge = db.Column(db.String(100))
+    start_date_zone = db.Column(db.DateTime, nullable=False)
+    end_date_zone = db.Column(db.DateTime, nullable=False)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+
+
+class AirDailyMeasurement(db.Model):
+    __tablename__ = 'air_daily_measurement'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    CO = db.Column(db.Float)
+    CO_ug_m3 = db.Column(db.Float)
+    H2S = db.Column(db.Float)
+    H2S_ug_m3 = db.Column(db.Float)
+    NO2 = db.Column(db.Float)
+    NO2_ug_m3 = db.Column(db.Float)
+    O3 = db.Column(db.Float)
+    O3_ug_m3 = db.Column(db.Float)
+    PM25 = db.Column(db.Float)
+    PM10 = db.Column(db.Float)
+    SO2 = db.Column(db.Float)
+    SO2_ug_m3 = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    pressure = db.Column(db.Float)
+    spl = db.Column(db.Float)
+    uv = db.Column(db.Float)
+    temperature = db.Column(db.Float)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+
+class AirQualityMeasurement(db.Model):
+    __tablename__ = 'air_quality_measurement'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    CO = db.Column(db.Float)
+    CO_ug_m3 = db.Column(db.Float)
+    H2S = db.Column(db.Float)
+    H2S_ug_m3 = db.Column(db.Float)
+    NO2 = db.Column(db.Float)
+    NO2_ug_m3 = db.Column(db.Float)
+    O3 = db.Column(db.Float)
+    O3_ug_m3 = db.Column(db.Float)
+    PM25 = db.Column(db.Float)
+    PM10 = db.Column(db.Float)
+    SO2 = db.Column(db.Float)
+    SO2_ug_m3 = db.Column(db.Float)
+    uv = db.Column(db.Float)
+    uva = db.Column(db.Float)
+    uvb = db.Column(db.Float)
+    spl = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    pressure = db.Column(db.Float)
+    temperature = db.Column(db.Float)
+    lat = db.Column(db.Float)
+    lon = db.Column(db.Float)
+    alt = db.Column(db.Float)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+
+class ProcessedMeasurement(db.Model):
+    __tablename__ = 'processed_measurement'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    CO = db.Column(db.Float)
+    CO_ug_m3 = db.Column(db.Float)
+    CO2 = db.Column(db.Float)
+    H2S = db.Column(db.Float)
+    H2S_ug_m3 = db.Column(db.Float)
+    NO = db.Column(db.Float)
+    NO2 = db.Column(db.Float)
+    NO2_ug_m3 = db.Column(db.Float)
+    O3 = db.Column(db.Float)
+    O3_ug_m3 = db.Column(db.Float)
+    PM1 = db.Column(db.Float)
+    PM25 = db.Column(db.Float)
+    PM10 = db.Column(db.Float)
+    SO2 = db.Column(db.Float)
+    SO2_ug_m3 = db.Column(db.Float)
+    VOC = db.Column(db.Float)
+    UV = db.Column(db.Float)
+    UVA = db.Column(db.Float)
+    UVB = db.Column(db.Float)
+    spl = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    pressure = db.Column(db.Float)
+    temperature = db.Column(db.Float)
+    lat = db.Column(db.Float)
+    lon = db.Column(db.Float)
+    alt = db.Column(db.Float)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+
 
 class ValidProcessedMeasurement(db.Model):
     __tablename__ = 'valid_processed_measurement'
@@ -222,43 +260,5 @@ class ValidProcessedMeasurement(db.Model):
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
     qhawax_installation_id = db.Column(db.Integer, db.ForeignKey('qhawax_installation_history.id'))
-
-class Bitacora(db.Model):
-    __tablename__ = 'bitacora'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp_zone = db.Column(db.DateTime, nullable=False)
-    observation_type = db.Column(db.String(100))
-    description = db.Column(db.String(800))
-    solution = db.Column(db.String(800))
-    person_in_charge = db.Column(db.String(100))
-    start_date_zone = db.Column(db.DateTime, nullable=False)
-    end_date_zone = db.Column(db.DateTime, nullable=False)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
-class AirDailyMeasurement(db.Model):
-    __tablename__ = 'air_daily_measurement'
-
-    # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
-    timestamp_zone = db.Column(db.DateTime, nullable=False)
-    CO = db.Column(db.Float)
-    CO_ug_m3 = db.Column(db.Float)
-    H2S = db.Column(db.Float)
-    H2S_ug_m3 = db.Column(db.Float)
-    NO2 = db.Column(db.Float)
-    NO2_ug_m3 = db.Column(db.Float)
-    O3 = db.Column(db.Float)
-    O3_ug_m3 = db.Column(db.Float)
-    PM25 = db.Column(db.Float)
-    PM10 = db.Column(db.Float)
-    SO2 = db.Column(db.Float)
-    SO2_ug_m3 = db.Column(db.Float)
-    humidity = db.Column(db.Float)
-    pressure = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 import project.database.utils as utils
