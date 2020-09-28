@@ -52,14 +52,19 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp,date_forma
         return []
     return None
 
-def getTimeQhawaxHistory(qhawax_name):
-    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
-    if(installation_id is not None):
-        return session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
-                             QhawaxInstallationHistory.last_registration_time_zone).\
-                       filter(QhawaxInstallationHistory.id == installation_id).first()
-    return None
 
+def getTimeQhawaxHistory(installation_id):
+    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
+              QhawaxInstallationHistory.last_registration_time_zone)
+
+    if(isinstance(installation_id, int) is not True):  
+        raise TypeError("Installation ID "+str(installation_id)+" should be integer")
+
+    values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
+    if (values!=None):
+        print({'last_time_on': values[0], 'last_time_registration': values[1]} )
+        return {'last_time_on': values[0], 'last_time_registration': values[1]} 
+    return None
 
 def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     """
@@ -74,30 +79,30 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
         raise ValueError("Sensor name "+str(gas_name)+" should be CO, H2S, NO2, O3, PM25, PM10 or SO2")
 
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id is not None):
-        installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
-        values = getTimeQhawaxHistory(installation_id)
-        values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
-        
-        initial_timestamp = datetime.datetime.now()
-        last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
-        
-        column_array = [AirQualityMeasurement.CO.label('sensor'), AirQualityMeasurement.H2S.label('sensor'), 
-                        AirQualityMeasurement.NO2.label('sensor'), AirQualityMeasurement.O3.label('sensor'),
-                        AirQualityMeasurement.PM25.label('sensor'), AirQualityMeasurement.PM10.label('sensor'),
-                        AirQualityMeasurement.SO2.label('sensor')]
+    if(qhawax_id!= None):
+        installation_id = same_helper.getInstallationId(qhawax_id)
+        if(installation_id!=None):
+            values_list = getTimeQhawaxHistory(installation_id)
+            
+            initial_timestamp = datetime.datetime.now()
+            last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
+            
+            column_array = [AirQualityMeasurement.CO.label('sensor'), AirQualityMeasurement.H2S.label('sensor'), 
+                            AirQualityMeasurement.NO2.label('sensor'), AirQualityMeasurement.O3.label('sensor'),
+                            AirQualityMeasurement.PM25.label('sensor'), AirQualityMeasurement.PM10.label('sensor'),
+                            AirQualityMeasurement.SO2.label('sensor')]
 
-        for i in range(len(sensor_array)):
-            if(gas_name==sensor_array[i]):
-                sensors = (AirQualityMeasurement.timestamp_zone, column_array[i])
+            for i in range(len(sensor_array)):
+                if(gas_name==sensor_array[i]):
+                    sensors = (AirQualityMeasurement.timestamp_zone, column_array[i])
 
-        last_time_turn_on = values_list['last_time_on']
-        last_registration_time = values_list['last_time_registration']
+            last_time_turn_on = values_list['last_time_on']
+            last_registration_time = values_list['last_time_registration']
 
-        return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                   filter(AirQualityMeasurement.timestamp_zone >= last_timestamp). \
-                                   filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp). \
-                                   order_by(AirQualityMeasurement.timestamp_zone.asc()).all()
+            return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
+                                       filter(AirQualityMeasurement.timestamp_zone >= last_timestamp). \
+                                       filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp). \
+                                       order_by(AirQualityMeasurement.timestamp_zone.asc()).all()
     return None
 
 

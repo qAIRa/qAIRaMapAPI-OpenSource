@@ -3,6 +3,7 @@ import datetime
 from project import app
 import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
+import project.main.util_helper as util_helper
 
 @app.route('/api/air_quality_measurements/', methods=['POST'])
 def storeAirQualityData():
@@ -48,7 +49,7 @@ def getGasAverageMeasurementsEvery24():
     try:
         qhawax_name = request.args.get('qhawax')
         gas_name = request.args.get('gas')
-        gas_average_measurement = helper.queryDBGasAverageMeasurement(qhawax_name, gas_name)
+        gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement(qhawax_name, gas_name)
         gas_average_measurement_list = util_helper.getFormatData(gas_average_measurement)
         if(gas_average_measurement_list is not None):
             return make_response(jsonify(gas_average_measurement_list), 200)

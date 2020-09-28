@@ -105,8 +105,7 @@ def getInstallationIdBaseName(qhawax_name):
 
     if(qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = getQhawaxID(qhawax_name)
-        installation_id = getInstallationId(qhawax_id)
-        return installation_id
+        return getInstallationId(qhawax_id)
     return None
 
 def getMainIncaQhawaxTable(qhawax_id):

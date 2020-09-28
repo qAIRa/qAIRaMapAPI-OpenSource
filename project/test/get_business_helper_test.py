@@ -229,11 +229,11 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
-		y = [('qH004', 'Firmware Update', 'ON', 'STATIC', -2.0, 51, 4, 1, 'Test Aguitas 2.0',\
-		 -12.042111, -77.028233, 'Zona de Protección Especial'), ('qH021', 'Cliente', 'OFF', \
-		 'STATIC', -1.0, 53, 21, 2, 'UNICEF ESTATICO', -12.04325, -77.02855, 'Zona Residencial'), \
-		 ('qH034', 'Cliente', 'OFF', 'STATIC', 0.0, 52, 34, 1, 'Prueba en la Oficina', -12.139502, \
-		 	-77.022529, 'Zona de Protección Especial')]
+		y =[('qH004', 'Cliente', 'OFF', 'STATIC', -1.0, 51, 4, 1, 'Test Aguitas 2.0', -12.042111, \
+			-77.028233, 'Zona de Protección Especial'), ('qH021', 'Cliente', 'OFF', 'STATIC', -1.0, 53,\
+			21, 2, 'UNICEF ESTATICO', -12.04325, -77.02855, 'Zona Residencial'), ('qH034', 'Cliente', \
+			'OFF', 'STATIC', 0.0, 52, 34, 1, 'Prueba en la Oficina', -12.139502, -77.022529, \
+			'Zona de Protección Especial')]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
 
 	def test_get_qhawax_mode_not_valid(self):
@@ -247,7 +247,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_get_qhawax_mode_valid(self):
 		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH001'),'Stand By')
-		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH004'),'Firmware Update')
+		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH004'),'Cliente')
 		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH100'),None)
 
 	def test_get_qhawax_status_not_valid(self):
@@ -261,7 +261,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_get_qhawax_status_valid(self):
 		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH001'),'ON')
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH004'),'ON')
+		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH004'),'OFF')
 		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH100'),None)
 
 if __name__ == '__main__':
