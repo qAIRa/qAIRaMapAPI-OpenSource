@@ -57,12 +57,11 @@ def getTimeQhawaxHistory(installation_id):
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
               QhawaxInstallationHistory.last_registration_time_zone)
 
-    if(isinstance(installation_id, int) is not True):  
+    if(type(installation_id) not in [int]):
         raise TypeError("Installation ID "+str(installation_id)+" should be integer")
 
     values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
     if (values!=None):
-        print({'last_time_on': values[0], 'last_time_registration': values[1]} )
         return {'last_time_on': values[0], 'last_time_registration': values[1]} 
     return None
 
@@ -83,6 +82,7 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
         installation_id = same_helper.getInstallationId(qhawax_id)
         if(installation_id!=None):
             values_list = getTimeQhawaxHistory(installation_id)
+            print(values_list)
             
             initial_timestamp = datetime.datetime.now()
             last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)

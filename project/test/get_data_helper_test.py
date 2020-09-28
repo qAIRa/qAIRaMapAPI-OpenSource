@@ -58,12 +58,11 @@ class TestGetDataHelper(unittest.TestCase):
 
 	def test_query_time_qhawax_history_valid(self):
 		initial_timestamp = "09-09-2020 00:51:45.877701+00:00"
-		last_timestamp = "22-09-2020 08:11:57.877701+00:00"
+		last_timestamp = "22-09-2020 08:11:57.0+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
-		last_time_turn_on = datetime.datetime.strptime("09-09-2020 00:51:45.877701+00:00",date_format)
-		last_registration_time = datetime.datetime.strptime("22-09-2020 08:11:57.877701+00:00",date_format)
+		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
+		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
 		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time} 
-		print(values)
 		self.assertAlmostEqual(get_data_helper.getTimeQhawaxHistory(51),values)
 
 	def test_query_gas_average_measurement_not_valid(self):
