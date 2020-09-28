@@ -29,7 +29,7 @@ def getActiveQhawaxModeCustomer():
     """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-        if qhawaxs is not []:
+        if qhawaxs!=[]:
             qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
             return make_response(jsonify(qhawaxs_list), 200)
         return make_response({'Warning':'There are no qHAWAXs in field'}, 200)
@@ -139,16 +139,8 @@ def createQhawax():
         qhawax_type=str(req_json['qhawax_type']).strip()
         person_in_charge = req_json['person_in_charge']
         description = req_json['description']
-        last_qhawax_id = get_business_helper.queryGetLastQhawax()
-        if(last_qhawax_id==None):
-            post_business_helper.createQhawax(1, qhawax_name,qhawax_type)
-        else:
-            post_business_helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
-        last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
-        if(last_gas_sensor_id ==None):
-            post_business_helper.insertDefaultOffsets(0,qhawax_name)
-        else:
-            post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
+        post_business_helper.createQhawax(qhawax_name,qhawax_type)
+        post_business_helper.insertDefaultOffsets(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         return make_response({'Success': 'qHAWAX & Sensors have been created'}, 200)
     except (TypeError,ValueError) as e:

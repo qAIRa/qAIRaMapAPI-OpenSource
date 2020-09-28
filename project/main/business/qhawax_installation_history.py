@@ -39,7 +39,8 @@ def saveEndWorkField():
         end_date = data_json['end_date']
         description = data_json['description']
         person_in_charge = data_json['person_in_charge']
-        post_business_helper.saveEndWorkFieldDate(qhawax_id, end_date)
+        date_format = '%d-%m-%Y %H:%M:%S.%f'
+        post_business_helper.saveEndWorkFieldDate(qhawax_id, end_date,date_format)
         post_business_helper.setAvailableQhawax(qhawax_id)
         qhawax_name = same_helper.getQhawaxName(qhawax_id)
         post_business_helper.changeMode(qhawax_name, "Stand By")

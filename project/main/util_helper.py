@@ -19,16 +19,16 @@ array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
 array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_id',\
                          'connection_type','season','is_public','person_in_charge']
 
-def check_valid_date(date):
+def check_valid_date(date,date_format):
     """
     Check if it's a valid date.
     """
-    if(type(date) is not [str]):
-        raise TypeError("Variable "+str(date)+" should not be string")
+    if(isinstance(date, str) is not True):  
+        raise TypeError("Variable "+str(date)+" should be string")
     try:
-        date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+        date = datetime.datetime.strptime(date,date_format)
     except ValueError:
-        raise ValueError("Date "+str(date)+" should be datetime YYYY-MM-DD HH:MM:SS Format")
+        raise ValueError("Date "+str(date)+" should be datetime "+str(date_format)+" Format")
 
 def getValidTime(minutes_diff, date_util):
     if(type(minutes_diff) is not [int]):
