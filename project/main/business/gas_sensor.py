@@ -53,7 +53,7 @@ def saveOffsets():
         offsets = req_json['offsets']
         description =req_json['description']
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.updateOffsetsFromProductID(qhawax_name, offsets)
+        post_business_helper.updateJsonGasSensor(qhawax_name, offsets)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)    
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': ' \'%s\'' % (e)})
@@ -70,7 +70,7 @@ def saveControlledOffsets():
         controlled_offsets = req_json['controlled_offsets']
         description =req_json['description']
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets)
+        post_business_helper.updateJsonGasSensor(qhawax_name, controlled_offsets)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
     except TypeError as e:
         json_message = jsonify({'error': ' \'%s\'' % (e)})
@@ -87,7 +87,7 @@ def saveNonControlledOffsets():
         non_controlled_offsets = req_json['non_controlled_offsets']
         description =req_json['description']
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets)
+        post_business_helper.updateJsonGasSensor(qhawax_name, non_controlled_offsets)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
     except TypeError as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})

@@ -29,7 +29,7 @@ def getActiveQhawaxModeCustomer():
     """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-        if qhawaxs is not []:
+        if qhawaxs!=[]:
             qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
             return make_response(jsonify(qhawaxs_list), 200)
         return make_response({'Warning':'There are no qHAWAXs in field'}, 200)
@@ -49,7 +49,7 @@ def updateIncaData():
         name = str(req_json['name']).strip()
         value_inca = req_json['value_inca']
         post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
-        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+        if(same_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.updateMainIncaInDB(value_inca, name)
         jsonsend['main_inca'] = value_inca
         jsonsend['name'] = name 
@@ -74,7 +74,7 @@ def sendQhawaxStatusOff():
         description = req_json['description']
         person_in_charge = req_json['person_in_charge']
         post_business_helper.saveStatusOffQhawaxTable(name)
-        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+        if(same_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
         post_business_helper.writeBinnacle(name,description,person_in_charge)
         jsonsend['main_inca'] = -1
@@ -99,7 +99,7 @@ def sendQhawaxStatusOn():
         description = req_json['description']
         person_in_charge = req_json['person_in_charge']
         post_business_helper.saveStatusOnTable(qhawax_name)
-        if(get_business_helper.getQhawaxMode(qhawax_name)=='Cliente'):
+        if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         jsonsend['main_inca'] = 0
@@ -139,16 +139,8 @@ def createQhawax():
         qhawax_type=str(req_json['qhawax_type']).strip()
         person_in_charge = req_json['person_in_charge']
         description = req_json['description']
-        last_qhawax_id = get_business_helper.queryGetLastQhawax()
-        if(last_qhawax_id==None):
-            post_business_helper.createQhawax(1, qhawax_name,qhawax_type)
-        else:
-            post_business_helper.createQhawax(last_qhawax_id[0]+1, qhawax_name,qhawax_type)
-        last_gas_sensor_id = get_business_helper.queryGetLastGasSensor()
-        if(last_gas_sensor_id ==None):
-            post_business_helper.insertDefaultOffsets(0,qhawax_name)
-        else:
-            post_business_helper.insertDefaultOffsets(last_gas_sensor_id[0],qhawax_name)
+        post_business_helper.createQhawax(qhawax_name,qhawax_type)
+        post_business_helper.insertDefaultOffsets(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         return make_response({'Success': 'qHAWAX & Sensors have been created'}, 200)
     except (TypeError,ValueError) as e:
@@ -172,7 +164,7 @@ def qhawaxChangeToCalibration():
         qhawax_time_off = now.replace(tzinfo=None)
         post_business_helper.saveStatusOffQhawaxTable(qhawax_name)
         post_business_helper.updateMainIncaQhawaxTable(-2,qhawax_name)
-        if(get_business_helper.getQhawaxMode(qhawax_name)=='Cliente'):
+        if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
             post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qhawax_name)
         post_business_helper.changeMode(qhawax_name,"Calibracion")

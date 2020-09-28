@@ -130,5 +130,20 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(100),None)
 
 
+	def test_get_qhawax_mode_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getQhawaxMode)
+		self.assertRaises(TypeError,same_helper.getQhawaxMode,40)
+		self.assertRaises(TypeError,same_helper.getQhawaxMode,True)
+		self.assertRaises(TypeError,same_helper.getQhawaxMode,4.5)
+		self.assertRaises(TypeError,same_helper.getQhawaxMode,None)
+		self.assertRaises(TypeError,same_helper.getQhawaxMode,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getQhawaxMode,{"name":"qH001"},1)
+
+	def test_get_qhawax_mode_valid(self):
+		self.assertAlmostEqual(same_helper.getQhawaxMode('qH001'),'Stand By')
+		self.assertAlmostEqual(same_helper.getQhawaxMode('qH004'),'Cliente')
+		self.assertAlmostEqual(same_helper.getQhawaxMode('qH100'),None)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

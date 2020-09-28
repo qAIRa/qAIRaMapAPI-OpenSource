@@ -114,3 +114,10 @@ def getMainIncaQhawaxTable(qhawax_id):
         return session.query(Qhawax.main_inca).filter_by(id=qhawax_id).first()[0]
     return None
 
+
+def getQhawaxMode(qhawax_name):
+    """ Get qHAWAX mode based on name """
+    if(qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
+    return None
+

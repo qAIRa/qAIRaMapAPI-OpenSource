@@ -11,50 +11,18 @@ from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallat
 var_gases=['CO','H2S','NO','NO2','O3','SO2']
 session = db.session
 
-def updateOffsetsFromProductID(qhawax_name, offsets):
+def updateJsonGasSensor(qhawax_name, json_gas_sensor):
     """
-    Helper Gas Sensor function to save offsets from qHAWAX ID
+    Helper Gas Sensor function to save json from qHAWAX ID
 
     """
-    if(isinstance(offsets, dict) is not True):
-        raise TypeError("Offset "+str(offsets)+" should be Json Format")
-
+    if(isinstance(json_gas_sensor, dict) is not True):
+        raise TypeError("Gas Sensor Variables "+str(json_gas_sensor)+" should be Json Format")
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
-        for sensor_type in offsets:
+        for sensor_type in json_gas_sensor:
             session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                     update(values=offsets[sensor_type])
-        session.commit()
-
-def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
-    """
-    Helper Gas Sensor function to save controlled offsets from qHAWAX ID
-
-    """
-    if(isinstance(controlled_offsets, dict) is not True):
-        raise TypeError("Controlled Offset "+str(controlled_offsets)+" should be Json Format")
-    
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id is not None):
-        for sensor_type in controlled_offsets:
-            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                     update(values=controlled_offsets[sensor_type])
-        session.commit()
-
-def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets):
-    """
-    Helper Gas Sensor function to save non controlled offsets from qHAWAX ID
-
-    """
-
-    if(isinstance(non_controlled_offsets, dict) is not True):
-        raise TypeError("Non Controlled Offset "+str(non_controlled_offsets)+" should be Json Format")
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-
-    if(qhawax_id is not None):
-        for sensor_type in non_controlled_offsets:
-            session.query(GasSensor).filter_by(qhawax_id=qhawax_id, type=sensor_type).\
-                                     update(values=non_controlled_offsets[sensor_type])
+                                     update(values=json_gas_sensor[sensor_type])
         session.commit()
 
 def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
@@ -160,12 +128,12 @@ def setModeCustomer(qhawax_id):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'mode': "Cliente"})
         session.commit()
 
-def saveEndWorkFieldDate(qhawax_id,end_date):
+def saveEndWorkFieldDate(qhawax_id,end_date,date_format):
     """
     Save End Work in Field
 
     """
-    util_helper.check_valid_date(end_date)
+    util_helper.check_valid_date(end_date,date_format)
     
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         installation_id = same_helper.getInstallationId(qhawax_id)
@@ -205,19 +173,22 @@ def updateQhawaxInstallation(data):
             session.query(QhawaxInstallationHistory). \
                     filter_by(qhawax_id=data['qhawax_id'], \
                               company_id=data['company_id'], \
-                              end_date=None).update(values=data)
+                              end_date_zone=None).update(values=data)
             session.commit()
         else:
             raise Exception("qHAWAX Installation fields must have data")
     else:
         raise TypeError("qHAWAX Installation data "+str(data)+" should be in Json Format")
 
-def createQhawax(qhawax_id, qhawax_name,qhawax_type):
+def createQhawax(qhawax_name,qhawax_type):
     """
     Create a qHAWAX module 
     """
-    if(type(qhawax_id) not in [int]):
-        raise TypeError("qHAWAX id should be integer")
+    qhawax_id = 1
+    last_qhawax_id = get_business_helper.queryGetLastQhawax()
+    
+    if(last_qhawax_id!=None):
+        qhawax_id = int(last_qhawax_id[0])+1
     
     if(isinstance(qhawax_name, str) and isinstance(qhawax_type, str)):
         qhawax_data = {'id':qhawax_id,'name': qhawax_name, 'qhawax_type': qhawax_type,
@@ -230,13 +201,16 @@ def createQhawax(qhawax_id, qhawax_name,qhawax_type):
         raise TypeError("qHAWAX name and type should be string")
 
 
-def insertDefaultOffsets(last_gas_sensor_id, qhawax_name):
+def insertDefaultOffsets(qhawax_name):
     """
     To insert a Default Offset 
 
     """
-    if(type(last_gas_sensor_id) not in [int]):
-        raise TypeError("Gas Sensor ID should be integer")
+    last_gas_sensor_id = 0
+    last_gas_sensor = get_business_helper.queryGetLastGasSensor()
+
+    if(last_gas_sensor!=None):
+        last_gas_sensor_id= last_gas_sensor[0]
 
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = int(same_helper.getQhawaxID(qhawax_name))
@@ -274,7 +248,7 @@ def storeNewQhawaxInstallation(data):
     if(isinstance(data, dict)):
         if(util_helper.areFieldsValid(data)==True):
             data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
-            data['instalation_date_zone'] = datetime.datetime.now(dateutil.tz.tzutc())
+            data['installation_date_zone'] = datetime.datetime.now(dateutil.tz.tzutc())
             data['last_time_physically_turn_on_zone'] = datetime.datetime.now(dateutil.tz.tzutc())
             data['last_registration_time_zone'] = datetime.datetime.now(dateutil.tz.tzutc())
             qhawax_installation = QhawaxInstallationHistory(**data)
