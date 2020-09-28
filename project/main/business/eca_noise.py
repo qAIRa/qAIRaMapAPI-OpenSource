@@ -4,13 +4,6 @@ from project import app
 
 @app.route('/api/get_eca_noise_limit/', methods=['GET'])
 def getEcaNoiseLimitById():
-    """
-    To get eca noise minimun and maximun
-
-    :type ID: string
-    :param ID: Eca Noise ID
-
-    """
     try:
         noiseID = int(request.args.get('ID'))
         ecaNoiseInfo = get_business_helper.queryGetEcaNoise(noiseID)
@@ -25,12 +18,6 @@ def getEcaNoiseLimitById():
 
 @app.route('/api/get_all_areas/', methods=['GET'])
 def getAllAreas():
-    """
-    To list all areas in a combo box
-
-    No parameters required
-
-    """
     try:
         allAreas = get_business_helper.queryGetAreas() 
     except Exception as e:

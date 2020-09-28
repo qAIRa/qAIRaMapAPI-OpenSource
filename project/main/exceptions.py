@@ -4,18 +4,11 @@ def getCompanyTargetofJson(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("Company variable "+str(data)+" should be json")
 
-    if 'company_name' not in data:
-        raise ValueError("No target company_name in given json")
-    if 'email_group' not in data:
-        raise ValueError("No target email_group in given json")
-    if 'ruc' not in data:
-        raise ValueError("No target ruc in given json")
-    if 'address' not in data:
-        raise ValueError("No target address in given json")
-    if 'phone' not in data:
-        raise ValueError("No target phone in given json")
-    if 'contact_person' not in data:
-        raise ValueError("No target contact_person in given json")
+    array = ['company_name','email_group','ruc','address','phone','contact_person']
+
+    for i in range(len(array)):
+        if array[i] not in data:
+            raise ValueError("No target "+array[i]+" in given json")
 
 def getOffsetTargetofJson(data):
     if(isinstance(data, dict) is not True):

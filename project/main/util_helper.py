@@ -72,34 +72,45 @@ def getColorBaseOnIncaValue(qhawax_inca):
         return'red'
     return 'green'
 
+def validTimeJsonProcessed(data_json):
+    datetime_array = data_json['timestamp'].split() 
+    measurement_year = datetime.datetime.strptime(datetime_array[0], '%Y-%m-%d').year
+    if(measurement_year > datetime.date.today().year):
+        data_json['timestamp'] = (datetime.datetime.now(dateutil.tz.tzutc())-datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
+        data_json['timestamp_zone'] = (datetime.datetime.now(dateutil.tz.tzutc())).strftime("%Y-%m-%d %H:%M:%S")
+    return data_json
+
 def validAndBeautyJsonProcessed(data_json):
     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
-    data_json = checkNumberValues(data_json)
+    #data_json = checkNumberValues(data_json)
+    if  'timestamp_zone' not in data_json:
+        data_json["timestamp_zone"] = data_json["timestamp"]
     data_json = gasConversionPPBtoMG(data_json, arr_season)
-    data_json = roundUpThree(data_json)  
-    data_json["timestamp_zone"] = data_json["timestamp"]
+    data_json = roundUpThree(data_json)
     return data_json
 
 def gasConversionPPBtoMG(data_json,season):
-    data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': 0,'H2S': data_json['H2S'],'H2S_ug_m3': 0,
-          'NO2': data_json['NO2'],'NO2_ug_m3': 0,'O3': data_json['O3'],'O3_ug_m3': 0, 'PM1': data_json['PM1'],
-          'PM10': data_json['PM10'],'PM25': data_json['PM25'],'SO2': data_json['SO2'],'SO2_ug_m3': 0,
-          'spl': data_json['spl'],'UV': data_json['UV'],'UVA': data_json['UVA'],'UVB': data_json['UVB'],
-          'humidity': data_json['humidity'],'lat':data_json['lat'],'lon':data_json['lon'],
-          'pressure': data_json['pressure'],'temperature': data_json['temperature'],'timestamp': data_json['timestamp']}
-
+    data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': 0,'H2S': data_json['H2S'],
+          'H2S_ug_m3': 0,'NO2': data_json['NO2'],'NO2_ug_m3': 0,'O3': data_json['O3'],
+          'O3_ug_m3': 0, 'PM1': data_json['PM1'],'PM10': data_json['PM10'],'PM25': data_json['PM25'],
+          'SO2': data_json['SO2'],'SO2_ug_m3': 0,'spl': data_json['spl'],'UV': data_json['UV'],
+          'UVA': data_json['UVA'],'UVB': data_json['UVB'],'humidity': data_json['humidity'],
+          'lat':data_json['lat'],'lon':data_json['lon'],'pressure': data_json['pressure'],
+          'temperature': data_json['temperature'],'timestamp': data_json['timestamp'],
+          'timestamp_zone': data_json['timestamp_zone']}
     for key in data:
         if(key in pollutant):
-            if(key=='SO2'):
-                data['SO2_ug_m3']=data[key]*season[0]
-            elif(key=='NO2'):
-                data['NO2_ug_m3']=data[key]*season[1]
-            elif(key=='O3'):
-                data['O3_ug_m3']=data[key]*season[2]
-            elif(key=='CO'):
-                data['CO_ug_m3']=data[key]*season[3]
-            elif(key=='H2S'):
-                data['H2S_ug_m3']=data[key]*season[4]
+            if((type(data[key]) is float) or (type(data[key]) is int)):
+                if(key=='SO2'):
+                    data['SO2_ug_m3']=data[key]*season[0]
+                elif(key=='NO2'):
+                    data['NO2_ug_m3']=data[key]*season[1]
+                elif(key=='O3'):
+                    data['O3_ug_m3']=data[key]*season[2]
+                elif(key=='CO'):
+                    data['CO_ug_m3']=data[key]*season[3]
+                elif(key=='H2S'):
+                    data['H2S_ug_m3']=data[key]*season[4]
     return data
 
 def roundUpThree(data_json):
@@ -153,43 +164,6 @@ def areFieldsValid(data):
             return False
     return True
 
-def averageMeasurementsInHours(measurements, initial_timestamp, final_timestamp, interval_hours):
-
-    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
-    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
-
-    initial_hour_utc = initial_timestamp.astimezone(tz=dateutil.tz.tzutc()).replace(tzinfo=None)
-    final_hour_utc = final_timestamp.astimezone(tz=dateutil.tz.tzutc()).replace(tzinfo=None)
-    initial_hour = initial_hour_utc.replace(minute=0, second=0, microsecond=0)
-    final_hour = final_hour_utc.replace(minute=0, second=0, microsecond=0)
-
-    current_hour = initial_hour
-    ind = 0
-    measurements_in_timestamp = []
-    averaged_measurements = []
-    while current_hour < final_hour:
-        if ind > len(measurements) - 1:
-            break
-        
-        timestamp = measurements[ind]['timestamp']
-        if timestamp >= current_hour and timestamp <= current_hour + datetime.timedelta(hours=interval_hours):
-            measurements_in_timestamp.append(measurements[ind])
-            ind += 1
-        else:
-            if len(measurements_in_timestamp) != 0:
-                averaged_measurement = averageMeasurements(measurements_in_timestamp)
-                averaged_measurement['timestamp'] = current_hour
-                averaged_measurements.append(averaged_measurement)
-            measurements_in_timestamp = []
-            current_hour += datetime.timedelta(hours=interval_hours)
-    
-    if len(measurements_in_timestamp) != 0:
-        averaged_measurement = averageMeasurements(measurements_in_timestamp)
-        averaged_measurement['timestamp'] = current_hour
-        averaged_measurements.append(averaged_measurement)
-
-    return averaged_measurements
-
 
 def averageMeasurements(measurements):
     SKIP_KEYS = ['timestamp', 'lat', 'lon']
@@ -215,3 +189,50 @@ def averageMeasurements(measurements):
     average_measurement['lon'] = measurements[-1]['lon']
 
     return average_measurement
+
+def getDateRangeFromWeek(p_year,p_week):
+    """
+    Helper to get date range from week
+
+    :type p_year: integer
+    :param p_year: year 
+
+    :type p_week: integer
+    :param p_week: week number
+
+    """
+    d = str(p_year)+'-W'+str((int(p_week)- 1))+'-1'
+
+    firstdayofweek = datetime.datetime.strptime(d, "%Y-W%W-%w").date()
+    lastdayofweek = firstdayofweek + datetime.timedelta(days=6.9)
+    return firstdayofweek, lastdayofweek
+
+
+def getFormatData(gas_average_measurement):
+    gas_average_measurement_list = []
+    if gas_average_measurement is not None:
+        next_hour = -1
+        for measurement in gas_average_measurement:
+            gas_measurement = measurement._asdict() 
+            hour = gas_measurement["timestamp_zone"].hour
+            if(next_hour == -1): 
+                gas_average_measurement_list.append(gas_measurement)
+                next_hour = hour + 1
+            else:
+                if(hour == next_hour):
+                    gas_average_measurement_list.append(gas_measurement)                   
+                else:
+                    if(next_hour>hour): # si next_hour > hour => se resta con 24 horas
+                        diff_0 = abs(24 - next_hour) 
+                        diff = diff_0 + hour 
+                    else:
+                        diff = abs(hour - next_hour-1)
+                    for i in range(1,diff+1):
+                        new_variable ={"timestamp_zone":before_date + datetime.timedelta(hours=i),"sensor":""}
+                        gas_average_measurement_list.append(new_variable)
+                    gas_average_measurement_list.append(gas_measurement)
+                next_hour = hour + 1
+            before_date = gas_measurement["timestamp_zone"]
+            if(next_hour == 24): next_hour = 0
+        return gas_average_measurement_list
+    return None

@@ -13,9 +13,6 @@ def getTimeQhawaxHistory(name):
     """
     Get time qHAWAX History
 
-    :type installation_id: integer
-    :param installation_id: Installation ID
-
     """
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
               QhawaxInstallationHistory.last_registration_time_zone)
@@ -27,25 +24,21 @@ def queryQhawaxModeCustomer():
     """
     Get qHAWAX list in mode Customer and state ON
 
-    No parameters required
-
     """
     qhawax_column = (Qhawax.id, Qhawax.name, Qhawax.main_inca, Qhawax.qhawax_type,\
                      QhawaxInstallationHistory.comercial_name, EcaNoise.area_name)
 
     return session.query(*qhawax_column).\
-                          join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
-                          join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
-                          group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                          filter(Qhawax.mode =="Cliente", \
-                                 Qhawax.state =="ON", \
-                                 QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
+                   join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                   join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                   group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                   filter(Qhawax.mode =="Cliente", \
+                          Qhawax.state =="ON", \
+                          QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
 
 def queryGetAreas():
     """
     Helper Eca Noise function to list all zones 
-
-    No parameters required
 
     """
     fields = (EcaNoise.id, EcaNoise.area_name)
@@ -55,9 +48,6 @@ def queryGetAreas():
 def queryGetEcaNoise(eca_noise_id):
     """
     Helper Eca Noise function to get zone description
-
-    :type eca_noise_id: integer
-    :param eca_noise_id: Eca Noise ID
 
     """
     fields = (EcaNoise.id, EcaNoise.area_name, EcaNoise.max_daytime_limit, \
@@ -69,9 +59,6 @@ def queryGetEcaNoise(eca_noise_id):
 def getOffsetsFromProductID(qhawax_name):
     """
     Helper Gas Sensor function to get offsets from qHAWAX ID
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, \
@@ -89,9 +76,6 @@ def getControlledOffsetsFromProductID(qhawax_name):
     """
     Helper Gas Sensor function to get controlled offsets from qHAWAX ID
 
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
     """
     attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
 
@@ -105,9 +89,6 @@ def getControlledOffsetsFromProductID(qhawax_name):
 def getNonControlledOffsetsFromProductID(qhawax_name):
     """
     Helper Gas Sensor function to get non controlled offsets from qHAWAX name
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
@@ -123,9 +104,6 @@ def queryIncaQhawax(name):
     """
     Helper qHAWAX function to get main inca value
 
-    :type name: string
-    :param name: qHAWAX name
-
     """
     qhawax_id = same_helper.getQhawaxID(name)
     if(qhawax_id is not None):
@@ -138,9 +116,6 @@ def getInstallationDate(qhawax_id):
     """
     Helper qHAWAX function to get Installation Date
 
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
     """
     installation_id = same_helper.getInstallationId(qhawax_id)
     if(installation_id is not None):
@@ -151,9 +126,6 @@ def getInstallationDate(qhawax_id):
 def getFirstTimestampValidProcessed(qhawax_id):
     """
     Helper qHAWAX Installation function to get first timestamp of Valid Processed 
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
 
     """
     installation_id = same_helper.getInstallationId(qhawax_id)
@@ -169,9 +141,6 @@ def queryGetLastQhawax():
     """
     Helper qHAWAX function to get last qHAWAX ID
 
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
     """
     qhawax_list = session.query(Qhawax.id).all()
     return None if (qhawax_list== []) else session.query(Qhawax.id).\
@@ -180,9 +149,6 @@ def queryGetLastQhawax():
 def queryGetLastGasSensor():
     """
     Helper Gas Sensor function to get last Gas Sensor ID
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
 
     """
     gas_sensor_list = session.query(GasSensor.id).all()
@@ -193,19 +159,13 @@ def isItFieldQhawax(qhawax_name):
     """
     Check qhawax in field
 
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
     """
     return True if (same_helper.getInstallationIdBaseName(qhawax_name)is not None) else False
 
 def getLatestTimeInProcessedMeasurement(qhawax_name):
     """
     Helper qHAWAX function to get latest timestamp in UTC 00 from Processed Measurement
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-    
+
     """
 
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
@@ -225,9 +185,6 @@ def getLatestTimeInValidProcessed(qhawax_name):
     """
     Helper qHAWAX function to get latest timestamp in UTC 00 from Valid Processed Measurement
     
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-    
     """
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
@@ -245,8 +202,6 @@ def getLatestTimeInValidProcessed(qhawax_name):
 def queryQhawaxInFieldInPublicMode():
     """
     Get list of qHAWAXs in field in public mode
-    
-    No parameters required
 
     """
     columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, 

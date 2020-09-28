@@ -11,7 +11,6 @@ import project.main.same_function_helper as same_helper
 import project.main.business.post_business_helper as post_business_helper
 
 session = db.session
-
 def storeAirQualityDataInDB(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("Air Quality variable "+str(data)+" should be Json")
@@ -26,13 +25,9 @@ def storeAirQualityDataInDB(data):
     session.add(air_quality_measurement)
     session.commit()
 
-
 def storeGasIncaInDB(data):
     """
     Helper function to record GAS INCA measurement
-
-    :type data: json
-    :param data: gas inca measurement
 
     """
     if(isinstance(data, dict) is not True):
@@ -44,13 +39,9 @@ def storeGasIncaInDB(data):
     session.add(gas_inca_processed)
     session.commit()
                                   
-
 def storeProcessedDataInDB(data):
     """
     Helper Processed Measurement function to store Processed Data
-
-    :type data: json
-    :param data: Processed Measurement detail
 
     """
     if(isinstance(data, dict) is not True):
@@ -62,7 +53,6 @@ def storeProcessedDataInDB(data):
     session.add(processed_measurement)
     session.commit()
 
-
 def storeValidProcessedDataInDB(data, qhawax_id):
     """
     Helper Processed Measurement function to insert Valid Processed Data
@@ -73,7 +63,7 @@ def storeValidProcessedDataInDB(data, qhawax_id):
     
     installation_id = same_helper.getInstallationId(qhawax_id)
     if(installation_id!=None):
-        valid_data = {'CO': data['CO'],'CO_ug_m3': data['CO_ug_m3'], 
+        valid_data = {'timestamp': data['timestamp'],'CO': data['CO'],'CO_ug_m3': data['CO_ug_m3'], 
                       'H2S': data['H2S'],'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],
                       'SO2_ug_m3': data['SO2_ug_m3'],'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],
                       'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'],'PM25': data['PM25'],
@@ -89,9 +79,6 @@ def storeValidProcessedDataInDB(data, qhawax_id):
 def storeAirDailyQualityDataInDB(data):
     """
     Helper Daily Air Measurement function to store air daily measurement
-
-    :type data: json
-    :param data: json of average of daily measurement
 
     """
     if(isinstance(data, dict) is not True):

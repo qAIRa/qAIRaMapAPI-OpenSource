@@ -5,7 +5,6 @@ from project import app, db
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
-
 from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallationHistory, \
                                     Company, AirQualityMeasurement, Bitacora
 
@@ -15,12 +14,6 @@ session = db.session
 def updateOffsetsFromProductID(qhawax_name, offsets):
     """
     Helper Gas Sensor function to save offsets from qHAWAX ID
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type offsets: json
-    :param offsets: Json of offset variable of qHAWAX
 
     """
     if(isinstance(offsets, dict) is not True):
@@ -37,12 +30,6 @@ def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
     """
     Helper Gas Sensor function to save controlled offsets from qHAWAX ID
 
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type offsets: json
-    :param offsets: Json of offset variable of qHAWAX
-
     """
     if(isinstance(controlled_offsets, dict) is not True):
         raise TypeError("Controlled Offset "+str(controlled_offsets)+" should be Json Format")
@@ -57,12 +44,6 @@ def updateControlledOffsetsFromProductID(qhawax_name, controlled_offsets):
 def updateNonControlledOffsetsFromProductID(qhawax_name, non_controlled_offsets):
     """
     Helper Gas Sensor function to save non controlled offsets from qHAWAX ID
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type offsets: json
-    :param offsets: Json of offset variable of qHAWAX
 
     """
 
@@ -80,12 +61,6 @@ def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
     """
     Helper qHAWAX function to save main inca value in qHAWAX table
 
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type new_main_inca: integer
-    :param new_main_inca: qHAWAX main inca
-
     """
     if(type(new_main_inca) not in [int]):
         raise TypeError("Inca value "+str(new_main_inca)+" should be int")
@@ -97,12 +72,6 @@ def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
 def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
     """
     Helper qHAWAX function to save main inca value in qHAWAX Installation table
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type new_main_inca: integer
-    :param new_main_inca: qHAWAX main inca
 
     """
     if(type(new_main_inca) not in [int]):
@@ -117,9 +86,6 @@ def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
 def saveStatusOffQhawaxTable(qhawax_name):
     """
     Set qHAWAX OFF in qHAWAX table
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
@@ -130,16 +96,8 @@ def saveStatusOffQhawaxTable(qhawax_name):
 def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
     """
     Set qHAWAX OFF in qHAWAX Installation table
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type qhawax_lost_timestamp: timestamp
-    :param qhawax_lost_timestamp: qHAWAX last time off
 
     """
-    util_helper.check_valid_date(qhawax_lost_timestamp)
-
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         session.query(QhawaxInstallationHistory).\
@@ -150,9 +108,6 @@ def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
 def saveStatusOnTable(qhawax_name):
     """
     Set qHAWAX ON in qHAWAX table
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
@@ -162,9 +117,6 @@ def saveStatusOnTable(qhawax_name):
 def saveTurnOnLastTime(qhawax_name):
     """
     Set qHAWAX ON in qHAWAX Installation table
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
@@ -179,9 +131,6 @@ def saveTurnOnLastTime(qhawax_name):
 def turnOnAfterCalibration(qhawax_name):
     """
     Set qHAWAX ON in qHAWAX Installation table
-    
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
@@ -197,9 +146,6 @@ def setOccupiedQhawax(qhawax_id):
     """
     Update qHAWAX Availability to Occupied
 
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
     """
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': 'Occupied'})
@@ -209,9 +155,6 @@ def setModeCustomer(qhawax_id):
     """
     Update qHAWAX mode to Customer
 
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
     """
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'mode': "Cliente"})
@@ -220,12 +163,6 @@ def setModeCustomer(qhawax_id):
 def saveEndWorkFieldDate(qhawax_id,end_date):
     """
     Save End Work in Field
-
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type end_date: timestamp
-    :param end_date: qHAWAX installation end date
 
     """
     util_helper.check_valid_date(end_date)
@@ -240,9 +177,6 @@ def setAvailableQhawax(qhawax_id):
     """
     Update qhawax installation state in qHAWAX table
 
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
     """
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': 'Available'})
@@ -252,9 +186,6 @@ def setAvailableQhawax(qhawax_id):
 def changeMode(qhawax_name, mode):
     """
     Change To Other Mode
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     if(isinstance(mode, str) is not True):
@@ -267,9 +198,6 @@ def changeMode(qhawax_name, mode):
 def updateQhawaxInstallation(data):
     """
     Update qHAWAX in Field 
-
-    :type data: json
-    :param data: qHAWAX Installation detail
 
     """
     if(isinstance(data, dict)):
@@ -287,16 +215,6 @@ def updateQhawaxInstallation(data):
 def createQhawax(qhawax_id, qhawax_name,qhawax_type):
     """
     Create a qHAWAX module 
-    
-    :type qhawax_id: integer
-    :param qhawax_id: qHAWAX ID
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type qhawax_type: string
-    :param qhawax_type: qHAWAX type
-
     """
     if(type(qhawax_id) not in [int]):
         raise TypeError("qHAWAX id should be integer")
@@ -315,12 +233,6 @@ def createQhawax(qhawax_id, qhawax_name,qhawax_type):
 def insertDefaultOffsets(last_gas_sensor_id, qhawax_name):
     """
     To insert a Default Offset 
-    
-    :type last_gas_sensor_id: integer
-    :param last_gas_sensor_id: last gas sensor ID
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
 
     """
     if(type(last_gas_sensor_id) not in [int]):
@@ -343,9 +255,6 @@ def insertDefaultOffsets(last_gas_sensor_id, qhawax_name):
 def createCompany(json_company):
     """
     To insert new company
-    
-    :type json_company: json
-    :param json_company: json company
 
     """
     if(isinstance(json_company, dict) is not True):
@@ -360,9 +269,6 @@ def createCompany(json_company):
 def storeNewQhawaxInstallation(data):
     """
     Insert new qHAWAX in Field 
-
-    :type data: json
-    :param data: qHAWAX Installation detail
 
     """
     if(isinstance(data, dict)):
@@ -382,19 +288,7 @@ def storeNewQhawaxInstallation(data):
 
 def writeBinnacle(qhawax_name,description,person_in_charge):
     """
-    Write Binnacle
-
-    :type qhawax_name: string
-    :param qhawax_name: qHAWAX name
-
-    :type observation_type: string
-    :param observation_type: Observation type
-
-    :type description: string
-    :param description: Bitacora description
-
-    :type person_in_charge: string
-    :param person_in_charge: Person in Charge
+    Write observations in Binnacle
 
     """
     if(isinstance(qhawax_name, str) is not True):
