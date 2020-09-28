@@ -215,16 +215,6 @@ def queryQhawaxInFieldInPublicMode():
                                    filter(QhawaxInstallationHistory.is_public == 'si'). \
                                    filter(QhawaxInstallationHistory.end_date_zone == None). \
                                    order_by(Qhawax.id).all() 
-
-def getQhawaxMode(qhawax_name):
-    """
-    Get qHAWAX mode based on name
-
-    """
-    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
-        return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
-    return None
-
 def getQhawaxStatus(qhawax_name):
     """
     Get qHAWAX status based on name

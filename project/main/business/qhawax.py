@@ -49,7 +49,7 @@ def updateIncaData():
         name = str(req_json['name']).strip()
         value_inca = req_json['value_inca']
         post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
-        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+        if(same_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.updateMainIncaInDB(value_inca, name)
         jsonsend['main_inca'] = value_inca
         jsonsend['name'] = name 
@@ -74,7 +74,7 @@ def sendQhawaxStatusOff():
         description = req_json['description']
         person_in_charge = req_json['person_in_charge']
         post_business_helper.saveStatusOffQhawaxTable(name)
-        if(get_business_helper.getQhawaxMode(name)=='Cliente'):
+        if(same_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
         post_business_helper.writeBinnacle(name,description,person_in_charge)
         jsonsend['main_inca'] = -1
@@ -99,7 +99,7 @@ def sendQhawaxStatusOn():
         description = req_json['description']
         person_in_charge = req_json['person_in_charge']
         post_business_helper.saveStatusOnTable(qhawax_name)
-        if(get_business_helper.getQhawaxMode(qhawax_name)=='Cliente'):
+        if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         jsonsend['main_inca'] = 0
@@ -164,7 +164,7 @@ def qhawaxChangeToCalibration():
         qhawax_time_off = now.replace(tzinfo=None)
         post_business_helper.saveStatusOffQhawaxTable(qhawax_name)
         post_business_helper.updateMainIncaQhawaxTable(-2,qhawax_name)
-        if(get_business_helper.getQhawaxMode(qhawax_name)=='Cliente'):
+        if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
             post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qhawax_name)
         post_business_helper.changeMode(qhawax_name,"Calibracion")

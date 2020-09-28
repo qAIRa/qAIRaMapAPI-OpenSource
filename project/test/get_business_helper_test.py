@@ -236,19 +236,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 			'Zona de Protección Especial')]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
 
-	def test_get_qhawax_mode_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getQhawaxMode)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,40)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,True)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,4.5)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,None)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.getQhawaxMode,{"name":"qH001"},1)
-
-	def test_get_qhawax_mode_valid(self):
-		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH001'),'Stand By')
-		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH004'),'Cliente')
-		self.assertAlmostEqual(get_business_helper.getQhawaxMode('qH100'),None)
 
 	def test_get_qhawax_status_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus)

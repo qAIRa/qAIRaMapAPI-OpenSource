@@ -12,15 +12,6 @@ import project.main.business.post_business_helper as post_business_helper
 
 session = db.session
 
-def getQhawaxMode(qhawax_id):
-    """
-    Helper Processed Measurement function to get qHAWAX mode
-
-    """
-    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-        return session.query(Qhawax.mode).filter_by(id=qhawax_id).one()[0]
-    return None
-
 def getComercialName(qhawax_id):
     """
     Helper Processed Measurement function to get qHAWAX comercial name
@@ -47,7 +38,7 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp,date_forma
                                           filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
                                           filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
                                           order_by(AirQualityMeasurement.timestamp_zone).all()
-        if(air_quality_measurements is not []):
+        if(air_quality_measurements !=[]):
             return [measurement._asdict() for measurement in air_quality_measurements]
         return []
     return None
@@ -126,7 +117,7 @@ def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp,date_fo
                                         filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
                                         filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
                                         order_by(AirQualityMeasurement.timestamp).all()
-        if(average_valid_processed is not []):
+        if(average_valid_processed !=[]):
             return [measurement._asdict() for measurement in average_valid_processed]
         return []
     return None
@@ -154,7 +145,7 @@ def queryDBGasInca(initial_timestamp, final_timestamp,date_format):
                        group_by(Qhawax.id, GasInca.id). \
                        filter(GasInca.timestamp_zone >= initial_timestamp). \
                        filter(GasInca.timestamp_zone <= final_timestamp).all()
-    if(gas_inca is not []):
+    if(gas_inca !=[]):
         return [measurement._asdict() for measurement in gas_inca]
     return []
                                   
@@ -183,7 +174,7 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format
                                          filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
                                          filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
                                          order_by(ProcessedMeasurement.timestamp).all()
-        if(processed_measurements is not []):                                 
+        if(processed_measurements !=[]):                                 
             return [measurement._asdict() for measurement in processed_measurements]
         return []
     return None
@@ -244,7 +235,7 @@ def queryDBValidProcessedByQhawaxScript(qhawax_id, initial_timestamp, final_time
                                        filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
                                        filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
                                        order_by(ValidProcessedMeasurement.timestamp_zone).all()
-        if (valid_processed_measurements is not []):
+        if (valid_processed_measurements !=[]):
             return [measurement._asdict() for measurement in valid_processed_measurements]
         return []
     return None
@@ -292,7 +283,7 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
                                   filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
                                   filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
                                   order_by(ValidProcessedMeasurement.timestamp_zone).all()
-        if(valid_processed is not []):
+        if(valid_processed!=[]):
             return [daily_valid_measurement._asdict() for daily_valid_measurement in valid_processed]
         return []
     return None
@@ -336,7 +327,7 @@ def queryDBAirDailyQuality(qhawax_id, init_week, init_year,end_week, end_year):
                                          filter(AirDailyMeasurement.timestamp_zone >= init_firstdate). \
                                          filter(AirDailyMeasurement.timestamp_zone <= end_lastdate). \
                                          order_by(AirDailyMeasurement.timestamp_zone).all()
-        if(air_daily_measurements is not []):
+        if(air_daily_measurements!=[]):
             return [measurement._asdict() for measurement in air_daily_measurements]
         return []
     return None

@@ -168,12 +168,16 @@ class TestPostBusinessHelper(unittest.TestCase):
 		post_business_helper.changeMode("qH015","Stand By")
 
 	def test_update_qhawax_installation_not_valid(self):
+		installation_json = {'lat':None,'lon':None,'comercial_name':None,
+							 'company_id':1,'eca_noise_id':1,'qhawax_id':100,
+							 'connection_type':None,'season':'Primavera','is_public':None,
+							 'person_in_charge':None}
 		self.assertRaises(TypeError,post_business_helper.updateQhawaxInstallation)
 		self.assertRaises(TypeError,post_business_helper.updateQhawaxInstallation,None)
 		self.assertRaises(TypeError,post_business_helper.updateQhawaxInstallation,5)
 		self.assertRaises(TypeError,post_business_helper.updateQhawaxInstallation,"qH050")
 		self.assertRaises(TypeError,post_business_helper.updateQhawaxInstallation,True)
-		self.assertRaises(Exception,post_business_helper.updateQhawaxInstallation,{"hola":"hola"})
+		self.assertRaises(Exception,post_business_helper.updateQhawaxInstallation,installation_json)
 
 	def test_update_qhawax_installation_valid(self):
 		installation_json = {'lat':'-12.0000499','lon':'-77.9000000','comercial_name':'Unit Test Coveralls',
@@ -235,16 +239,21 @@ class TestPostBusinessHelper(unittest.TestCase):
 		post_business_helper.createCompany(json)
 
 	def test_store_qhawax_installation_not_valid(self):
+		installation_json = {'lat':None,'lon':None,'comercial_name':None,
+							 'company_id':1,'eca_noise_id':1,'qhawax_id':100,
+							 'connection_type':None,'season':'Primavera','is_public':None,
+							 'person_in_charge':None}
 		self.assertRaises(TypeError,post_business_helper.storeNewQhawaxInstallation)
 		self.assertRaises(TypeError,post_business_helper.storeNewQhawaxInstallation,None)
 		self.assertRaises(TypeError,post_business_helper.storeNewQhawaxInstallation,5)
 		self.assertRaises(TypeError,post_business_helper.storeNewQhawaxInstallation,"qH050")
 		self.assertRaises(TypeError,post_business_helper.storeNewQhawaxInstallation,True)
-		self.assertRaises(Exception,post_business_helper.storeNewQhawaxInstallation,{"hola":"hola"})
+		self.assertRaises(Exception,post_business_helper.storeNewQhawaxInstallation,installation_json)
 
 
 	def test_write_binnacle_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle)
+		self.assertRaises(TypeError,post_business_helper.writeBinnacle,80,"description","l.montalvo")
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH080",None,None)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH080",None,4)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004",4,"l.montalvo")
