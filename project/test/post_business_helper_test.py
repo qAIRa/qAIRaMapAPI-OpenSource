@@ -230,7 +230,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.createCompany,{},4.0)
 
 	def test_create_company_valid(self):
-		json= {"company_name": "Unit Test "+str(randint(0, 20))+"_"+str(randint(0, 20)), "email_group": "unitest"+str(randint(0, 20))+".gob",
+		json= {"company_name": "Unit Test "+str(randint(0, 20))+"_"+str(randint(0, 20)), "email_group": "unitest"+str(randint(0, 20))+"-"+str(randint(0, 20))+".gob",
 			   "ruc":"12345678"+str(randint(200, 900)),"phone":"998123123","contact_person":"Test","address":"Prueba"}
 		post_business_helper.createCompany(json)
 

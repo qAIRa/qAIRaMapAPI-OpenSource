@@ -17,6 +17,9 @@ class TestPostDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_data_helper.storeAirQualityDataInDB,None)
 		self.assertRaises(TypeError,post_data_helper.storeAirQualityDataInDB,"String_")
 
+	#def test_store_air_quality_valid(self):
+	#	air_quality_json= {}
+
 	def test_store_gas_inca_not_valid(self):
 		self.assertRaises(TypeError,post_data_helper.storeGasIncaInDB)
 		self.assertRaises(TypeError,post_data_helper.storeGasIncaInDB,True)
