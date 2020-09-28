@@ -98,8 +98,6 @@ def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
     Set qHAWAX OFF in qHAWAX Installation table
 
     """
-    util_helper.check_valid_date(qhawax_lost_timestamp)
-
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         session.query(QhawaxInstallationHistory).\
