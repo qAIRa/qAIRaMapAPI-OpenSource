@@ -122,11 +122,17 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.saveStatusOnTable,50)
 		self.assertRaises(TypeError,post_business_helper.saveStatusOnTable,True)
 
+	def test_save_status_on_qhawax_valid(self):
+		post_business_helper.saveStatusOnTable('qH035')
+
 	def test_save_turn_on_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime)
 		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,None)
 		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,50)
 		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,True)
+
+	#def test_save_turn_on_qhawax_installation_valid(self):
+		#post_business_helper.saveTurnOnLastTime('qH004')
 
 	def test_save_turn_on_after_calibration_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration)

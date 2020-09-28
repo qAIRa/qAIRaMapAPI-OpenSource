@@ -57,8 +57,8 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.getTimeQhawaxHistory,"qH001")
 
 	def test_query_time_qhawax_history_valid(self):
-		initial_timestamp = "09-09-2020 00:51:45.877701+00:00"
-		last_timestamp = "22-09-2020 08:11:57.0+00:00"
+		initial_timestamp = "28-09-2020 03:48:50.867872+00:00"
+		last_timestamp = "27-09-2020 00:00:00.877701+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
 		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
