@@ -1,7 +1,7 @@
 import datetime
+from datetime import timedelta
 import dateutil
 import dateutil.parser
-import time
 
 pollutant=['SO2','NO2','O3','CO','H2S']
 pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
@@ -31,7 +31,7 @@ def check_valid_date(date,date_format):
         raise ValueError("Date "+str(date)+" should be datetime "+str(date_format)+" Format")
 
 def getValidTime(minutes_diff, date_util):
-    if(type(minutes_diff) is not [int]):
+    if(isinstance(minutes_diff, int) is not True): 
         raise TypeError("Variable "+str(minutes_diff)+" should be integer")
 
     if(minutes_diff<5):
@@ -59,8 +59,8 @@ def gasSensorJson(json,sensors):
     return initial
 
 def getColorBaseOnIncaValue(qhawax_inca):
-    #if(type(qhawax_inca) is not [int]):
-    #    raise TypeError("Variable "+str(qhawax_inca)+" should be integer")
+    if(isinstance(qhawax_inca, int) is not True):
+        raise TypeError("qHAWAX Inca value "+str(qhawax_inca)+" should be integer")
 
     if qhawax_inca == 50:
         return 'green'
@@ -73,6 +73,9 @@ def getColorBaseOnIncaValue(qhawax_inca):
     return 'green'
 
 def validTimeJsonProcessed(data_json):
+    if(isinstance(data_json, dict) is not True):
+        raise TypeError("json "+str(data_json)+" should be Json Format")
+
     datetime_array = data_json['timestamp'].split() 
     measurement_year = datetime.datetime.strptime(datetime_array[0], '%Y-%m-%d').year
     if(measurement_year > datetime.date.today().year):
@@ -82,7 +85,10 @@ def validTimeJsonProcessed(data_json):
 
 def validAndBeautyJsonProcessed(data_json):
     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
-    #data_json = checkNumberValues(data_json)
+
+    if(isinstance(data_json, dict) is not True):
+        raise TypeError("json "+str(data_json)+" should be Json Format")
+
     if  'timestamp_zone' not in data_json:
         data_json["timestamp_zone"] = data_json["timestamp"]
     data_json = gasConversionPPBtoMG(data_json, arr_season)
@@ -90,6 +96,12 @@ def validAndBeautyJsonProcessed(data_json):
     return data_json
 
 def gasConversionPPBtoMG(data_json,season):
+    if(isinstance(data_json, dict) is not True):
+        raise TypeError("json "+str(data_json)+" should be Json Format")
+
+    if(isinstance(season, list) is not True):
+        raise TypeError("season "+str(season)+" should be List Format")
+
     data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': 0,'H2S': data_json['H2S'],
           'H2S_ug_m3': 0,'NO2': data_json['NO2'],'NO2_ug_m3': 0,'O3': data_json['O3'],
           'O3_ug_m3': 0, 'PM1': data_json['PM1'],'PM10': data_json['PM10'],'PM25': data_json['PM25'],
@@ -201,6 +213,18 @@ def getDateRangeFromWeek(p_year,p_week):
     :param p_week: week number
 
     """
+    if(isinstance(p_year, int) is not True):
+        raise TypeError("Year value "+str(p_year)+" should be integer")
+
+    if(isinstance(p_week, int) is not True):
+        raise TypeError("Week value "+str(p_week)+" should be integer")
+
+    if(p_year<2020):
+        raise ValueError("Year value "+str(p_year)+" should be higher or equal 2020")
+
+    if(p_week<=0 and p_week>=54):
+        raise ValueError("Week value "+str(p_week)+" should be higher than cero and lower than 54")
+
     d = str(p_year)+'-W'+str((int(p_week)- 1))+'-1'
 
     firstdayofweek = datetime.datetime.strptime(d, "%Y-W%W-%w").date()
@@ -209,6 +233,9 @@ def getDateRangeFromWeek(p_year,p_week):
 
 
 def getFormatData(gas_average_measurement):
+    if(isinstance(gas_average_measurement, dict) is not True):
+        raise TypeError("Gas Average Measurement variable "+str(gas_average_measurement)+" should be Json Format")
+
     gas_average_measurement_list = []
     if gas_average_measurement is not None:
         next_hour = -1

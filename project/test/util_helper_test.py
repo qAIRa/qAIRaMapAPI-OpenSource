@@ -1,6 +1,8 @@
 import unittest
 import datetime
 from datetime import timedelta
+import dateutil
+import dateutil.parser
 import project.main.util_helper as util_helper
 
 class TestUtilHelper(unittest.TestCase):
@@ -9,26 +11,74 @@ class TestUtilHelper(unittest.TestCase):
 
 	"""
 	def test_check_date_not_valid(self):
+		date_format = '%d-%m-%Y %H:%M:%S'
 		self.assertRaises(TypeError,util_helper.check_valid_date,{"name":"qH001"})
-		self.assertRaises(TypeError,util_helper.check_valid_date,4.33)
-		self.assertRaises(TypeError,util_helper.check_valid_date,5)
-		self.assertRaises(TypeError,util_helper.check_valid_date,None)
-		self.assertRaises(TypeError,util_helper.check_valid_date,True)
+		self.assertRaises(TypeError,util_helper.check_valid_date,4.33,date_format)
+		self.assertRaises(TypeError,util_helper.check_valid_date,5,date_format)
+		self.assertRaises(TypeError,util_helper.check_valid_date,None,date_format)
+		self.assertRaises(TypeError,util_helper.check_valid_date,True,date_format)
+		self.assertRaises(ValueError,util_helper.check_valid_date,'2020-09-09 00:00:00',date_format)
 
 	def test_check_time_not_valid(self):
+		test_timestamp = "27-09-2020 00:00:00.877701"
+		date_format = '%d-%m-%Y %H:%M:%S.%f'
+		datetime_test = datetime.datetime.strptime(test_timestamp,date_format)
 		self.assertRaises(TypeError,util_helper.getValidTime)
 		self.assertRaises(TypeError,util_helper.getValidTime,{"name":"qH001"})
 		self.assertRaises(TypeError,util_helper.getValidTime,4.33)
 		self.assertRaises(TypeError,util_helper.getValidTime,5)
-		self.assertRaises(TypeError,util_helper.getValidTime,None)
-		self.assertRaises(TypeError,util_helper.getValidTime,True)
+		self.assertRaises(TypeError,util_helper.getValidTime,None,datetime_test)
+
+	def test_check_time_valid(self):
+		test_timestamp = "27-09-2020 00:00:00.877701"
+		test_timestamp_10m = "27-09-2020 00:10:00.877701"
+		test_timestamp_02h = "27-09-2020 02:00:00.877701"
+		date_format = '%d-%m-%Y %H:%M:%S.%f'
+		datetime_test = datetime.datetime.strptime(test_timestamp,date_format)
+		datetime_test_10m = datetime.datetime.strptime(test_timestamp_10m,date_format)
+		datetime_test_02h = datetime.datetime.strptime(test_timestamp_02h,date_format)
+		self.assertAlmostEqual(util_helper.getValidTime(1,datetime_test),datetime_test_10m)
+		self.assertAlmostEqual(util_helper.getValidTime(10,datetime_test),datetime_test_02h)
 
 	def test_get_gas_sensor_json_not_valid(self):
 		self.assertRaises(TypeError,util_helper.gasSensorJson)
-		self.assertRaises(TypeError,util_helper.gasSensorJson,{"name":"qH001"})
-		self.assertRaises(TypeError,util_helper.gasSensorJson,"resultado")
+		self.assertRaises(TypeError,util_helper.gasSensorJson,{"name":"qH001"},5)
+		self.assertRaises(TypeError,util_helper.gasSensorJson,5,[4,4])
 		self.assertRaises(TypeError,util_helper.gasSensorJson,None)
-		self.assertRaises(TypeError,util_helper.gasSensorJson,True)
+
+	def test_get_color_base_on_inca_value_not_valid(self):
+		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue)
+		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,"resultado")
+		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,None)
+		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,{"name":"qH001"})
+
+	def test_get_color_base_on_inca_value_valid(self):
+		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(50),'green')
+		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(100),'yellow')
+		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(500),'orange')
+		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(600),'red')
+		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(-1),'green')
+
+	def test_valid_time_json_processed_not_valid(self):
+		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed)
+		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,"resultado")
+		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,None)
+		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,50)
+
+	def test_valid_time_json_processed_valid(self):
+		data_json_current_year={"timestamp":"2020-09-01"}
+		data_json_future={"timestamp":"2080-09-01"}
+		var_datetime = (datetime.datetime.now(dateutil.tz.tzutc())-datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
+		datetime_zone = (datetime.datetime.now(dateutil.tz.tzutc())).strftime("%Y-%m-%d %H:%M:%S")
+		data_json_future_fix ={"timestamp":var_datetime,"timestamp_zone":datetime_zone}
+		self.assertAlmostEqual(util_helper.validTimeJsonProcessed(data_json_current_year),data_json_current_year)
+		self.assertAlmostEqual(util_helper.validTimeJsonProcessed(data_json_future),data_json_future_fix)
+
+	def test_valid_and_beauty_json_processed_not_valid(self):
+		self.assertRaises(TypeError,util_helper.validAndBeautyJsonProcessed)
+		self.assertRaises(TypeError,util_helper.validAndBeautyJsonProcessed,"resultado")
+		self.assertRaises(TypeError,util_helper.validAndBeautyJsonProcessed,None)
+		self.assertRaises(TypeError,util_helper.validAndBeautyJsonProcessed,50)
 
 	def test_are_fields_correct_not_valid(self):
 		self.assertRaises(TypeError,util_helper.areFieldsValid)
@@ -81,6 +131,30 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.averageMeasurements,None)
 		self.assertRaises(TypeError,util_helper.averageMeasurements,True)
 
+	def test_get_date_range_from_week_not_valid(self):
+		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek)
+		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek,5,"week")
+		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek,"year",2020)
+		self.assertRaises(ValueError,util_helper.getDateRangeFromWeek,-1,1)
+		self.assertRaises(ValueError,util_helper.getDateRangeFromWeek,2020,60)
+
+	def test_get_date_range_from_week_valid(self):
+		d = str(2020)+'-W'+str((int(38)- 1))+'-1'
+		firstdayofweek = datetime.datetime.strptime(d, "%Y-W%W-%w").date()
+		lastdayofweek = firstdayofweek + datetime.timedelta(days=6.9)
+		self.assertAlmostEqual(util_helper.getDateRangeFromWeek(2020,38),(firstdayofweek,lastdayofweek))
+
+	def test_get_format_date_not_valid(self):
+		self.assertRaises(TypeError,util_helper.getFormatData)
+		self.assertRaises(TypeError,util_helper.getFormatData,5)
+		self.assertRaises(TypeError,util_helper.getFormatData,"year")
+		self.assertRaises(TypeError,util_helper.getFormatData,-1,1)
+		self.assertRaises(TypeError,util_helper.getFormatData,None)
+		self.assertRaises(TypeError,util_helper.getFormatData,True)
+
+	#def test_get_format_date_valid(self):
+	#	gas_measurement = {"timestamp_zone":"2020"}
+	#	self.assertAlmostEqual(util_helper.getFormatData(2020,38),(firstdayofweek,lastdayofweek))
 
 
 if __name__ == '__main__':
