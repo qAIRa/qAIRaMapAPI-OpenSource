@@ -152,10 +152,18 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.getFormatData,None)
 		self.assertRaises(TypeError,util_helper.getFormatData,True)
 
-	#def test_get_format_date_valid(self):
-	#	gas_measurement = {"timestamp_zone":"2020"}
-	#	self.assertAlmostEqual(util_helper.getFormatData(2020,38),(firstdayofweek,lastdayofweek))
+	def test_gas_conversion_ppb_to_mg_not_valid(self):
+		self.assertRaises(TypeError,util_helper.gasConversionPPBtoMG,5,5)
+		self.assertRaises(TypeError,util_helper.gasConversionPPBtoMG,{"hola":"hola"},5)
+		self.assertRaises(TypeError,util_helper.gasConversionPPBtoMG,5,[5,4,3])
 
+	def test_gas_conversion_ppb_to_mg_valid(self):
+		data={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
+			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+		arr_season=[2.62,1.88,1.96,1.15,1.39]
+		self.assertAlmostEqual(util_helper.gasConversionPPBtoMG(data,arr_season),data)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
