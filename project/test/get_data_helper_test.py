@@ -11,18 +11,6 @@ class TestGetDataHelper(unittest.TestCase):
 
 	"""
 
-	def test_query_comercial_name_not_valid(self):
-		self.assertRaises(TypeError,get_data_helper.getComercialName)
-		self.assertRaises(TypeError,get_data_helper.getComercialName,{"qhawax_id":5})
-		self.assertRaises(TypeError,get_data_helper.getComercialName,True)
-		self.assertRaises(TypeError,get_data_helper.getComercialName,-5.0)
-		self.assertRaises(TypeError,get_data_helper.getComercialName,None)
-		self.assertRaises(TypeError,get_data_helper.getComercialName,"String_")
-
-	def test_query_comercial_name_valid(self):
-		self.assertAlmostEqual(get_data_helper.getComercialName(4),"Test Aguitas 2.0")
-		self.assertAlmostEqual(get_data_helper.getComercialName(20),None)
-
 	def test_query_air_quality_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryDBAirQuality)
 		self.assertRaises(TypeError,get_data_helper.queryDBAirQuality,{"qhawax_id":5})
