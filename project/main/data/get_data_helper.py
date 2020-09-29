@@ -12,17 +12,6 @@ import project.main.business.post_business_helper as post_business_helper
 
 session = db.session
 
-def getComercialName(qhawax_id):
-    """
-    Helper Processed Measurement function to get qHAWAX comercial name
-
-    """
-    installation_id = same_helper.getInstallationId(qhawax_id)
-    if(installation_id is not None):
-        return session.query(QhawaxInstallationHistory.comercial_name).\
-                       filter_by(id=installation_id).one()[0]
-    return None
-
 def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp,date_format):
     sensors = (AirQualityMeasurement.CO, AirQualityMeasurement.H2S, AirQualityMeasurement.NO2,
                     AirQualityMeasurement.O3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
@@ -42,7 +31,6 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp,date_forma
             return [measurement._asdict() for measurement in air_quality_measurements]
         return []
     return None
-
 
 def getTimeQhawaxHistory(installation_id):
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
@@ -94,32 +82,6 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
                                        filter(AirQualityMeasurement.timestamp_zone >= last_timestamp). \
                                        filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp). \
                                        order_by(AirQualityMeasurement.timestamp_zone.asc()).all()
-    return None
-
-
-def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp,date_format):
-    """
-    Helper function to get Air Quality measurement
-
-    """
-    sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3,
-                AirQualityMeasurement.O3_ug_m3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
-                AirQualityMeasurement.SO2_ug_m3, AirQualityMeasurement.uv,AirQualityMeasurement.uva, 
-                AirQualityMeasurement.uvb, AirQualityMeasurement.spl,AirQualityMeasurement.humidity, 
-                AirQualityMeasurement.pressure, AirQualityMeasurement.temperature, AirQualityMeasurement.lat, 
-                AirQualityMeasurement.lon, AirQualityMeasurement.timestamp_zone)
-
-    initial_timestamp = datetime.datetime.strptime(initial_timestamp, '%d-%m-%Y %H:%M:%S')
-    final_timestamp = datetime.datetime.strptime(final_timestamp, '%d-%m-%Y %H:%M:%S')
-    
-    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-        average_valid_processed= session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                        filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
-                                        filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
-                                        order_by(AirQualityMeasurement.timestamp).all()
-        if(average_valid_processed !=[]):
-            return [measurement._asdict() for measurement in average_valid_processed]
-        return []
     return None
 
 def queryDBGasInca(initial_timestamp, final_timestamp,date_format):

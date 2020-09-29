@@ -285,4 +285,3 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
         session.commit()
         
 
-

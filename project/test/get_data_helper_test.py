@@ -75,20 +75,6 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH100","CO"),None)
 
 	def test_query_valid_air_quality_not_valid(self):
-		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality)
-		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,{"qhawax_id":5})
-		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,True)
-		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,-5.0)
-		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,None)
-		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,"qH001",1,2)
-
-	def test_query_valid_air_quality_valid(self):
-		initial_timestamp = "02-09-2020 00:00:00"
-		last_timestamp = "02-09-2020 00:01:00"
-		self.assertAlmostEqual(get_data_helper.queryDBValidAirQuality(1,initial_timestamp,last_timestamp),[])
-		self.assertAlmostEqual(get_data_helper.queryDBValidAirQuality(100,initial_timestamp,last_timestamp),None)
-
-	def test_query_valid_air_quality_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryDBGasInca)
 		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,{"qhawax_id":5})
 		self.assertRaises(TypeError,get_data_helper.queryDBGasInca,True)

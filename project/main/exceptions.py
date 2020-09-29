@@ -10,44 +10,18 @@ def getCompanyTargetofJson(data):
         if array[i] not in data:
             raise ValueError("No target "+array[i]+" in given json")
 
-def getOffsetTargetofJson(data):
+def getGasSensorTargetofJson(data):
     if(isinstance(data, dict) is not True):
-        raise TypeError("Offset variable "+str(data)+" should be json")
+        raise TypeError("Gas Sensor variable "+str(data)+" should be json")
 
     if 'product_id' not in data:
         raise ValueError("No target product_id in given json")
-    if 'offsets' not in data:
-        raise ValueError("No target offsets in given json")
     if 'description' not in data:
         raise ValueError("No target description in given json")
     if 'person_in_charge' not in data:
         raise ValueError("No target person_in_charge in given json")
-
-def getControlledOffsetTargetofJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Company variable "+str(data)+" should be json") 
-
-    if 'product_id' not in data:
-        raise ValueError("No target product_id in given json")
-    if 'controlled_offsets' not in data:
-        raise ValueError("No target controlled_offsets in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
-    if 'person_in_charge' not in data:
-        raise ValueError("No target person_in_charge in given json")
-
-def getNonControlledOffsetTargetofJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Offset variable "+str(data)+" should be json") 
-
-    if 'product_id' not in data:
-        raise ValueError("No target product_id in given json")
-    if 'non_controlled_offsets' not in data:
-        raise ValueError("No target non_controlled_offsets in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
-    if 'person_in_charge' not in data:
-        raise ValueError("No target person_in_charge in given json")
+    if 'gas_sensor_json' not in data:
+        raise ValueError("No target gas_sensor_json in given json")
 
 def getQhawaxTargetofJson(data):
     if(isinstance(data, dict) is not True):
