@@ -43,55 +43,20 @@ def requestNonControlledOffsets():
             return make_response(jsonify(non_controlled_offsets), 200)
         return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
-
-@app.route('/api/save_offsets/', methods=['POST'])
-def saveOffsets():
+@app.route('/api/save_gas_sensor_json/', methods=['POST'])
+def saveGasSensorJson():
     try:
         req_json = request.get_json()
-        exception_helper.getOffsetTargetofJson(req_json)
+        exception_helper.getGasSensorTargetofJson(req_json)
         qhawax_name = str(req_json['product_id']).strip()
-        offsets = req_json['offsets']
+        gas_sensor_json = req_json['gas_sensor_json']
         description =req_json['description']
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.updateJsonGasSensor(qhawax_name, offsets)
-        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)    
+        post_business_helper.updateJsonGasSensor(qhawax_name, gas_sensor_json)
+        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': ' \'%s\'' % (e)})
         return make_response(json_message, 400)
     else:
-        return make_response({'Success':'Offsets have been updated'}, 200)
-
-@app.route('/api/save_controlled_offsets/', methods=['POST'])
-def saveControlledOffsets():
-    try:
-        req_json = request.get_json()
-        exception_helper.getControlledOffsetTargetofJson(req_json)
-        qhawax_name = str(req_json['product_id']).strip()
-        controlled_offsets = req_json['controlled_offsets']
-        description =req_json['description']
-        person_in_charge = req_json['person_in_charge']
-        post_business_helper.updateJsonGasSensor(qhawax_name, controlled_offsets)
-        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-    except TypeError as e:
-        json_message = jsonify({'error': ' \'%s\'' % (e)})
-        return make_response(json_message, 400)
-    else:
-        return make_response({'Success':'Controlled offsets have been updated'}, 200)
-
-@app.route('/api/save_non_controlled_offsets/', methods=['POST'])
-def saveNonControlledOffsets():
-    try:
-        req_json = request.get_json()
-        exception_helper.getNonControlledOffsetTargetofJson(req_json)
-        qhawax_name = str(req_json['product_id']).strip()
-        non_controlled_offsets = req_json['non_controlled_offsets']
-        description =req_json['description']
-        person_in_charge = req_json['person_in_charge']
-        post_business_helper.updateJsonGasSensor(qhawax_name, non_controlled_offsets)
-        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-    except TypeError as e:
-        json_message = jsonify({'error': ' \'%s\' ' % (e)})
-        return make_response(json_message, 400)
-    else:
-        return make_response({'Success':'Non Controlled offsets have been updated'}, 200)
+        return make_response({'Success':'Gas Sensor variables have been updated'}, 200)
 

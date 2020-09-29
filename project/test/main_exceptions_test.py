@@ -16,29 +16,13 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertRaises(TypeError,exception_helper.getCompanyTargetofJson,None)
 		self.assertRaises(TypeError,exception_helper.getCompanyTargetofJson,True)
 
-	def test_query_offset_target_json_not_valid(self):
-		self.assertRaises(TypeError,exception_helper.getOffsetTargetofJson)
-		self.assertRaises(TypeError,exception_helper.getOffsetTargetofJson,"Json")
-		self.assertRaises(TypeError,exception_helper.getOffsetTargetofJson,4.33)
-		self.assertRaises(TypeError,exception_helper.getOffsetTargetofJson,5)
-		self.assertRaises(TypeError,exception_helper.getOffsetTargetofJson,None)
-		self.assertRaises(TypeError,exception_helper.getOffsetTargetofJson,True)
-
-	def test_query_controlled_offset_target_json_not_valid(self):
-		self.assertRaises(TypeError,exception_helper.getControlledOffsetTargetofJson)
-		self.assertRaises(TypeError,exception_helper.getControlledOffsetTargetofJson,"Json")
-		self.assertRaises(TypeError,exception_helper.getControlledOffsetTargetofJson,4.33)
-		self.assertRaises(TypeError,exception_helper.getControlledOffsetTargetofJson,5)
-		self.assertRaises(TypeError,exception_helper.getControlledOffsetTargetofJson,None)
-		self.assertRaises(TypeError,exception_helper.getControlledOffsetTargetofJson,True)
-
-	def test_query_non_controlled_offset_target_json_not_valid(self):
-		self.assertRaises(TypeError,exception_helper.getNonControlledOffsetTargetofJson)
-		self.assertRaises(TypeError,exception_helper.getNonControlledOffsetTargetofJson,"Json")
-		self.assertRaises(TypeError,exception_helper.getNonControlledOffsetTargetofJson,4.33)
-		self.assertRaises(TypeError,exception_helper.getNonControlledOffsetTargetofJson,5)
-		self.assertRaises(TypeError,exception_helper.getNonControlledOffsetTargetofJson,None)
-		self.assertRaises(TypeError,exception_helper.getNonControlledOffsetTargetofJson,True)
+	def test_query_gas_sensor_target_json_not_valid(self):
+		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson)
+		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,"Json")
+		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,4.33)
+		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,5)
+		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,None)
+		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,True)
 
 	def test_query_qhawax_target_json_not_valid(self):
 		self.assertRaises(TypeError,exception_helper.getQhawaxTargetofJson)

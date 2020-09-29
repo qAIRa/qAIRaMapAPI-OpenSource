@@ -58,25 +58,6 @@ def getGasAverageMeasurementsEvery24():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-@app.route('/api/average_valid_processed_period/', methods=['GET'])
-def getAverageValidProcessedMeasurementsTimePeriod():
-    """
-    To list all average measurement of valid processed measurement table in a define period of time and company
-    """
-    qhawax_id = int(request.args.get('qhawax_id'))
-    initial_timestamp = str(request.args.get('initial_timestamp'))
-    final_timestamp = str(request.args.get('final_timestamp'))
-    try:
-        date_format = '%d-%m-%Y %H:%M:%S'
-        average_valid_processed_measurements = get_data_helper.queryDBValidAirQuality(qhawax_id, initial_timestamp,\
-                                                                                     final_timestamp, date_format)
-        if average_valid_processed_measurements is not None:
-            return make_response(jsonify(average_valid_processed_measurements), 200)
-        return make_response(jsonify('Valid Measurements not found'), 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-
 
 
 
