@@ -4,43 +4,25 @@ import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app
 
-@app.route('/api/request_offsets/', methods=['GET'])
-def requestOffsets():
+@app.route('/api/request_gas_sensor_variables/', methods=['GET'])
+def requestGasSensorVariable():
     qhawax_name = request.args.get('ID')
+    variable_type = str(request.args.get('gas_sensor_type'))
+    variable_gas_sensor = None
     try:
-        offsets = get_business_helper.getOffsetsFromProductID(qhawax_name)
+        if(variable_type=='offset'):
+            variable_gas_sensor = get_business_helper.getOffsetsFromProductID(qhawax_name)
+        elif(variable_type=='controlled-offset'):
+            variable_gas_sensor = get_business_helper.getControlledOffsetsFromProductID(qhawax_name)
+        elif(variable_type=='non-controlled-offset'):
+            variable_gas_sensor = get_business_helper.getNonControlledOffsetsFromProductID(qhawax_name)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
     else:
-        if(offsets is not None):
-            return make_response(jsonify(offsets), 200)
-        return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
-
-@app.route('/api/request_controlled_offsets/', methods=['GET'])
-def requestControlledOffsets():
-    qhawax_name = request.args.get('ID')
-    try:
-        controlled_offsets = get_business_helper.getControlledOffsetsFromProductID(qhawax_name)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-    else:
-        if(controlled_offsets is not None):
-            return make_response(jsonify(controlled_offsets), 200)
-        return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
-
-@app.route('/api/request_non_controlled_offsets/', methods=['GET'])
-def requestNonControlledOffsets():
-    qhawax_name = request.args.get('ID')
-    try:
-        non_controlled_offsets = get_business_helper.getNonControlledOffsetsFromProductID(qhawax_name)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-    else:
-        if(non_controlled_offsets is not None):
-            return make_response(jsonify(non_controlled_offsets), 200)
+        print(variable_gas_sensor)
+        if(variable_gas_sensor is not None):
+            return make_response(jsonify(variable_gas_sensor), 200)
         return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)
 
 @app.route('/api/save_gas_sensor_json/', methods=['POST'])
