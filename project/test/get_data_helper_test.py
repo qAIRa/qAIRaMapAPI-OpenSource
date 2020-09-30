@@ -41,6 +41,7 @@ class TestGetDataHelper(unittest.TestCase):
 		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
 		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time} 
 		self.assertAlmostEqual(get_data_helper.getTimeQhawaxHistory(51),values)
+		self.assertAlmostEqual(get_data_helper.getTimeQhawaxHistory(200),None)
 
 	def test_query_gas_average_measurement_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryDBGasAverageMeasurement)
@@ -119,6 +120,7 @@ class TestGetDataHelper(unittest.TestCase):
 
 	def test_get_hours_difference_valid(self):
 		self.assertAlmostEqual(get_data_helper.getHoursDifference(100),(None,None))
+		self.assertAlmostEqual(get_data_helper.getHoursDifference(9),(None,None))
 
 	def test_get_valid_processed_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryDBValidProcessedByQhawaxScript)

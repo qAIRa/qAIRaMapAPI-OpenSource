@@ -230,10 +230,10 @@ class ValidProcessedMeasurement(db.Model):
     __tablename__ = 'valid_processed_measurement'
 
     # Column's definition
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
     CO = db.Column(db.Float)
+    timestamp = db.Column(db.DateTime, nullable=False)
     CO_ug_m3 = db.Column(db.Float)
     CO2 = db.Column(db.Float)
     H2S = db.Column(db.Float)

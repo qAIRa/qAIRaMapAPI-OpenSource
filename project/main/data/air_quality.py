@@ -30,7 +30,7 @@ def getAirQualityMeasurementsTimePeriod():
     initial_timestamp_utc = str(request.args.get('initial_timestamp'))
     final_timestamp_utc = str(request.args.get('final_timestamp'))
     try:
-        date_format = '%d-%m-%Y %H:%M:%S'
+        date_format = '%Y-%m-%d %H:%M:%S'
         air_quality_measurements = get_data_helper.queryDBAirQuality(qhawax_name, initial_timestamp_utc, \
                                                                      final_timestamp_utc,date_format)
         if air_quality_measurements is not None:
