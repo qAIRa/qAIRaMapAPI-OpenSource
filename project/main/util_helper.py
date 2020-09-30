@@ -222,7 +222,7 @@ def getDateRangeFromWeek(p_year,p_week):
     if(p_year<2020):
         raise ValueError("Year value "+str(p_year)+" should be higher or equal 2020")
 
-    if(p_week<=0 and p_week>=54):
+    if(p_week<=0 or p_week>=54):
         raise ValueError("Week value "+str(p_week)+" should be higher than cero and lower than 54")
 
     d = str(p_year)+'-W'+str((int(p_week)- 1))+'-1'
