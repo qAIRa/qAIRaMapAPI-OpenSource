@@ -45,7 +45,6 @@ def getIncaTargetofJson(data):
     if 'value_inca' not in data:
         raise ValueError("No target value_inca in given json")
 
-
 def getStatusOffTargetofJson(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("Qhawax status off variable "+str(data)+" should be json") 
