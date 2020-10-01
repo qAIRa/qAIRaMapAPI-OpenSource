@@ -80,6 +80,18 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.validAndBeautyJsonProcessed,None)
 		self.assertRaises(TypeError,util_helper.validAndBeautyJsonProcessed,50)
 
+	def test_valid_and_beauty_json_processed_valid(self):
+		data={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
+			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+		data_without={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
+			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00"}
+		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data),data)
+		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data_without),data)
+
 	def test_are_fields_correct_not_valid(self):
 		self.assertRaises(TypeError,util_helper.areFieldsValid)
 		self.assertRaises(TypeError,util_helper.areFieldsValid,5)
@@ -93,6 +105,16 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.checkNegatives,"resultado")
 		self.assertRaises(TypeError,util_helper.checkNegatives,None)
 		self.assertRaises(TypeError,util_helper.checkNegatives,True)
+
+	def test_check_negatives_valid(self):
+		data_negatives={'ID': 1,'CO': -1,'H2S': -1,'NO2': 1,'O3':-1,'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,
+						'spl': 1,'UV': 1,'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  			'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+		data={'ID': 1,'CO': 0,'H2S': 0,'NO2': 1,'O3':0,'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+		self.assertAlmostEqual(util_helper.checkNegatives(data_negatives),data)
+		self.assertAlmostEqual(util_helper.checkNegatives(data),data)
 
 	def test_check_number_values_not_valid(self):
 		self.assertRaises(TypeError,util_helper.checkNumberValues)
@@ -131,6 +153,17 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.averageMeasurements,None)
 		self.assertRaises(TypeError,util_helper.averageMeasurements,True)
 
+	def test_average_measurements_valid(self):
+		y = [{'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
+			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00"},
+			 {'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
+			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00"}]
+		self.assertAlmostEqual(util_helper.averageMeasurements(y),y[0])
+
 	def test_get_date_range_from_week_not_valid(self):
 		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek)
 		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek,5,"week")
@@ -144,14 +177,6 @@ class TestUtilHelper(unittest.TestCase):
 		lastdayofweek = firstdayofweek + datetime.timedelta(days=6.9)
 		self.assertAlmostEqual(util_helper.getDateRangeFromWeek(2020,38),(firstdayofweek,lastdayofweek))
 
-	def test_get_format_date_not_valid(self):
-		self.assertRaises(TypeError,util_helper.getFormatData)
-		self.assertRaises(TypeError,util_helper.getFormatData,5)
-		self.assertRaises(TypeError,util_helper.getFormatData,"year")
-		self.assertRaises(TypeError,util_helper.getFormatData,-1,1)
-		self.assertRaises(TypeError,util_helper.getFormatData,None)
-		self.assertRaises(TypeError,util_helper.getFormatData,True)
-
 	def test_gas_conversion_ppb_to_mg_not_valid(self):
 		self.assertRaises(TypeError,util_helper.gasConversionPPBtoMG,5,5)
 		self.assertRaises(TypeError,util_helper.gasConversionPPBtoMG,{"hola":"hola"},5)
@@ -164,6 +189,24 @@ class TestUtilHelper(unittest.TestCase):
 			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
 		arr_season=[2.62,1.88,1.96,1.15,1.39]
 		self.assertAlmostEqual(util_helper.gasConversionPPBtoMG(data,arr_season),data)
+
+	def test_get_format_data_not_valid(self):
+		self.assertRaises(TypeError,util_helper.getFormatData)
+		self.assertRaises(TypeError,util_helper.getFormatData,5)
+		self.assertRaises(TypeError,util_helper.getFormatData,"year")
+		self.assertRaises(TypeError,util_helper.getFormatData,-1,1)
+		self.assertRaises(TypeError,util_helper.getFormatData,None)
+		self.assertRaises(TypeError,util_helper.getFormatData,True)
+
+	#def test_get_format_data_valid(self):
+	#	y = [{'CO': 1.15,'timestamp_zone':"2020-01-01 23:00:00"},
+	#		 {'CO': 2.30,'timestamp_zone':"2020-01-02 03:00:00"}]
+	#	y_result = [{'CO': 1.15,'timestamp_zone':"2020-01-01 23:00:00"},
+	#				{'CO': "",  'timestamp_zone':"2020-01-02 00:00:00"},
+	#				{'CO': "",  'timestamp_zone':"2020-01-02 01:00:00"},
+	#				{'CO': "",  'timestamp_zone':"2020-01-02 02:00:00"},
+	#				{'CO': 2.30,'timestamp_zone':"2020-01-02 03:00:00"}]
+	#	self.assertAlmostEqual(util_helper.getFormatData(y),y_result)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

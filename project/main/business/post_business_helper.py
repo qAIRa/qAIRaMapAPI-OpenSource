@@ -12,10 +12,7 @@ var_gases=['CO','H2S','NO','NO2','O3','SO2']
 session = db.session
 
 def updateJsonGasSensor(qhawax_name, json_gas_sensor):
-    """
-    Helper Gas Sensor function to save json from qHAWAX ID
-
-    """
+    """ Helper Gas Sensor function to save json from qHAWAX ID """
     if(isinstance(json_gas_sensor, dict) is not True):
         raise TypeError("Gas Sensor Variables "+str(json_gas_sensor)+" should be Json Format")
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
@@ -26,10 +23,7 @@ def updateJsonGasSensor(qhawax_name, json_gas_sensor):
         session.commit()
 
 def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
-    """
-    Helper qHAWAX function to save main inca value in qHAWAX table
-
-    """
+    """ Helper qHAWAX function to save main inca value in qHAWAX table """
     if(type(new_main_inca) not in [int]):
         raise TypeError("Inca value "+str(new_main_inca)+" should be int")
 
@@ -38,10 +32,7 @@ def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
         session.commit()
 
 def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
-    """
-    Helper qHAWAX function to save main inca value in qHAWAX Installation table
-
-    """
+    """ Helper qHAWAX function to save main inca value in qHAWAX Installation table """
     if(type(new_main_inca) not in [int]):
         raise TypeError("Inca value "+str(new_main_inca)+" should be int")
 
@@ -51,21 +42,8 @@ def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
                                                  update(values={'main_inca': new_main_inca})
         session.commit()
 
-def saveStatusOffQhawaxTable(qhawax_name):
-    """
-    Set qHAWAX OFF in qHAWAX table
-
-    """
-    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
-        session.query(Qhawax).filter_by(name=qhawax_name).\
-                              update(values={'state': "OFF",'main_inca':-1})
-        session.commit()
-
 def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
-    """
-    Set qHAWAX OFF in qHAWAX Installation table
-
-    """
+    """ Set qHAWAX OFF in qHAWAX Installation table """
     installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         session.query(QhawaxInstallationHistory).\
@@ -73,20 +51,15 @@ def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
                 update(values={'main_inca': -1,'last_registration_time_zone':qhawax_lost_timestamp})
         session.commit()
 
-def saveStatusOnTable(qhawax_name):
-    """
-    Set qHAWAX ON in qHAWAX table
-
-    """
+def saveStatusQhawaxTable(qhawax_name, qhawax_status,main_inca):
+    """ Set qHAWAX ON or OFF in qHAWAX table """
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
-        session.query(Qhawax).filter_by(name=qhawax_name).update(values={'state': "ON",'main_inca':0})
+        session.query(Qhawax).filter_by(name=qhawax_name).\
+                              update(values={'state': qhawax_status,'main_inca':main_inca})
         session.commit()
 
 def saveTurnOnLastTime(qhawax_name):
-    """
-    Set qHAWAX ON in qHAWAX Installation table
-
-    """
+    """ Set qHAWAX ON in qHAWAX Installation table  """
     installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         now = datetime.datetime.now(dateutil.tz.tzutc())
@@ -97,10 +70,7 @@ def saveTurnOnLastTime(qhawax_name):
         session.commit()
 
 def turnOnAfterCalibration(qhawax_name):
-    """
-    Set qHAWAX ON in qHAWAX Installation table
-
-    """
+    """ Set qHAWAX ON in qHAWAX Installation table"""
     installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         now = datetime.datetime.now(dateutil.tz.tzutc())
@@ -109,30 +79,8 @@ def turnOnAfterCalibration(qhawax_name):
                 update(values={'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
         session.commit()
 
-
-def setOccupiedQhawax(qhawax_id):
-    """
-    Update qHAWAX Availability to Occupied
-
-    """
-    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-        session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': 'Occupied'})
-        session.commit()
-
-def setModeCustomer(qhawax_id):
-    """
-    Update qHAWAX mode to Customer
-
-    """
-    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-        session.query(Qhawax).filter_by(id=qhawax_id).update(values={'mode': "Cliente"})
-        session.commit()
-
 def saveEndWorkFieldDate(qhawax_id,end_date,date_format):
-    """
-    Save End Work in Field
-
-    """
+    """ Save End Work in Field"""
     util_helper.check_valid_date(end_date,date_format)
     
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
@@ -141,21 +89,14 @@ def saveEndWorkFieldDate(qhawax_id,end_date,date_format):
                                                  update(values={'end_date_zone': end_date})
         session.commit()
 
-def setAvailableQhawax(qhawax_id):
-    """
-    Update qhawax installation state in qHAWAX table
-
-    """
+def setAvailabilityQhawax(qhawax_id, availability):
+    """ Update qHAWAX Availability to Occupied or Free """
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-        session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': 'Available'})
+        session.query(Qhawax).filter_by(id=qhawax_id).update(values={'availability': availability})
         session.commit()
 
-
 def changeMode(qhawax_name, mode):
-    """
-    Change To Other Mode
-
-    """
+    """Change To Other Mode"""
     if(isinstance(mode, str) is not True):
         raise TypeError("Mode value "+str(mode)+" should be string")
 
@@ -164,10 +105,7 @@ def changeMode(qhawax_name, mode):
         session.commit()
 
 def updateQhawaxInstallation(data):
-    """
-    Update qHAWAX in Field 
-
-    """
+    """ Update qHAWAX in Field """
     if(isinstance(data, dict)):
         if(util_helper.areFieldsValid(data)==True):
             session.query(QhawaxInstallationHistory). \
@@ -181,9 +119,7 @@ def updateQhawaxInstallation(data):
         raise TypeError("qHAWAX Installation data "+str(data)+" should be in Json Format")
 
 def createQhawax(qhawax_name,qhawax_type):
-    """
-    Create a qHAWAX module 
-    """
+    """ Create a qHAWAX module """
     qhawax_id = 1
     last_qhawax_id = get_business_helper.queryGetLastQhawax()
     
@@ -202,10 +138,7 @@ def createQhawax(qhawax_name,qhawax_type):
 
 
 def insertDefaultOffsets(qhawax_name):
-    """
-    To insert a Default Offset 
-
-    """
+    """To insert a Default Offset """
     last_gas_sensor_id = 0
     last_gas_sensor = get_business_helper.queryGetLastGasSensor()
 
@@ -227,10 +160,7 @@ def insertDefaultOffsets(qhawax_name):
             start+=1
 
 def createCompany(json_company):
-    """
-    To insert new company
-
-    """
+    """ To insert new company"""
     if(isinstance(json_company, dict) is not True):
         raise TypeError("The Json company "+str(json_company)+" should be in Json Format")
 
@@ -241,10 +171,7 @@ def createCompany(json_company):
     session.commit()
 
 def storeNewQhawaxInstallation(data):
-    """
-    Insert new qHAWAX in Field 
-
-    """
+    """Insert new qHAWAX in Field  """
     if(isinstance(data, dict)):
         if(util_helper.areFieldsValid(data)==True):
             data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
@@ -259,14 +186,8 @@ def storeNewQhawaxInstallation(data):
     else:
         raise TypeError("The Json company "+str(data)+" should be in Json Format")
 
-
 def writeBinnacle(qhawax_name,description,person_in_charge):
-    """
-    Write observations in Binnacle
-
-    """
-    if(isinstance(qhawax_name, str) is not True):
-        raise TypeError("qHAWAX name should be string")
+    """ Write observations in Binnacle"""
 
     if(isinstance(description, str) is not True):
         raise TypeError("Binnacle description should be string")
@@ -283,5 +204,10 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
         bitacora_update = Bitacora(**bitacora)
         session.add(bitacora_update)
         session.commit()
-        
+
+def util_qhawax_installation_set_up(qhawax_id,availability,mode,description,person_in_charge):
+    setAvailabilityQhawax(qhawax_id,availability)
+    qhawax_name = same_helper.getQhawaxName(qhawax_id)
+    changeMode(qhawax_name, mode)
+    writeBinnacle(qhawax_name,description,person_in_charge)
 

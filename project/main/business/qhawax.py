@@ -7,10 +7,7 @@ from project import app, socketio
 
 @app.route('/api/get_qhawax_inca/', methods=['GET'])
 def getIncaQhawaxInca():
-    """
-    To get qHAWAX Inca Value 
-
-    """
+    """ To get qHAWAX Inca Value """
     try:
         name = request.args.get('name')
         inca_qhawax = get_business_helper.queryIncaQhawax(name)
@@ -29,19 +26,15 @@ def getActiveQhawaxModeCustomer():
     """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-        if qhawaxs!=[]:
-            qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
-            return make_response(jsonify(qhawaxs_list), 200)
-        return make_response({'Warning':'There are no qHAWAXs in field'}, 200)
+        qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
+        return make_response(jsonify(qhawaxs_list), 200)
     except TypeError as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
 
 @app.route('/api/save_main_inca/', methods=['POST'])
 def updateIncaData():
-    """
-    To save qHAWAX inca value
-    """
+    """ To save qHAWAX inca value """
     jsonsend = {}
     try:
         req_json = request.get_json()
@@ -61,10 +54,7 @@ def updateIncaData():
 
 @app.route('/api/qhawax_change_status_off/', methods=['POST'])
 def sendQhawaxStatusOff():
-    """
-    Endpoint to set qHAWAX OFF because script detect no new data within five minutes
-
-    """
+    """ Endpoint to set qHAWAX OFF because script detect no new data within five minutes  """
     jsonsend = {}
     try:
         req_json = request.get_json()
@@ -73,7 +63,7 @@ def sendQhawaxStatusOff():
         qhawax_time_off = req_json['qhawax_lost_timestamp']
         description = req_json['description']
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.saveStatusOffQhawaxTable(name)
+        post_business_helper.saveStatusQhawaxTable(name,'OFF',-1)
         if(same_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
         post_business_helper.writeBinnacle(name,description,person_in_charge)
@@ -87,10 +77,7 @@ def sendQhawaxStatusOff():
 
 @app.route('/api/qhawax_change_status_on/', methods=['POST'])
 def sendQhawaxStatusOn():
-    """
-    Set qHAWAX ON due to module reset (sensors reset) 
-
-    """
+    """ Set qHAWAX ON due to module reset (sensors reset) """
     jsonsend = {}
     try:
         req_json = request.get_json()
@@ -98,7 +85,7 @@ def sendQhawaxStatusOn():
         qhawax_name = str(req_json['qhawax_name']).strip()
         description = req_json['description']
         person_in_charge = req_json['person_in_charge']
-        post_business_helper.saveStatusOnTable(qhawax_name)
+        post_business_helper.saveStatusOnTable(qhawax_name,'ON',0)
         if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
@@ -111,10 +98,7 @@ def sendQhawaxStatusOn():
 
 @app.route('/api/get_time_all_active_qhawax/', methods=['GET'])
 def getTimeAllActiveQhawax():
-    """
-    Get Time All Active qHAWAX - Script   
-
-    """
+    """ Get Time All Active qHAWAX - Script """
     try:
         name = request.args.get('name')
         values = get_business_helper.getTimeQhawaxHistory(name)
@@ -128,10 +112,7 @@ def getTimeAllActiveQhawax():
 
 @app.route('/api/create_qhawax/', methods=['POST'])
 def createQhawax():
-    """
-    To create a qHAWAX 
-
-    """
+    """ Endpoint to create a qHAWAX """
     try:
         req_json = request.get_json()
         exception_helper.getQhawaxTargetofJson(req_json)
@@ -152,10 +133,7 @@ def createQhawax():
 
 @app.route('/api/change_to_calibration/', methods=['POST'])
 def qhawaxChangeToCalibration():
-    """
-    qHAWAX update to Calibration mode, set main inca -2 value
-
-    """
+    """ qHAWAX update to Calibration mode, set main inca -2 value """
     req_json = request.get_json()
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
@@ -176,10 +154,7 @@ def qhawaxChangeToCalibration():
 
 @app.route('/api/end_calibration/', methods=['POST'])
 def qhawaxEndCalibration():
-    """
-    qHAWAX update end calibration mode, set main inca original, depends of mode (customer or stand by)
-
-    """
+    """ qHAWAX update end calibration mode, set main inca original, depends of mode (customer or stand by)"""
     req_json = request.get_json()
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
@@ -203,13 +178,9 @@ def qhawaxEndCalibration():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
         
-
 @app.route('/api/qhawax_status/', methods=['GET'])
 def getQhawaxStatus():
-    """
-    Get qHAWAX Status
-
-    """
+    """ Get qHAWAX Status """
     try:
         name = request.args.get('name')
         qhawax_status = get_business_helper.getQhawaxStatus(name)

@@ -5,10 +5,7 @@ import datetime
 import pytz
 
 class TestGetBusinessHelper(unittest.TestCase):
-	"""
-	Test of Get Business Functions
-
-	"""
+	""" Test of Get Business Functions """
 	def test_query_time_qhawax_history_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory)
 		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,{"name":"qH001"})
@@ -208,18 +205,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 	def test_get_qhawax_latest_timestamp_processed_valid(self):
 		self.assertAlmostEqual(get_business_helper.getLatestTimeInProcessedMeasurement('qH100'),None)
 
-	def test_get_qhawax_latest_timestamp_valid_processed_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed)
-		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,40)
-		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,True)
-		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,4.5)
-		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,None)
-		self.assertRaises(TypeError,get_business_helper.getLatestTimeInValidProcessed,{"name":"qH001"})
-
-	def test_get_qhawax_latest_timestamp_valid_processed_valid(self):
-		self.assertAlmostEqual(get_business_helper.getLatestTimeInValidProcessed('qH100'),None)
-
-
 	def test_get_qhawax_in_field_public_mode_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,40)
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,True)
@@ -235,7 +220,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 			'OFF', 'STATIC', 0.0, 52, 34, 1, 'Prueba en la Oficina', -12.139502, -77.022529, \
 			'Zona de Protección Especial')]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
-
 
 	def test_get_qhawax_status_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus)

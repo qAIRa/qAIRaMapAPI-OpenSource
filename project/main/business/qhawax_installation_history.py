@@ -6,33 +6,23 @@ from project import app
 
 @app.route('/api/newQhawaxInstallation/', methods=['POST'])
 def newQhawaxInstallation():
-    """
-    To create a qHAWAX in Field 
-
-    """
+    """ To create a qHAWAX in Field """
     data_json = request.get_json()
     try:
         qhawax_id = data_json['qhawax_id']
         qhawax_id = data_json['description']
         person_in_charge = data_json['person_in_charge']
         post_business_helper.storeNewQhawaxInstallation(data_json)
-        post_business_helper.setOccupiedQhawax(qhawax_id)
-        post_business_helper.setModeCustomer(qhawax_id)
-        qhawax_name = same_helper.getQhawaxName(qhawax_id)
-        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        post_business_helper.util_qhawax_installation_set_up(qhawax_id,'Occupied','Cliente',description,person_in_charge)
     except Exception as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
     else:
         return make_response({'Success': 'Save new qHAWAX in field'}, 200)
 
-
 @app.route('/api/saveEndWorkField/', methods=['POST'])
 def saveEndWorkField():
-    """
-    Save last date of qHAWAX in field
-
-    """
+    """Save last date of qHAWAX in field """
     data_json = request.get_json()
     try:
         qhawax_id = data_json['qhawax_id']
@@ -41,10 +31,7 @@ def saveEndWorkField():
         person_in_charge = data_json['person_in_charge']
         date_format = '%d-%m-%Y %H:%M:%S.%f'
         post_business_helper.saveEndWorkFieldDate(qhawax_id, end_date,date_format)
-        post_business_helper.setAvailableQhawax(qhawax_id)
-        qhawax_name = same_helper.getQhawaxName(qhawax_id)
-        post_business_helper.changeMode(qhawax_name, "Stand By")
-        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        post_business_helper.util_qhawax_installation_set_up(qhawax_id,'Available','Stand By',description,person_in_charge)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -54,13 +41,9 @@ def saveEndWorkField():
 
 @app.route('/api/AllQhawaxInMap/', methods=['GET'])
 def getQhawaxInMap():
-    """
-    Get list of qHAWAXs filter by company ID
-
-    """
+    """ Get list of qHAWAXs filter by company ID """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
-        print(qhawax_in_field)
         qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
         return make_response(jsonify(qhawax_in_field_list), 200)
     except TypeError as e:
@@ -69,10 +52,7 @@ def getQhawaxInMap():
 
 @app.route('/api/GetInstallationDate/', methods=['GET'])
 def getInstallationDate():
-    """
-    Get installation date of qHAWAX in field
-    
-    """
+    """ Get installation date of qHAWAX in field """
     try:
         qhawax_id = int(request.args.get('qhawax_id'))
         installation_date = get_business_helper.getInstallationDate(qhawax_id)
@@ -91,10 +71,7 @@ def getInstallationDate():
 
 @app.route('/api/updateQhawaxInstallation/', methods=['POST'])
 def updateQhawaxInstallation():
-    """
-    To create a qHAWAX in Field 
-
-    """
+    """ To update qHAWAX in Field """
     try:
         data_json = request.get_json()
         qhawax_id = int(data_json['qhawax_id'])
