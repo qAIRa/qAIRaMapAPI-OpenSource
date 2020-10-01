@@ -14,14 +14,6 @@ columns_qhawax = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawa
                   QhawaxInstallationHistory.eca_noise_id, QhawaxInstallationHistory.comercial_name, 
                   QhawaxInstallationHistory.lat, QhawaxInstallationHistory.lon, EcaNoise.area_name)
 
-def getTimeQhawaxHistory(name):
-    """ Get time qHAWAX History """
-    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,\
-              QhawaxInstallationHistory.last_registration_time_zone)
-    installation_id = same_helper.getInstallationIdBaseName(name)
-    return None if (installation_id is None) else session.query(*fields).\
-                                                        filter_by(id= installation_id).first()
-
 def queryQhawaxModeCustomer():
     """ Get qHAWAX list in mode Customer and state ON """
     return session.query(*columns_qhawax).\

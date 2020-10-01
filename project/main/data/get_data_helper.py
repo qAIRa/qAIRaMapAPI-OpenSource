@@ -29,18 +29,6 @@ def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp,date_forma
         return [measurement._asdict() for measurement in air_quality_measurements]
     return None
 
-def getTimeQhawaxHistory(installation_id):
-    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
-              QhawaxInstallationHistory.last_registration_time_zone)
-
-    if(type(installation_id) not in [int]):
-        raise TypeError("Installation ID "+str(installation_id)+" should be integer")
-
-    values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
-    if (values!=None):
-        return {'last_time_on': values[0], 'last_time_registration': values[1]} 
-    return None
-
 def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     """ Helper function to get gas average measurement based on qHAWAX name and sensor name"""
     sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
@@ -55,7 +43,7 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     if(qhawax_id!= None):
         installation_id = same_helper.getInstallationId(qhawax_id)
         if(installation_id!=None):
-            values_list = getTimeQhawaxHistory(installation_id)
+            values_list = same_helper.getTimeQhawaxHistory(installation_id)
             
             initial_timestamp = datetime.datetime.now()
             last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)

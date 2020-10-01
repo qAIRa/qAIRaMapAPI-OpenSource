@@ -101,10 +101,10 @@ def getTimeAllActiveQhawax():
     """ Get Time All Active qHAWAX - Script """
     try:
         name = request.args.get('name')
-        values = get_business_helper.getTimeQhawaxHistory(name)
+        installation_id = same_helper.getInstallationIdBaseName(name)
+        values = same_helper.getTimeQhawaxHistory(installation_id)
         if(values is not None):
-            values_list = {'last_time_on': values[0], 'last_time_registration': values[1]} 
-            return make_response(jsonify(values_list), 200)
+            return make_response(jsonify(values), 200)
         return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

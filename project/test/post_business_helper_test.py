@@ -136,7 +136,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.changeMode,True,"Cliente")
 
 	def test_change_mode_valid(self):
-		post_business_helper.changeMode("qH015","Stand By")
+		post_business_helper.changeMode("qH001","Stand By")
 
 	def test_update_qhawax_installation_not_valid(self):
 		installation_json = {'lat':None,'lon':None,'comercial_name':None,

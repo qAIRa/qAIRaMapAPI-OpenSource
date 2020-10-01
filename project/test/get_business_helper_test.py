@@ -6,17 +6,6 @@ import pytz
 
 class TestGetBusinessHelper(unittest.TestCase):
 	""" Test of Get Business Functions """
-	def test_query_time_qhawax_history_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory)
-		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,4.33)
-		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,5)
-		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,None)
-		self.assertRaises(TypeError,get_business_helper.getTimeQhawaxHistory,True)
-
-	def test_query_time_qhawax_history_valid(self):
-		self.assertAlmostEqual(get_business_helper.getTimeQhawaxHistory('qH020'),None)
-		self.assertAlmostEqual(get_business_helper.getTimeQhawaxHistory('qH0100'),None)
 
 	def test_query_qhawax_mode_customer_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,{"name":"qH001"})
@@ -28,8 +17,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,"String_")
 
 	def test_query_qhawax_mode_customer_valid(self):
-		y = [(4, 'qH004', 50.0, 'STATIC', 'Test Aguitas 2.0', 'Zona de Protección Especial')]
-		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),[])
+		y = [('qH004', 'Cliente', 'ON', 'STATIC', 0.0, 51, 4, 1, 'Test Aguitas 2.0', -12.042111,\
+			 -77.028233, 'Zona de Protección Especial'), ('qH021', 'Cliente', 'ON', 'STATIC', 1.0,\
+			  53, 21, 2, 'UNICEF ESTATICO', -12.04325, -77.02855, 'Zona Residencial')]
+		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
 
 	def test_query_get_areas_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetAreas,{"name":"qH001"})
@@ -214,11 +205,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
-		y =[('qH004', 'Cliente', 'OFF', 'STATIC', -1.0, 51, 4, 1, 'Test Aguitas 2.0', -12.042111, \
-			-77.028233, 'Zona de Protección Especial'), ('qH021', 'Cliente', 'OFF', 'STATIC', -1.0, 53,\
-			21, 2, 'UNICEF ESTATICO', -12.04325, -77.02855, 'Zona Residencial'), ('qH034', 'Cliente', \
-			'OFF', 'STATIC', 0.0, 52, 34, 1, 'Prueba en la Oficina', -12.139502, -77.022529, \
-			'Zona de Protección Especial')]
+		y = [('qH004', 'Cliente', 'ON', 'STATIC', 0.0, 51, 4, 1, 'Test Aguitas 2.0', -12.042111, -77.028233, \
+			'Zona de Protección Especial'), ('qH021', 'Cliente', 'ON', 'STATIC', 1.0, 53, 21, 2, 'UNICEF ESTATICO',\
+			 -12.04325, -77.02855, 'Zona Residencial'), ('qH034', 'Cliente', 'OFF', 'STATIC', 0.0, 52, 34, 1, \
+			 'Prueba en la Oficina', -12.139502, -77.022529, 'Zona de Protección Especial')]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
 
 	def test_get_qhawax_status_not_valid(self):
@@ -232,7 +222,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_get_qhawax_status_valid(self):
 		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH001'),'ON')
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH004'),'OFF')
+		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH004'),'ON')
 		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH100'),None)
 
 if __name__ == '__main__':
