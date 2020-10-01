@@ -180,8 +180,8 @@ def areFieldsValid(data):
 def averageMeasurements(measurements):
     SKIP_KEYS = ['timestamp', 'lat', 'lon']
 
-    if(isinstance(measurements, dict) is not True):
-        raise TypeError("Measurement variable "+str(measurements)+" should be Json Format")
+    if(isinstance(measurements, list) is not True):
+        raise TypeError("Measurement variable "+str(measurements)+" should be List Format")
 
     average_measurement = {}
 
@@ -233,8 +233,8 @@ def getDateRangeFromWeek(p_year,p_week):
 
 
 def getFormatData(gas_average_measurement):
-    if(isinstance(gas_average_measurement, dict) is not True):
-        raise TypeError("Gas Average Measurement variable "+str(gas_average_measurement)+" should be Json Format")
+    if(isinstance(gas_average_measurement, list) is not True):
+        raise TypeError("Gas Average Measurement variable "+str(gas_average_measurement)+" should be List Format")
 
     gas_average_measurement_list = []
     if gas_average_measurement is not None:
