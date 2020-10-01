@@ -103,6 +103,7 @@ def getTimeAllActiveQhawax():
         name = request.args.get('name')
         installation_id = same_helper.getInstallationIdBaseName(name)
         values = same_helper.getTimeQhawaxHistory(installation_id)
+        print(values)
         if(values is not None):
             return make_response(jsonify(values), 200)
         return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
