@@ -121,3 +121,14 @@ def getQhawaxMode(qhawax_name):
         return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
     return None
 
+
+def getTimeQhawaxHistory(installation_id):
+    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
+              QhawaxInstallationHistory.last_registration_time_zone)
+
+    if(qhawaxInstallationExistBasedOnID(installation_id)):
+        values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
+        if (values!=None):
+            return {'last_time_on': values[0], 'last_time_registration': values[1]} 
+    
+    return None

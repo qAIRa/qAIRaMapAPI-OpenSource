@@ -3,10 +3,7 @@ dist: bionic
 python:
 - 3.7.6
 cache: pip
-before_cache:
-- rm -vrf $HOME/.cache/pip/{http,log}
 install:
-- rm -vrf $HOME/.cache/pip/{http,log}
 - pip install -r requirements.txt
 - pip install coverage==4.5.4
 script:

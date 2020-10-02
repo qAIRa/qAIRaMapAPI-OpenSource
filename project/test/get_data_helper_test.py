@@ -27,22 +27,6 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertAlmostEqual(get_data_helper.queryDBAirQuality('qH001',initial_timestamp,last_timestamp,date_format),[])
 		self.assertAlmostEqual(get_data_helper.queryDBAirQuality('qH100',initial_timestamp,last_timestamp,date_format),None)
 
-	def test_query_time_qhawax_history_not_valid(self):
-		self.assertRaises(TypeError,get_data_helper.getTimeQhawaxHistory)
-		self.assertRaises(TypeError,get_data_helper.getTimeQhawaxHistory,True)
-		self.assertRaises(TypeError,get_data_helper.getTimeQhawaxHistory,None)
-		self.assertRaises(TypeError,get_data_helper.getTimeQhawaxHistory,"qH001")
-
-	def test_query_time_qhawax_history_valid(self):
-		initial_timestamp = "28-09-2020 03:48:50.867872+00:00"
-		last_timestamp = "27-09-2020 00:00:00.877701+00:00"
-		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
-		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
-		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
-		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time} 
-		self.assertAlmostEqual(get_data_helper.getTimeQhawaxHistory(51),values)
-		self.assertAlmostEqual(get_data_helper.getTimeQhawaxHistory(200),None)
-
 	def test_query_gas_average_measurement_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryDBGasAverageMeasurement)
 		self.assertRaises(TypeError,get_data_helper.queryDBGasAverageMeasurement,{"qhawax_id":5})

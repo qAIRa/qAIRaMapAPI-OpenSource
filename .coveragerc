@@ -1,0 +1,4 @@
+[run]
+branch = False
+source = project/
+omit = /home/travis/virtualenv/python3.7.6/*

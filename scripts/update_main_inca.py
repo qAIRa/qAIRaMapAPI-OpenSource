@@ -14,25 +14,19 @@ SAVE_GAS_INCA_ENDPOINT = 'api/saveGasInca/'
 GET_TIME_BY_QHAWAX_ACTIVE = 'api/get_time_all_active_qhawax/'
 GET_TIMESTAMP_OF_VALID = 'api/get_time_valid_data_active_qhawax/'
 
-
-def init_inca_gas_processed(valueH2S,valueCO,valueNO2,valuePM10,valuePM25,valueSO2, valueO3, calInca):
+def init_inca_gas_processed(sensor_array,value_sensor_array, calInca):
     inca_json = {}
     starting_hour = datetime.datetime.now(dateutil.tz.tzutc())
     inca_json['timestamp_zone'] = str(starting_hour.replace(minute=0, second=0, microsecond=0))
-    inca_json['CO'] = valueCO
-    inca_json['CO2'] = 0.0
-    inca_json['H2S'] = valueH2S
-    inca_json['NO'] = 0.0
-    inca_json['NO2'] = valueNO2
-    inca_json['O3'] = valueO3
-    inca_json['PM1'] = 0.0
-    inca_json['PM25'] = valuePM25
-    inca_json['PM10'] = valuePM10
-    inca_json['SO2'] = valueSO2
-    inca_json['main_inca'] = calInca
-
-    return inca_json
+    for i in range(len(value_sensor_array)):
+        inca_json[sensor_array[i]] = value_sensor_array[i]
     
+    inca_json['CO2'] = 0.0
+    inca_json['NO'] = 0.0
+    inca_json['PM1'] = 0.0
+    inca_json['main_inca'] = calInca
+    
+    return inca_json
 
 def validaH2S(val):
     calificacionInca = 0
@@ -132,7 +126,42 @@ factor_final_SO2 = (0.0409 * 64.066 * 100)/20
 factor_final_O3 = (0.0409 * 48* 100)/120
 factor_final_H2S = (0.0409 * 34.1*100)/150
 
+def setFactorArray():
+    array = []
+    array.append(factor_final_CO)
+    array.append(factor_final_NO2)
+    array.append(factor_final_PM10)
+    array.append(factor_final_PM25)
+    array.append(factor_final_SO2)
+    array.append(factor_final_O3)
+    array.append(factor_final_H2S)
+    return array
+
+def verifySensor(responseSensor,factor_final_sensor,sensor_type):
+    valueSensor = None
+    if(responseSensor.text!="-1"):
+        valueSensor = math.floor(float(responseSensor.text) * factor_final_sensor)
+        if(sensor_type == 'NO2' or sensor_type == 'CO')
+            aux = validaCO_NO2(valueSensor)
+
+        if(sensor_type == 'H2S')
+            aux = validaH2S(valueSensor)
+
+        if(sensor_type == 'SO2')
+            aux = validaSO2(valueSensor)
+
+        if(sensor_type == 'PM10')
+            aux = validaPM10(valueSensor)
+
+        if(sensor_type == 'PM25')
+            aux = validaPM25(valueSensor)
+
+        if(sensor_type == 'O3')
+            aux = validaO3(valueSensor)
+    return aux,valueSensor
+
 # Request all qhawax
+fator_array = setFactorArray()
 response = requests.get(BASE_URL + GET_ACTIVE_QHAWAX_IN_FIELD)
 qhawax_names = [qhawax['name'] for qhawax in response.json()]
 for qhawax_name in qhawax_names:
@@ -149,63 +178,25 @@ for qhawax_name in qhawax_names:
                 print("Entre a valid_response_time no es NONE "+ str(qhawax_name))
                 if(valid_response_time.replace(tzinfo=None) >= last_time_turn_on.replace(tzinfo=None)):
                     print("Entre a valid_response_time >= a last_time_turn_on "+ str(qhawax_name))
-                    responseCO = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': 'CO', 'hoursSensor': 8,'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
-                    responseNO2 = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': 'NO2', 'hoursSensor': 1,'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
-                    responsePM10 = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': 'PM10', 'hoursSensor': 24,'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
-                    responsePM25 = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': 'PM25', 'hoursSensor': 24,'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
-                    responseSO2 = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': 'SO2', 'hoursSensor': 24,'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
-                    responseO3 = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': 'O3', 'hoursSensor': 8,'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
-                    responseH2S = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': 'H2S', 'hoursSensor': 24,'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
+
+                    sensor_array = ['CO','NO2','PM10','PM25','SO2','O3','H2S']
+                    hour_array = [8,1,24,24,24,8,24]
+                    response_array = []
+                    value_sensor_array = []
+                    for sensor_i in range(len(sensor_array)):
+                        response_sensor = requests.get(BASE_URL + GET_MEASUREMENT_PROM, params={'name': qhawax_name, 'sensor': sensor_array[i], 'hoursSensor': hour_array[i],'minutes_diff':minutes_diff, 'last_time_turn_on':last_time_turn_on})
+                        response_array.append(response_sensor)
 
                     aux = 0
                     calInca = 0
-                    valueCO, valueNO2, valuePM10, valuePM25, valueSO2,valueO3,valueH2S = None, None,None,None,None,None,None
-
-                    if(responseCO.text!="-1"):
-                        valueCO = math.floor(float(responseCO.text) * factor_final_CO)
-                        aux = validaCO_NO2(valueCO)
-                        if aux > calInca:
-                            calInca = aux 
-
-                    if(responseNO2.text!="-1"):
-                        valueNO2 = math.floor(float(responseNO2.text) * factor_final_NO2)
-                        aux = validaCO_NO2(valueNO2)
+                    for i in range(len(sensor_array)):
+                        aux,valueSensor =verifySensor(response_array[i],factor_array[i],sensor_array[i])
+                        value_sensor_array.append(valueSensor)
                         if aux > calInca:
                             calInca = aux
-
-                    if(responsePM10.text!="-1"):
-                        valuePM10 = math.floor(float(responsePM10.text) * factor_final_PM10)
-                        aux = validaPM10(valuePM10)
-                        if aux > calInca:
-                            calInca = aux
-
-                    if(responsePM25.text!="-1"):
-                        valuePM25 = math.floor(float(responsePM25.text) * factor_final_PM25)
-                        aux = validaPM25(valuePM25)
-                        if aux > calInca:
-                            calInca = aux
-
-                    if(responseSO2.text!="-1"):
-                        valueSO2 = math.floor(float(responseSO2.text) * factor_final_SO2)
-                        aux = validaSO2(valueSO2)
-                        if aux > calInca:
-                            calInca = aux
-
-                    if(responseO3.text!="-1"):
-                        valueO3 = math.floor(float(responseO3.text) * factor_final_O3)
-                        aux = validaO3(valueO3)
-                        if aux > calInca:
-                            calInca = aux 
-
-                    if(responseH2S.text!="-1"):
-                        valueH2S = math.floor(float(responseH2S.text) * factor_final_H2S)
-                        aux = validaH2S(valueH2S)
-                        if aux > calInca:
-                            calInca = aux 
                            
                     name_qhawax = qhawax_name
-
-                    inca_gas_processed = init_inca_gas_processed(valueH2S,valueCO,valueNO2,valuePM10,valuePM25,valueSO2, valueO3,calInca)
+                    inca_gas_processed = init_inca_gas_processed(sensor_array,value_sensor_array,calInca)
                 
                     inca_gas_processed['ID'] = qhawax_name
                     if(calInca!=0):

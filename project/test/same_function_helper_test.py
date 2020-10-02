@@ -1,5 +1,9 @@
 import unittest
 import project.main.same_function_helper as same_helper
+import datetime
+from datetime import timedelta
+import dateutil
+import dateutil.parser
 
 class TestSameFunctionHelper(unittest.TestCase):
 	"""
@@ -126,7 +130,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,True)
 
 	def test_get_main_inca_valid(self):
-		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(4),-1)
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(4),0)
 		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(100),None)
 
 
@@ -143,6 +147,22 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertAlmostEqual(same_helper.getQhawaxMode('qH001'),'Stand By')
 		self.assertAlmostEqual(same_helper.getQhawaxMode('qH004'),'Cliente')
 		self.assertAlmostEqual(same_helper.getQhawaxMode('qH100'),None)
+
+	def test_query_time_qhawax_history_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory)
+		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,True)
+		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,None)
+		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,"qH001")
+
+	def test_query_time_qhawax_history_valid(self):
+		initial_timestamp = "01-10-2020 22:51:26.500289+00:00"
+		last_timestamp = "27-09-2020 00:00:00.877701+00:00"
+		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
+		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
+		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
+		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time} 
+		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(51),values)
+		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(800),None)
 
 
 if __name__ == '__main__':
