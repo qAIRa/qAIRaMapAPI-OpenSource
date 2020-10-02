@@ -162,7 +162,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
 		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time} 
 		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(51),values)
-		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(200),None)
+		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(800),None)
 
 
 if __name__ == '__main__':
