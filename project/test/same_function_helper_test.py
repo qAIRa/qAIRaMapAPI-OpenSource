@@ -155,7 +155,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,"qH001")
 
 	def test_query_time_qhawax_history_valid(self):
-		initial_timestamp = "01-10-2020 22:51:26.500289+00:00"
+		initial_timestamp = "05-10-2020 17:13:14.701402+00:00"
 		last_timestamp = "27-09-2020 00:00:00.877701+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)

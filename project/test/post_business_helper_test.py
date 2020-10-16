@@ -165,8 +165,9 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(Exception,post_business_helper.createQhawax,"qH050",50)
 
 	def test_create_qhawax_and_default_sensors_valid(self):
+		installation_date = "2020-10-01 08:44:00.0-05:00"
 		end_date_string = "2020-10-30 00:00:00.255258"
-		date_format = '%Y-%m-%d %H:%M:%S.%f'
+		date_format_end_date = '%Y-%m-%d %H:%M:%S.%f'
 		person_in_charge = 'l.montalvo'
 		last_qhawax_id = int(get_business_helper.queryGetLastQhawax()[0]) +1
 		qhawax_name = 'qH0'+str(last_qhawax_id)
@@ -177,11 +178,12 @@ class TestPostBusinessHelper(unittest.TestCase):
 							 'comercial_name':'Unit Test '+str(randint(0, 20))+' Coveralls',
 							 'company_id':1,'eca_noise_id':1,'qhawax_id':int(last_qhawax_id),
 							 'connection_type':'Panel Solar','season':'Primavera','is_public':'no',
-							 'person_in_charge':person_in_charge}
+							 'person_in_charge':person_in_charge,"instalation_date":installation_date,
+							 'link_report':'Test','observations':'Test Obs','district':"La Victoria"}
 		post_business_helper.storeNewQhawaxInstallation(installation_json)
 		description = 'qHAWAX record in field'
 		post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-		post_business_helper.saveEndWorkFieldDate(last_qhawax_id,end_date_string,date_format)
+		post_business_helper.saveEndWorkFieldDate(last_qhawax_id,end_date_string,date_format_end_date)
 		description = 'qHAWAX save end work in field'
 		post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
 

@@ -138,12 +138,16 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.roundUpThree,True)
 
 	def test_round_up_three_valid(self):
-		y = {'ID': 'qH004', 'CO': 162.379, 'CO_ug_m3': 186.73584999999997, 'H2S': 0, 'H2S_ug_m3': 0.0,
-			 'NO2': 1.218, 'NO2_ug_m3': 2.28984, 'O3': 0, 'O3_ug_m3': 0.0, 'PM1': 0, 'PM10': 0, 'PM25': 0,
-			 'SO2': 0.77, 'SO2_ug_m3': 2.0174000000000003, 'spl': 0, 'UV': 0, 'UVA': 0, 'UVB': 0, 
+		y = {'ID': 'qH004', 'CO': 162.3791119, 'CO_ug_m3': 186.787111, 'H2S': 0, 'H2S_ug_m3': 1.42111,
+			 'NO2': 1.218, 'NO2_ug_m3': 2.28111, 'O3': 0, 'O3_ug_m3': 29.12311, 'PM1': 0, 'PM10': 0, 'PM25': 0,
+			 'SO2': 0.77, 'SO2_ug_m3': 2.055551, 'spl': 0, 'UV': 1.0, 'UVA': 0, 'UVB': 0, 
 			 'humidity': 71.9, 'lat': -12.072736, 'lon': -77.082687, 'pressure': 100743.24, 'temperature': 19.1,
 			 'timestamp': '2020-08-31 00:00:00.0-05:00'}
-		last_y = {'ID': 'qH004', 'CO': 162.379, 'CO_ug_m3': 186.736, 'H2S': 0,'H2S_ug_m3': 0.0, 'NO2': 1.218,'NO2_ug_m3': 2.29, 'O3': 0, 'O3_ug_m3': 0.0, 'PM1': 0, 'PM10': 0, 'PM25': 0, 'SO2': 0.77, 'SO2_ug_m3': 2.017, 'spl': 0, 'UV': 0, 'UVA': 0, 'UVB': 0, 'humidity': 71.9, 'lat': -12.072736,'lon': -77.082687, 'pressure': 100743.24, 'temperature': 19.1,'timestamp': '2020-08-31 00:00:00.0-05:00'}
+		last_y = {'ID': 'qH004', 'CO': 162.379, 'CO_ug_m3': 186.787, 'H2S': 0,'H2S_ug_m3': 1.421, 
+				  'NO2': 1.218,'NO2_ug_m3': 2.281, 'O3': 0, 'O3_ug_m3': 29.123, 'PM1': 0, 'PM10': 0,
+				  'PM25': 0, 'SO2': 0.77, 'SO2_ug_m3': 2.056, 'spl': 0, 'UV': 1.0, 'UVA': 0, 'UVB': 0,
+				  'humidity': 71.9, 'lat': -12.072736,'lon': -77.082687, 'pressure': 100743.24, 
+				  'temperature': 19.1,'timestamp': '2020-08-31 00:00:00.0-05:00'}
 		self.assertAlmostEqual(util_helper.roundUpThree(y),last_y)
 
 	def test_average_measurements_not_valid(self):

@@ -4,9 +4,6 @@ import dateutil
 import dateutil.parser
 
 pollutant=['SO2','NO2','O3','CO','H2S']
-pollutant_15C=[2.71,1.95,2.03,1.18,1.44]
-pollutant_20C=[2.66,1.91,2.00,1.16,1.41]
-pollutant_25C=[2.62,1.88,1.96,1.15,1.39]
 
 array_ppb = ['CO','H2S','NO2','O3','SO2',\
              'PM1','PM10','PM25','spl','UV',\
@@ -102,10 +99,10 @@ def gasConversionPPBtoMG(data_json,season):
     if(isinstance(season, list) is not True):
         raise TypeError("season "+str(season)+" should be List Format")
 
-    data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': 0,'H2S': data_json['H2S'],
-          'H2S_ug_m3': 0,'NO2': data_json['NO2'],'NO2_ug_m3': 0,'O3': data_json['O3'],
-          'O3_ug_m3': 0, 'PM1': data_json['PM1'],'PM10': data_json['PM10'],'PM25': data_json['PM25'],
-          'SO2': data_json['SO2'],'SO2_ug_m3': 0,'spl': data_json['spl'],'UV': data_json['UV'],
+    data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': None,'H2S': data_json['H2S'],
+          'H2S_ug_m3': None,'NO2': data_json['NO2'],'NO2_ug_m3': None,'O3': data_json['O3'],
+          'O3_ug_m3': None, 'PM1': data_json['PM1'],'PM10': data_json['PM10'],'PM25': data_json['PM25'],
+          'SO2': data_json['SO2'],'SO2_ug_m3': None,'spl': data_json['spl'],'UV': data_json['UV'],
           'UVA': data_json['UVA'],'UVB': data_json['UVB'],'humidity': data_json['humidity'],
           'lat':data_json['lat'],'lon':data_json['lon'],'pressure': data_json['pressure'],
           'temperature': data_json['temperature'],'timestamp': data_json['timestamp'],
@@ -125,14 +122,14 @@ def gasConversionPPBtoMG(data_json,season):
                     data['H2S_ug_m3']=data[key]*season[4]
     return data
 
+
 def roundUpThree(data_json):
     if(isinstance(data_json, dict) is not True):
         raise TypeError("Measurement variable "+str(data_json)+" should be Json Format")
-
     for i in range(len(array_ug_m3)):
-        data_json[array_ug_m3[i]] = round(data_json[array_ug_m3[i]],3)
+        if((type(data_json[array_ug_m3[i]]) is float) or (type(data_json[array_ug_m3[i]]) is int)):
+            data_json[array_ug_m3[i]] = round(data_json[array_ug_m3[i]],3)
     return data_json
-
 
 def checkNumberValues(data_json):
     """
@@ -263,3 +260,15 @@ def getFormatData(gas_average_measurement):
             if(next_hour == 24): next_hour = 0
         return gas_average_measurement_list
     return None
+
+def setNoneStringElements(data_json):
+    string_fields = ['ID','timestamp_zone','timestamp','zone']
+    for key in data_json:
+        if((type(data_json[key]) is str) and (key not in string_fields)):
+            data_json[key]=None
+    return data_json
+
+def NanToCeroJsonProcessed(data_json,i_temperature):
+    data_json['I_temperature'] = i_temperature
+    data_json = setNoneStringElements(data_json)
+    return data_json

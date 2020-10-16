@@ -1,7 +1,6 @@
 from flask import jsonify, make_response, request
 import datetime
 from datetime import timedelta
-import pytz
 import dateutil.parser
 import dateutil.tz
 from project import app, db, socketio
@@ -40,8 +39,10 @@ def handleProcessedData():
 
     """
     try:
-        flag_email = False
         data_json = request.get_json()
+        i_temperature = None
+        if('I_temperature' in data_json):
+            i_temperature = data_json['I_temperature']
         product_id = data_json['ID']
         data_json = util_helper.validTimeJsonProcessed(data_json)
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
@@ -58,11 +59,10 @@ def handleProcessedData():
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
-                        socketio.emit('new_data_summary_valid', data_json) 
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
-                        socketio.emit('new_data_summary_valid', data_json) 
+        data_json = util_helper.NanToCeroJsonProcessed(data_json,i_temperature)
         socketio.emit('new_data_summary_processed', data_json)
         return make_response('OK', 200)
     except TypeError as e:

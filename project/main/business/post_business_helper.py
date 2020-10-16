@@ -106,17 +106,16 @@ def changeMode(qhawax_name, mode):
 
 def updateQhawaxInstallation(data):
     """ Update qHAWAX in Field """
-    if(isinstance(data, dict)):
-        if(util_helper.areFieldsValid(data)==True):
-            session.query(QhawaxInstallationHistory). \
-                    filter_by(qhawax_id=data['qhawax_id'], \
-                              company_id=data['company_id'], \
-                              end_date_zone=None).update(values=data)
-            session.commit()
-        else:
-            raise Exception("qHAWAX Installation fields must have data")
-    else:
+    if(isinstance(data, dict) is not True):
         raise TypeError("qHAWAX Installation data "+str(data)+" should be in Json Format")
+    if(util_helper.areFieldsValid(data)==False):
+        raise Exception("qHAWAX Installation fields must have data")
+
+    session.query(QhawaxInstallationHistory). \
+            filter_by(qhawax_id=data['qhawax_id'], \
+                      company_id=data['company_id'], \
+                      end_date_zone=None).update(values=data)
+    session.commit()
 
 def createQhawax(qhawax_name,qhawax_type):
     """ Create a qHAWAX module """
@@ -172,19 +171,21 @@ def createCompany(json_company):
 
 def storeNewQhawaxInstallation(data):
     """Insert new qHAWAX in Field  """
-    if(isinstance(data, dict)):
-        if(util_helper.areFieldsValid(data)==True):
-            data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
-            data['installation_date_zone'] = datetime.datetime.now(dateutil.tz.tzutc())
-            data['last_time_physically_turn_on_zone'] = datetime.datetime.now(dateutil.tz.tzutc())
-            data['last_registration_time_zone'] = datetime.datetime.now(dateutil.tz.tzutc())
-            qhawax_installation = QhawaxInstallationHistory(**data)
-            session.add(qhawax_installation)
-            session.commit()
-        else:
-            raise Exception("qHAWAX Installation fields have to have data")
-    else:
+    if(isinstance(data, dict) is not True):
         raise TypeError("The Json company "+str(data)+" should be in Json Format")
+
+    if(util_helper.areFieldsValid(data)==False):
+        raise Exception("qHAWAX Installation fields have to have data")
+
+    installation_date = datetime.datetime.strptime(data['instalation_date'], '%Y-%m-%d %H:%M:%S.%f%z')
+    data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
+    data['installation_date_zone'] = str(installation_date)
+    data['last_time_physically_turn_on_zone'] = str(installation_date)
+    data['last_registration_time_zone'] = str(installation_date - datetime.timedelta(minutes=30))
+    data.pop('instalation_date', None)
+    qhawax_installation = QhawaxInstallationHistory(**data)
+    session.add(qhawax_installation)
+    session.commit()
 
 def writeBinnacle(qhawax_name,description,person_in_charge):
     """ Write observations in Binnacle"""
