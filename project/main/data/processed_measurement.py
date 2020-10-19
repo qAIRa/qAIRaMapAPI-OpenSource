@@ -34,10 +34,7 @@ def getProcessedData():
 
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
-    """
-    To record processed measurement and valid processed measurement every five seconds  
-
-    """
+    """ To record processed measurement and valid processed measurement every five seconds  """
     try:
         data_json = request.get_json()
         i_temperature = None

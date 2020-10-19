@@ -5,16 +5,24 @@ import dateutil.parser
 
 pollutant=['SO2','NO2','O3','CO','H2S']
 
-array_ppb = ['CO','H2S','NO2','O3','SO2',\
-             'PM1','PM10','PM25','spl','UV',\
+array_ppb = ['CO','H2S','NO2','O3','SO2','PM1','PM10','PM25','spl','UV',\
              'UVA','UVB','humidity','pressure','temperature']
 
 array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
                'O3_ug_m3','PM1','PM10','PM25','SO2','SO2_ug_m3','spl','UV',\
-               'humidity','pressure']
+               'humidity','pressure','VOC','CO2']
 
 array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_id',\
                          'connection_type','season','is_public','person_in_charge']
+
+all_processed_fields = ['ID','CO','H2S','NO2','O3','PM1','PM10','PM25','SO2','spl','UV','UVA','UVB',\
+                        'humidity','lat','lon','pressure','temperature','timestamp','CO2','VOC']
+
+def checkProcessedFields(data_json):
+    new_json = {}
+    for idx in range(len(all_processed_fields)):
+        new_json[all_processed_fields[idx]] = data_json[all_processed_fields[idx]] if (all_processed_fields[idx] in data_json) else None
+    return new_json
 
 def check_valid_date(date,date_format):
     """
@@ -86,6 +94,8 @@ def validAndBeautyJsonProcessed(data_json):
     if(isinstance(data_json, dict) is not True):
         raise TypeError("json "+str(data_json)+" should be Json Format")
 
+    data_json = checkProcessedFields(data_json)
+
     if  'timestamp_zone' not in data_json:
         data_json["timestamp_zone"] = data_json["timestamp"]
     data_json = gasConversionPPBtoMG(data_json, arr_season)
@@ -106,7 +116,7 @@ def gasConversionPPBtoMG(data_json,season):
           'UVA': data_json['UVA'],'UVB': data_json['UVB'],'humidity': data_json['humidity'],
           'lat':data_json['lat'],'lon':data_json['lon'],'pressure': data_json['pressure'],
           'temperature': data_json['temperature'],'timestamp': data_json['timestamp'],
-          'timestamp_zone': data_json['timestamp_zone']}
+          'timestamp_zone': data_json['timestamp_zone'],'VOC':data_json['VOC'],'CO2':data_json['CO2']}
     for key in data:
         if(key in pollutant):
             if((type(data[key]) is float) or (type(data[key]) is int)):
