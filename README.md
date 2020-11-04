@@ -8,6 +8,8 @@ We work with modules, called qHAWAX, that capture data from gases, dust and envi
 
 You can look for a more detailed documentation [here.](https://qaira.github.io/)
 
+Feel welcome to join our [forum](https://unicef-if.discourse.group/c/projects/qaira/11) with UNICEF. 
+ 
 ## Getting Started with installation
 
 ### Ubuntu, Mac & Windows
