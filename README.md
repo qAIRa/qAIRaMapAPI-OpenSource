@@ -6,6 +6,8 @@
 qAIRa Map API is an API to connect our [web](https://qairamap.qairadrones.com/), our qHAWAX and our database.
 We work with modules, called qHAWAX, that capture data from gases, dust and environmental sensors (temperature, pressure, ultraviolet and noise).
 
+You can look for a more detailed documentation [here.](https://qaira.github.io/)
+
 ## Getting Started with installation
 
 ### Ubuntu, Mac & Windows
