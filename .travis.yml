@@ -7,7 +7,7 @@ install:
 - pip install -r requirements.txt
 - pip install coverage==4.5.4
 script:
-- pytest -v --cov=project/main/
+- pytest -v
 - coverage run -m pytest project/test/
 after_success: coveralls
 env:
