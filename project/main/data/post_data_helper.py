@@ -59,8 +59,7 @@ def storeValidProcessedDataInDB(data, qhawax_id):
                       'lat':data['lat'],'lon':data['lon'],'PM1': data['PM1'],'PM10': data['PM10'],
                       'UV': data['UV'],'UVA': data['UVA'],'UVB': data['UVB'],'SPL': data['spl'],
                       'humidity': data['humidity'],'pressure': data['pressure'],
-                      'temperature': data['temperature'],'timestamp_zone': data['timestamp_zone'],
-                      'VOC':data['VOC'],'CO2':data['CO2']}
+                      'temperature': data['temperature'],'timestamp_zone': data['timestamp_zone']}
         valid_processed_measurement = ValidProcessedMeasurement(**valid_data, qhawax_installation_id=installation_id)
         session.add(valid_processed_measurement)
         session.commit()
