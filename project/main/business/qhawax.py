@@ -20,10 +20,7 @@ def getIncaQhawaxInca():
 
 @app.route('/api/get_qhawaxs_active_mode_customer/', methods=['GET'])
 def getActiveQhawaxModeCustomer():
-    """
-    To get all active qHAWAXs that are in field in mode costumer
-    No parameters required
-    """
+    """ To get all active qHAWAXs that are in field in mode costumer - No parameters required """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
         print(qhawaxs)
@@ -59,11 +56,10 @@ def sendQhawaxStatusOff():
     jsonsend = {}
     try:
         req_json = request.get_json()
-        exception_helper.getStatusOffTargetofJson(req_json)
         name = str(req_json['qhawax_name']).strip()
         qhawax_time_off = req_json['qhawax_lost_timestamp']
         description = req_json['description']
-        person_in_charge = req_json['person_in_charge']
+        person_in_charge = None
         post_business_helper.saveStatusQhawaxTable(name,'OFF',-1)
         if(same_helper.getQhawaxMode(name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(name,qhawax_time_off)
@@ -82,10 +78,9 @@ def sendQhawaxStatusOn():
     jsonsend = {}
     try:
         req_json = request.get_json()
-        exception_helper.getStatusOnTargetofJson(req_json)
         qhawax_name = str(req_json['qhawax_name']).strip()
         description = req_json['description']
-        person_in_charge = req_json['person_in_charge']
+        person_in_charge = None
         post_business_helper.saveStatusOnTable(qhawax_name,'ON',0)
         if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveTurnOnLastTime(qhawax_name)
