@@ -1,14 +1,10 @@
-import datetime
-import dateutil
-import dateutil.parser
-import time
-from project import app, db, socketio
+import project.main.business.post_business_helper as post_business_helper
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, \
                                     ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise, \
                                     AirDailyMeasurement
-import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
-import project.main.business.post_business_helper as post_business_helper
+import project.main.util_helper as util_helper
+from project import app, db, socketio
 
 session = db.session
 
@@ -69,7 +65,7 @@ def storeValidProcessedDataInDB(data, qhawax_id):
         session.add(valid_processed_measurement)
         session.commit()
         data = util_helper.setNoneStringElements(data)
-        socketio.emit('new_data_summary_valid', data)
+        socketio.emit(data['ID'], data)
 
 def storeAirDailyQualityDataInDB(data):
     """ Helper Daily Air Measurement function to store air daily measurement"""

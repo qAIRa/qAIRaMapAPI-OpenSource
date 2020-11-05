@@ -89,8 +89,12 @@ class TestUtilHelper(unittest.TestCase):
 			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
 			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
 			  'temperature': 20,'timestamp': "2020-01-01 00:00:00"}
-		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data),data)
-		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data_without),data)
+		data_pressure={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
+			  		   'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  		   'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 1.0,
+			  		   'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data),data_pressure)
+		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data_without),data_pressure)
 
 	def test_are_fields_correct_not_valid(self):
 		self.assertRaises(TypeError,util_helper.areFieldsValid)

@@ -26,6 +26,7 @@ def getActiveQhawaxModeCustomer():
     """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
+        print(qhawaxs)
         qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
         return make_response(jsonify(qhawaxs_list), 200)
     except TypeError as e:

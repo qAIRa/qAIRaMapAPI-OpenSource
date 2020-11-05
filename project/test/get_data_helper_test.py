@@ -38,13 +38,13 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(ValueError,get_data_helper.queryDBGasAverageMeasurement,"qH001","H2O")
 
 	def test_query_gas_average_measurement_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH004","CO"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH004","H2S"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH004","NO2"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH004","O3"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH004","PM25"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH004","PM10"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH004","SO2"),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH021","CO"),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH021","H2S"),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH021","NO2"),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH021","O3"),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH021","PM25"),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH021","PM10"),[])
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH021","SO2"),[])
 		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH100","CO"),None)
 
 	def test_query_valid_air_quality_not_valid(self):
