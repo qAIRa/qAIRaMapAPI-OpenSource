@@ -1,21 +1,18 @@
-from flask import jsonify, make_response, request
-import datetime
-from datetime import timedelta
-import pytz
-import dateutil.parser
-import dateutil.tz
-from project import app, db, socketio
 import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
+from flask import jsonify, make_response, request
+from project import app, socketio
+from datetime import timedelta
+import dateutil.parser
+import dateutil.tz
+import datetime
 
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
-    """
-    To list all measurement of processed measurement table record the last N minutes
-    """
+    """ To list all measurement of processed measurement table record the last N minutes """
     try:
         qhawax_name = request.args.get('name')
         interval_minutes = int(request.args.get('interval_minutes')) \
@@ -35,13 +32,12 @@ def getProcessedData():
 
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
-    """
-    To record processed measurement and valid processed measurement every five seconds  
-
-    """
+    """ To record processed measurement and valid processed measurement every five seconds  """
     try:
-        flag_email = False
         data_json = request.get_json()
+        i_temperature = None
+        if('I_temperature' in data_json):
+            i_temperature = data_json['I_temperature']
         product_id = data_json['ID']
         data_json = util_helper.validTimeJsonProcessed(data_json)
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
@@ -58,24 +54,19 @@ def handleProcessedData():
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
-                        socketio.emit('new_data_summary_valid', data_json) 
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
-                        socketio.emit('new_data_summary_valid', data_json) 
+        data_json = util_helper.NanToCeroJsonProcessed(data_json,i_temperature)
         socketio.emit('new_data_summary_processed', data_json)
         return make_response('OK', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-
 @app.route('/api/processed_measurements_period/', methods=['GET'])
 def getProcessedMeasurementsTimePeriod():
-    """
-    To list all measurement of processed measurement table in a define period of time
-
-    """
+    """ To list all measurement of processed measurement table in a define period of time """
     try:
         qhawax_name = request.args.get('name')
         initial_timestamp = request.args.get('initial_timestamp')
@@ -90,13 +81,9 @@ def getProcessedMeasurementsTimePeriod():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-
 @app.route('/api/get_time_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxProcessedLatestTimestamp():
-    """
-    To get qHAWAX Processed Measurement latest timestamp
-
-    """
+    """ To get qHAWAX Processed Measurement latest timestamp  """
     try:
         qhawax_name = request.args.get('qhawax_name')
         processed_timestamp = get_business_helper.getLatestTimeInProcessedMeasurement(qhawax_name)

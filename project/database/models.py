@@ -56,6 +56,7 @@ class GasSensor(db.Model):
     C0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
     NC1 = db.Column(db.Float, nullable=False, default=1, server_default='1')
     NC0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
+    algorithm = db.Column(db.Integer)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 class GasInca(db.Model):
@@ -223,6 +224,7 @@ class ProcessedMeasurement(db.Model):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
+    I_temperature = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 

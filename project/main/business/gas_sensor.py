@@ -20,7 +20,6 @@ def requestGasSensorVariable():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
     else:
-        print(variable_gas_sensor)
         if(variable_gas_sensor is not None):
             return make_response(jsonify(variable_gas_sensor), 200)
         return make_response(jsonify({'Warning':'qHAWAX name has not been found'}), 200)

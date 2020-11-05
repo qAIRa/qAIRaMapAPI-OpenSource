@@ -1,16 +1,13 @@
-import datetime
-import dateutil
-import dateutil.parser
-import time
-from project import app, db
+import project.main.business.post_business_helper as post_business_helper
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, \
                                     ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise, \
                                     AirDailyMeasurement
-import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
-import project.main.business.post_business_helper as post_business_helper
+import project.main.util_helper as util_helper
+from project import app, db, socketio
 
 session = db.session
+
 def storeAirQualityDataInDB(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("Air Quality variable "+str(data)+" should be Json")
@@ -26,10 +23,7 @@ def storeAirQualityDataInDB(data):
     session.commit()
 
 def storeGasIncaInDB(data):
-    """
-    Helper function to record GAS INCA measurement
-
-    """
+    """ Helper function to record GAS INCA measurement"""
     if(isinstance(data, dict) is not True):
         raise TypeError("Gas Inca variable "+str(data)+" should be Json")
 
@@ -40,10 +34,7 @@ def storeGasIncaInDB(data):
     session.commit()
                                   
 def storeProcessedDataInDB(data):
-    """
-    Helper Processed Measurement function to store Processed Data
-
-    """
+    """ Helper Processed Measurement function to store Processed Data """
     if(isinstance(data, dict) is not True):
         raise TypeError("Processed variable "+str(data)+" should be Json")
 
@@ -54,9 +45,7 @@ def storeProcessedDataInDB(data):
     session.commit()
 
 def storeValidProcessedDataInDB(data, qhawax_id):
-    """
-    Helper Processed Measurement function to insert Valid Processed Data
-    """
+    """ Helper Processed Measurement function to insert Valid Processed Data """
 
     if(isinstance(data, dict) is not True):
         raise TypeError("Valid Processed variable "+str(data)+" should be Json")
@@ -70,17 +59,16 @@ def storeValidProcessedDataInDB(data, qhawax_id):
                       'lat':data['lat'],'lon':data['lon'],'PM1': data['PM1'],'PM10': data['PM10'],
                       'UV': data['UV'],'UVA': data['UVA'],'UVB': data['UVB'],'SPL': data['spl'],
                       'humidity': data['humidity'],'pressure': data['pressure'],
-                      'temperature': data['temperature'],'timestamp_zone': data['timestamp_zone']}
+                      'temperature': data['temperature'],'timestamp_zone': data['timestamp_zone'],
+                      'VOC':data['VOC'],'CO2':data['CO2']}
         valid_processed_measurement = ValidProcessedMeasurement(**valid_data, qhawax_installation_id=installation_id)
         session.add(valid_processed_measurement)
         session.commit()
-                     
+        data = util_helper.setNoneStringElements(data)
+        socketio.emit(data['ID'], data)
 
 def storeAirDailyQualityDataInDB(data):
-    """
-    Helper Daily Air Measurement function to store air daily measurement
-
-    """
+    """ Helper Daily Air Measurement function to store air daily measurement"""
     if(isinstance(data, dict) is not True):
         raise TypeError("Valid Processed variable "+str(data)+" should be Json")
         

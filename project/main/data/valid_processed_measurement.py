@@ -1,18 +1,15 @@
-from flask import jsonify, make_response, request
-import datetime
-import dateutil.parser
-import dateutil.tz
-from project import app, db
 import project.main.data.get_data_helper as get_data_helper
 import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
+from flask import jsonify, make_response, request
+from project import app
+import dateutil.parser
+import dateutil.tz
+import datetime
 
 @app.route('/api/valid_processed_measurements_period/', methods=['GET'])
 def getValidProcessedMeasurementsTimePeriod():
-    """
-    To list all measurement of valid processed measurement table in a define period of time and company
-
-    """
+    """ To list all measurement of valid processed measurement table in a define period of time and company """
     qhawax_id = int(request.args.get('qhawax_id'))\
                 if request.args.get('qhawax_id') is not None else 0
     initial_timestamp = str(request.args.get('initial_timestamp'))\
@@ -34,10 +31,7 @@ def getValidProcessedMeasurementsTimePeriod():
 
 @app.route('/api/valid_processed_measurements/', methods=['GET'])
 def getValidProcessedData():
-    """
-    To list all measurement of valid processed measurement table record the last N minutes
-
-    """
+    """ To list all measurement of valid processed measurement table record the last N minutes """
     qhawax_name = request.args.get('name') \
                   if request.args.get('name') is not None else ""
     interval_minutes = int(request.args.get('interval_minutes')) \
@@ -61,11 +55,7 @@ def getValidProcessedData():
 
 @app.route('/api/get_time_valid_data_active_qhawax/', methods=['GET'])
 def getTimeOfValidProcessed():
-    """
-    Get the time of the last record in valid processed measurement table
-    If this qHAWAX does not exist, return []
-
-    """
+    """ Get the time of the last record in valid processed measurement table - If this qHAWAX does not exist, return []  """
     qhawax_name = request.args.get('name')\
                   if request.args.get('name') is not None else ""
     try:
@@ -78,9 +68,7 @@ def getTimeOfValidProcessed():
 
 @app.route('/api/daily_valid_processed_measurements/', methods=['GET'])
 def getDailyValidProcessedData():
-    """
-    To list all measurement of valid processed measurement table in a define period of time
-    """
+    """ To list all measurement of valid processed measurement table in a define period of time """
     qhawax_id = int(request.args.get('id')) \
                 if request.args.get('id') is not None else 0
     initial_timestamp_utc = str(request.args.get('start_date'))\
@@ -102,13 +90,9 @@ def getDailyValidProcessedData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-
 @app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxValidProcessedLatestTimestamp():
-    """
-    To get qHAWAX Valid Processed Measurement latest timestamp
-
-    """
+    """ To get qHAWAX Valid Processed Measurement latest timestamp """
     try:
         qhawax_name = request.args.get('qhawax_name')
         valid_processed_timestamp = get_business_helper.getLatestTimeInValidProcessed(qhawax_name)

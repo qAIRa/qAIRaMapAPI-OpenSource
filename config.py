@@ -18,7 +18,7 @@ elif env == 'dev':
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_DEFAULT_RECEIVER = os.environ.get('MAIL_DEFAULT_RECEIVER')
-    BASE_URL = 'https://qairamapnapi-dev.qairadrones.com/'
+    BASE_URL = 'https://qairamapnapi-dev-opensource.qairadrones.com/'
 elif env == 'prod':
     print('Using release configuration...')
     SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -26,7 +26,7 @@ elif env == 'prod':
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_DEFAULT_RECEIVER = os.environ.get('MAIL_DEFAULT_RECEIVER')
-    BASE_URL = 'https://qairamapnapi.qairadrones.com/'
+    BASE_URL = 'https://qairamapnapi-dev-opensource.qairadrones.com/'
 
 # Gmail authentication
 ADMIN_EMAIL = os.environ.get('MAIL_USERNAME')

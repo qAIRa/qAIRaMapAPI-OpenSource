@@ -1,9 +1,6 @@
-import time
-from project import app, db
-import string
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
-
+from project import app, db
 from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallationHistory, \
                                     Company, AirQualityMeasurement, ProcessedMeasurement, \
                                     ValidProcessedMeasurement

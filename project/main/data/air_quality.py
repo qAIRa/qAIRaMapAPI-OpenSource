@@ -7,10 +7,7 @@ import project.main.util_helper as util_helper
 
 @app.route('/api/air_quality_measurements/', methods=['POST'])
 def storeAirQualityData():
-    """
-    POST: To record processed measurement and valid processed measurement every five seconds
-
-    """
+    """ POST: To record processed measurement and valid processed measurement every five seconds """
     try:
         data_json = request.get_json()
         post_data_helper.storeAirQualityDataInDB(data_json)
@@ -21,11 +18,8 @@ def storeAirQualityData():
 
 @app.route('/api/air_quality_measurements_period/', methods=['GET'])
 def getAirQualityMeasurementsTimePeriod():
-    """
-    To list all measurement in ppb of air quality measurement table in a define period of time
-    This is an hourly average measurement
-
-    """
+    """ To list all measurement in ppb of air quality measurement table in a define period of time
+        This is an hourly average measurement """
     qhawax_name = str(request.args.get('name'))
     initial_timestamp_utc = str(request.args.get('initial_timestamp'))
     final_timestamp_utc = str(request.args.get('final_timestamp'))
@@ -42,10 +36,7 @@ def getAirQualityMeasurementsTimePeriod():
 
 @app.route('/api/gas_average_measurement/', methods=['GET'])
 def getGasAverageMeasurementsEvery24():
-    """
-    To list all values by a define gas or dust in ug/m3 of air quality measurement table of the last 24 hours
-
-    """
+    """ To list all values by a define gas or dust in ug/m3 of air quality measurement table of the last 24 hours """
     try:
         qhawax_name = request.args.get('qhawax')
         gas_name = request.args.get('gas')
@@ -57,8 +48,3 @@ def getGasAverageMeasurementsEvery24():
     except (ValueError,TypeError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-
-
-
-
-
