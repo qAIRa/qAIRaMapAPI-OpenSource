@@ -56,7 +56,11 @@ class GasSensor(db.Model):
     C0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
     NC1 = db.Column(db.Float, nullable=False, default=1, server_default='1')
     NC0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
+    A_OPC = db.Column(db.Float, nullable=False, default=1, server_default='1')
+    B_OPC = db.Column(db.Float, nullable=False, default=0, server_default='0')
     algorithm = db.Column(db.Integer)
+    WEt = db.Column(db.Float)
+    AEt = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 class GasInca(db.Model):

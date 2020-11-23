@@ -37,8 +37,8 @@ def queryGetEcaNoise(eca_noise_id):
 
 def getOffsetsFromProductID(qhawax_name):
     """ Helper Gas Sensor function to get offsets from qHAWAX ID """
-    attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, \
-                  GasSensor.sensitivity, GasSensor.sensitivity_2)
+    attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, GasSensor.sensitivity, 
+                  GasSensor.sensitivity_2, GasSensor.algorithm, GasSensor.WEt, GasSensor.AEt)
 
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
