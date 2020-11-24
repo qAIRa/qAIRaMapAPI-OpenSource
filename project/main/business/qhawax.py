@@ -81,7 +81,7 @@ def sendQhawaxStatusOn():
         qhawax_name = str(req_json['qhawax_name']).strip()
         description="Se prendió el qHAWAX luego de un reinicio general"
         person_in_charge = None
-        post_business_helper.saveStatusOnTable(qhawax_name,'ON',0)
+        post_business_helper.saveStatusQhawaxTable(qhawax_name,'ON',0)
         if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
             post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
