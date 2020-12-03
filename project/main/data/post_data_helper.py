@@ -45,7 +45,7 @@ def storeProcessedDataInDB(data):
     session.add(processed_measurement)
     session.commit()
 
-def storeValidProcessedDataInDB(data, qhawax_id, product_id):
+def storeValidProcessedDataInDB(data, qhawax_id):
     """ Helper Processed Measurement function to insert Valid Processed Data """
     installation_id = same_helper.getInstallationId(qhawax_id)
     if(installation_id!=None):

@@ -246,7 +246,5 @@ def setNoneStringElements(data_json):
             data_json[key]=None
     return data_json
 
-def NanToCeroJsonProcessed(data_json,i_temperature):
-    data_json['I_temperature'] = i_temperature
-    data_json = setNoneStringElements(data_json)
-    return data_json
+def NanToCeroJsonProcessed(data_json):
+    return setNoneStringElements(data_json)

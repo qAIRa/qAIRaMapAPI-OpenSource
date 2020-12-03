@@ -160,3 +160,11 @@ def getHoursDifference(qhawax_id):
                 minutes_difference = int((values[0] - values[1]).total_seconds() / 60)
                 return minutes_difference, values[0]
     return None, None
+
+def getMainIncaQhawax(name):
+    installation_id=same_helper.getInstallationIdBaseName(name)
+    qhawax_list = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).all()
+    if(qhawax_list == []):
+        return None
+    return session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).one()[0]
+

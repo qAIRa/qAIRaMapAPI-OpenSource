@@ -132,3 +132,10 @@ def getTimeQhawaxHistory(installation_id):
             return {'last_time_on': values[0], 'last_time_registration': values[1]} 
     
     return None
+
+def queryGetMode(name):
+    """ Get qHAWAX Mode """
+    qhawax_list = session.query(Qhawax.mode).filter(Qhawax.name == name).all()
+    if(qhawax_list == []):
+        raise TypeError("The qHAWAX name could not be found")
+    return session.query(Qhawax.mode).filter(Qhawax.name == name).one()[0]
