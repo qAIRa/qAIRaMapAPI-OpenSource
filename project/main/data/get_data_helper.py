@@ -6,6 +6,7 @@ import project.main.same_function_helper as same_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app, db
 import datetime
+import math
 
 session = db.session
 
@@ -117,9 +118,9 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format
         for measurement in processed_measurements:
           measurement = measurement._asdict()
           for key, value in measurement.items():
-              if((type(value) is float) and math.isnan(value)): measurement[key] = None
+            if((type(value) is float) and math.isnan(value)): measurement[key] = None
           all_measurement.append(measurement)
-        return [measurement._asdict() for measurement in all_measurement]
+        return all_measurement
     return None
 
 def queryDBValidProcessedByQhawaxScript(qhawax_id, initial_timestamp, final_timestamp,date_format):
