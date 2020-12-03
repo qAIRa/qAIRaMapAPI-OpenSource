@@ -23,7 +23,6 @@ def getActiveQhawaxModeCustomer():
     """ To get all active qHAWAXs that are in field in mode costumer - No parameters required """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-        print(qhawaxs)
         qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
         return make_response(jsonify(qhawaxs_list), 200)
     except TypeError as e:
@@ -99,7 +98,6 @@ def getTimeAllActiveQhawax():
         name = request.args.get('name')
         installation_id = same_helper.getInstallationIdBaseName(name)
         values = same_helper.getTimeQhawaxHistory(installation_id)
-        print(values)
         if(values is not None):
             return make_response(jsonify(values), 200)
         return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
@@ -115,9 +113,10 @@ def createQhawax():
         exception_helper.getQhawaxTargetofJson(req_json)
         qhawax_name=str(req_json['qhawax_name']).strip() 
         qhawax_type=str(req_json['qhawax_type']).strip()
+        firmware_version_id = int(req_json['firmware_version_id'])
         person_in_charge = req_json['person_in_charge']
         description = req_json['description']
-        post_business_helper.createQhawax(qhawax_name,qhawax_type)
+        post_business_helper.createQhawax(qhawax_name,qhawax_type,firmware_version_id)
         post_business_helper.insertDefaultOffsets(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
         return make_response({'Success': 'qHAWAX & Sensors have been created'}, 200)
@@ -178,8 +177,8 @@ def qhawaxEndCalibration():
 @app.route('/api/qhawax_status/', methods=['GET'])
 def getQhawaxStatus():
     """ Get qHAWAX Status """
+    name = str(request.args.get('name'))
     try:
-        name = request.args.get('name')
         qhawax_status = get_business_helper.getQhawaxStatus(name)
         if (qhawax_status is not None):
             return qhawax_status

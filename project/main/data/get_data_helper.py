@@ -11,9 +11,9 @@ session = db.session
 
 def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp,date_format):
     sensors = (AirQualityMeasurement.CO, AirQualityMeasurement.H2S, AirQualityMeasurement.NO2,
-                    AirQualityMeasurement.O3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
-                    AirQualityMeasurement.SO2, AirQualityMeasurement.lat, AirQualityMeasurement.lon, 
-                    AirQualityMeasurement.alt, AirQualityMeasurement.timestamp_zone)
+               AirQualityMeasurement.O3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
+               AirQualityMeasurement.SO2, AirQualityMeasurement.lat, AirQualityMeasurement.lon, 
+               AirQualityMeasurement.alt, AirQualityMeasurement.timestamp_zone)
 
     initial_timestamp_utc = datetime.datetime.strptime(initial_timestamp, date_format)
     final_timestamp_utc = datetime.datetime.strptime(final_timestamp, date_format)
@@ -100,41 +100,27 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
 
-        sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S, ProcessedMeasurement.NO,
-                    ProcessedMeasurement.NO2, ProcessedMeasurement.O3, ProcessedMeasurement.PM1, ProcessedMeasurement.PM25,
-                    ProcessedMeasurement.PM10, ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
-                    ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
-                    ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
-                    ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone)
+        sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S,ProcessedMeasurement.NO,
+                   ProcessedMeasurement.NO2, ProcessedMeasurement.O3, ProcessedMeasurement.PM1,ProcessedMeasurement.PM25,
+                   ProcessedMeasurement.PM10,ProcessedMeasurement.SO2, ProcessedMeasurement.VOC, ProcessedMeasurement.UV,
+                   ProcessedMeasurement.UVA, ProcessedMeasurement.UVB, ProcessedMeasurement.spl, ProcessedMeasurement.humidity,
+                   ProcessedMeasurement.pressure, ProcessedMeasurement.temperature, ProcessedMeasurement.lat,
+                   ProcessedMeasurement.lon, ProcessedMeasurement.alt, ProcessedMeasurement.timestamp_zone,
+                   ProcessedMeasurement.CO_ug_m3, ProcessedMeasurement.H2S_ug_m3, ProcessedMeasurement.NO2_ug_m3,
+                   ProcessedMeasurement.O3_ug_m3, ProcessedMeasurement.SO2_ug_m3, ProcessedMeasurement.I_temperature)
 
         processed_measurements = session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
-                                         filter(ProcessedMeasurement.timestamp_zone > initial_timestamp). \
-                                         filter(ProcessedMeasurement.timestamp_zone < final_timestamp). \
-                                         order_by(ProcessedMeasurement.timestamp).all()
-        return [measurement._asdict() for measurement in processed_measurements]
+                                         filter(ProcessedMeasurement.timestamp_zone >= initial_timestamp). \
+                                         filter(ProcessedMeasurement.timestamp_zone <= final_timestamp). \
+                                         order_by(ProcessedMeasurement.timestamp_zone).all()
+        all_measurement = []
+        for measurement in processed_measurements:
+          measurement = measurement._asdict()
+          for key, value in measurement.items():
+              if((type(value) is float) and math.isnan(value)): measurement[key] = None
+          all_measurement.append(measurement)
+        return [measurement._asdict() for measurement in all_measurement]
     return None
-
-def getNoiseData(qhawax_name):
-    """Helper Processed Measurement function to get Noise Area Description"""
-    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
-    if(installation_id is not None):
-        eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).\
-                               filter_by(id=installation_id).first()
-        return session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
-    return None
-
-def getHoursDifference(qhawax_id):
-    """Helper Processed Measurement function to get minutes difference
-      between last_registration_time and last_time_physically_turn_on """
-    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-        values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
-                               QhawaxInstallationHistory.last_registration_time_zone).\
-                         filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
-        if(values!=None):
-            if (values[0]!=None and values[1]!=None):
-                minutes_difference = int((values[0] - values[1]).total_seconds() / 60)
-                return minutes_difference, values[0]
-    return None, None
 
 def queryDBValidProcessedByQhawaxScript(qhawax_id, initial_timestamp, final_timestamp,date_format):
     """Helper Valid Processed Measurement function to get valid data to daily table"""
@@ -211,9 +197,13 @@ def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp,
 def queryDBAirDailyQuality(qhawax_id, init_week, init_year,end_week, end_year):
     """ Air Daily Measurement function helper to get daily average measurement based on week number and year """
 
-    sensors = (AirDailyMeasurement.CO, AirDailyMeasurement.H2S, AirDailyMeasurement.NO2,
-                AirDailyMeasurement.O3, AirDailyMeasurement.PM25, AirDailyMeasurement.PM10, 
-                AirDailyMeasurement.SO2, AirDailyMeasurement.timestamp_zone)
+    sensors = (AirDailyMeasurement.CO, AirDailyMeasurement.CO_ug_m3,AirDailyMeasurement.H2S, 
+               AirDailyMeasurement.H2S_ug_m3, AirDailyMeasurement.NO2, AirDailyMeasurement.NO2_ug_m3,
+               AirDailyMeasurement.O3, AirDailyMeasurement.O3_ug_m3, AirDailyMeasurement.PM25, 
+               AirDailyMeasurement.PM10, AirDailyMeasurement.SO2, AirDailyMeasurement.SO2_ug_m3,
+               AirDailyMeasurement.timestamp_zone,AirDailyMeasurement.UV, AirDailyMeasurement.spl,
+               AirDailyMeasurement.humidity, AirDailyMeasurement.pressure, AirDailyMeasurement.temperature)
+
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
 
         init_firstdate, init_lastdate =  util_helper.getDateRangeFromWeek(init_year,init_week)
@@ -228,4 +218,5 @@ def queryDBAirDailyQuality(qhawax_id, init_week, init_year,end_week, end_year):
                                          order_by(AirDailyMeasurement.timestamp_zone).all()
         return [measurement._asdict() for measurement in air_daily_measurements]
     return None
+
 

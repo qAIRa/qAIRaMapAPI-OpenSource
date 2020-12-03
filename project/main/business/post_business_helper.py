@@ -117,7 +117,7 @@ def updateQhawaxInstallation(data):
                       end_date_zone=None).update(values=data)
     session.commit()
 
-def createQhawax(qhawax_name,qhawax_type):
+def createQhawax(qhawax_name,qhawax_type,firmware_version_id):
     """ Create a qHAWAX module """
     qhawax_id = 1
     last_qhawax_id = get_business_helper.queryGetLastQhawax()
@@ -128,7 +128,9 @@ def createQhawax(qhawax_name,qhawax_type):
     if(isinstance(qhawax_name, str) and isinstance(qhawax_type, str)):
         qhawax_data = {'id':qhawax_id,'name': qhawax_name, 'qhawax_type': qhawax_type,
                        'state': 'OFF', 'availability': "Available", 'main_inca':-1.0, 
-                       'main_aqi':-1.0,'mode':"Stand By"}
+                       'main_aqi':-1.0,'mode':"Stand By",'firmware_version_id':firmware_version_id,
+                       'last_firmware_update': datetime.datetime.now(dateutil.tz.tzutc()),
+                       'on_loop':0}
         qhawax_data_var = Qhawax(**qhawax_data)
         session.add(qhawax_data_var)
         session.commit()

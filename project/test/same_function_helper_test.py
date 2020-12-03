@@ -97,7 +97,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getInstallationId,True)
 
 	def test_get_installation_valid(self):
-		self.assertAlmostEqual(same_helper.getInstallationId(4),51)
+		self.assertAlmostEqual(same_helper.getInstallationId(4),304)
 		self.assertAlmostEqual(same_helper.getInstallationId(100),None)
 
 	def test_get_qhawax_name_not_valid(self):
@@ -119,7 +119,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName,True)
 
 	def test_get_installation_id_based_name_valid(self):
-		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH004"),51)
+		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH004"),304)
 		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH100"),None)
 
 	def test_get_main_inca_not_valid(self):
@@ -145,7 +145,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_get_qhawax_mode_valid(self):
 		self.assertAlmostEqual(same_helper.getQhawaxMode('qH001'),'Stand By')
-		self.assertAlmostEqual(same_helper.getQhawaxMode('qH004'),'Cliente')
+		self.assertAlmostEqual(same_helper.getQhawaxMode('qH004'),'Calibracion')
 		self.assertAlmostEqual(same_helper.getQhawaxMode('qH100'),None)
 
 	def test_query_time_qhawax_history_not_valid(self):

@@ -96,6 +96,7 @@ def gasConversionPPBtoMG(data_json,season):
 
     if(isinstance(season, list) is not True):
         raise TypeError("season "+str(season)+" should be List Format")
+
     data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': None,'H2S': data_json['H2S'],
           'H2S_ug_m3': None,'NO2': data_json['NO2'],'NO2_ug_m3': None,'O3': data_json['O3'],
           'O3_ug_m3': None, 'PM1': data_json['PM1'],'PM10': data_json['PM10'],'PM25': data_json['PM25'],
@@ -103,7 +104,9 @@ def gasConversionPPBtoMG(data_json,season):
           'UVA': data_json['UVA'],'UVB': data_json['UVB'],'humidity': data_json['humidity'],
           'lat':data_json['lat'],'lon':data_json['lon'],'pressure': data_json['pressure'],
           'temperature': data_json['temperature'],'timestamp': data_json['timestamp'],
-          'timestamp_zone': data_json['timestamp_zone']}
+          'timestamp_zone': data_json['timestamp_zone'],'VOC': data_json['VOC'] if ('VOC' in data_json) else None,
+          'CO2': data_json['CO2'] if ('CO2' in data_json) else None,
+          'I_temperature': data_json['I_temperature'] if ('I_temperature' in data_json) else None}
 
     for key in data:
         if(key in pollutant):

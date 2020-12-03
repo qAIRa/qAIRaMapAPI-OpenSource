@@ -44,7 +44,6 @@ def getQhawaxInMap():
     """ Get list of qHAWAXs filter by company ID """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
-        print(qhawax_in_field)
         qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
         return make_response(jsonify(qhawax_in_field_list), 200)
     except TypeError as e:

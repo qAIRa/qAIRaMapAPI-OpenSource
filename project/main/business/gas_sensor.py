@@ -9,7 +9,7 @@ def requestOffsets():
     """ get qHAWAX offsets"""
     qhawax_name = request.args.get('ID')
     try:
-        offsets = get_business_helper.getOffsetsFromProductID(qhawax_name)
+        offsets = get_business_helper.getConstantsFromProductID(qhawax_name,'offsets')
         if(offsets is not None):
             return make_response(jsonify(offsets), 200)
         return make_response(jsonify('Gas Sensor does not exist due to qHAWAX '+str(qhawax_name)+' does not exist'), 200)
@@ -22,7 +22,7 @@ def requestControlledOffsets():
     """ get qHAWAX controlled offsets """
     qhawax_name = request.args.get('ID')
     try:
-        controlled_offsets = get_business_helper.getControlledOffsetsFromProductID(qhawax_name)
+        controlled_offsets = get_business_helper.getConstantsFromProductID(qhawax_name,'controlled-offsets')
         if(controlled_offsets is not None):
             return make_response(jsonify(controlled_offsets), 200)
         return make_response(jsonify('Gas Sensor does not exist due to qHAWAX '+str(qhawax_name)+' does not exist'), 200)
@@ -35,7 +35,7 @@ def requestNonControlledOffsets():
     """ get qHAWAX non controlled offsets"""
     qhawax_name = request.args.get('ID')
     try:
-        non_controlled_offsets = get_business_helper.getNonControlledOffsetsFromProductID(qhawax_name)
+        non_controlled_offsets = get_business_helper.getConstantsFromProductID(qhawax_name,'non-controlled-offsets')
         if(non_controlled_offsets is not None):
             return make_response(jsonify(non_controlled_offsets), 200)
         return make_response(jsonify('Gas Sensor does not exist due to qHAWAX '+str(qhawax_name)+' does not exist'), 200)
@@ -43,11 +43,10 @@ def requestNonControlledOffsets():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-
 @app.route('/api/save_gas_sensor_json/', methods=['POST'])
 def saveGasSensorJson():
+    req_json = request.get_json()
     try:
-        req_json = request.get_json()
         exception_helper.getGasSensorTargetofJson(req_json)
         qhawax_name = str(req_json['product_id']).strip()
         gas_sensor_json = req_json['gas_sensor_json']

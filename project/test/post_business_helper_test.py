@@ -171,7 +171,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		person_in_charge = 'l.montalvo'
 		last_qhawax_id = int(get_business_helper.queryGetLastQhawax()[0]) +1
 		qhawax_name = 'qH0'+str(last_qhawax_id)
-		post_business_helper.createQhawax(qhawax_name,'STATIC')
+		post_business_helper.createQhawax(qhawax_name,'STATIC',1)
 		last_gas_sensor_id = int(get_business_helper.queryGetLastGasSensor()[0]) +1
 		post_business_helper.insertDefaultOffsets(qhawax_name)
 		installation_json = {'lat':'-12.0000499','lon':'-77.9000000',
