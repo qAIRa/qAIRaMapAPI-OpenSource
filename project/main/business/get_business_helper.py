@@ -65,14 +65,6 @@ def getConstantsFromProductID(qhawax_name, constant_type):
           return util_helper.gasSensorJson(constant_json,constant_sensors)
     return None
 
-def queryIncaQhawax(name):
-    """ Helper qHAWAX function to get main inca value """
-    qhawax_id = same_helper.getQhawaxID(name)
-    if(qhawax_id is not None):
-        qhawax_inca = int(same_helper.getMainIncaQhawaxTable(qhawax_id))
-        return util_helper.getColorBaseOnIncaValue(qhawax_inca)
-    return None
-
 def getInstallationDate(qhawax_id):
     """ Helper qHAWAX function to get Installation Date """
     installation_id = same_helper.getInstallationId(qhawax_id)
@@ -168,3 +160,15 @@ def getMainIncaQhawax(name):
         return None
     return session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).one()[0]
 
+def setLastValuesOfQhawax(qH_name):
+    if(isItFieldQhawax(qH_name) == True):
+        post_business_helper.turnOnAfterCalibration(qH_name)
+        mode = "Cliente"
+        description="Se cambió a modo cliente"
+        main_inca = 0
+    else:
+        mode = "Stand By"
+        description="Se cambió a modo stand by"
+        main_inca = -1
+
+    return mode, description, main_inca

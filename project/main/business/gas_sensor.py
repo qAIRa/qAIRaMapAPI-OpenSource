@@ -47,13 +47,9 @@ def requestNonControlledOffsets():
 def saveGasSensorJson():
     req_json = request.get_json()
     try:
-        exception_helper.getGasSensorTargetofJson(req_json)
-        qhawax_name = str(req_json['product_id']).strip()
-        gas_sensor_json = req_json['gas_sensor_json']
-        description =req_json['description']
-        person_in_charge = req_json['person_in_charge']
-        post_business_helper.updateJsonGasSensor(qhawax_name, gas_sensor_json)
-        post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+        qH_name, gas_sensor_json, description, in_charge = exception_helper.getGasSensorTargetofJson(req_json)
+        post_business_helper.updateJsonGasSensor(qH_name, gas_sensor_json)
+        post_business_helper.writeBinnacle(qH_name,description,in_charge)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': ' \'%s\'' % (e)})
         return make_response(json_message, 400)

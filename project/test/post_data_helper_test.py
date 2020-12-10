@@ -40,7 +40,6 @@ class TestPostDataHelper(unittest.TestCase):
 
 	def test_store_valid_processed_data_not_valid(self):
 		self.assertRaises(TypeError,post_data_helper.storeValidProcessedDataInDB)
-		self.assertRaises(TypeError,post_data_helper.storeValidProcessedDataInDB,True,1)
 		self.assertRaises(TypeError,post_data_helper.storeValidProcessedDataInDB,True)
 		self.assertRaises(TypeError,post_data_helper.storeValidProcessedDataInDB,-5.0)
 		self.assertRaises(TypeError,post_data_helper.storeValidProcessedDataInDB,None)

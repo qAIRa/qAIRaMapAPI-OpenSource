@@ -52,20 +52,6 @@ def gasSensorJson(json,sensors):
 
     return initial
 
-def getColorBaseOnIncaValue(qhawax_inca):
-    if(isinstance(qhawax_inca, int) is not True):
-        raise TypeError("qHAWAX Inca value "+str(qhawax_inca)+" should be integer")
-
-    if qhawax_inca == 50:
-        return 'green'
-    elif qhawax_inca == 100:
-        return'yellow'
-    elif qhawax_inca == 500:
-        return'orange'
-    elif qhawax_inca == 600:
-        return'red'
-    return 'green'
-
 def validTimeJsonProcessed(data_json):
     if(isinstance(data_json, dict) is not True):
         raise TypeError("json "+str(data_json)+" should be Json Format")

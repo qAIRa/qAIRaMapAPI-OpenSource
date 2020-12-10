@@ -17,8 +17,8 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,"String_")
 
 	def test_query_qhawax_mode_customer_valid(self):
-		#y = [('qH002', 'Cliente', 'ON', 'STATIC', 50.0, 268, 2, 1, 'Socket 2', -12.03, -77.03, 'Zona de Protección Especial')]
-		y = []
+		y = [('qH004', 'Cliente', 'ON', 'STATIC', 0.0, 304, 4, 1, 'qHAWAX 04 en dev', -12.0444, -77.028888, 'Zona de Protección Especial'), 
+			 ('qH006', 'Cliente', 'ON', 'STATIC', 1.0, 314, 6, 1, 'test-unicef', -12.1, -77.1, 'Zona de Protección Especial')]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
 
 	def test_query_get_areas_not_valid(self):
@@ -92,18 +92,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 		               'NO2': {'NC0': 0.0, 'NC1': -1.0}}
 		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID(qhawax_name,'non-controlled-offsets'),offset_sensor)
 		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID('qH100','non-controlled-offsets'),None)
-
-	def test_query_inca_qhawax_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,4)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,None)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,True)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,"qH001",1)
-
-	def test_query_inca_qhawax_valid(self):
-		self.assertAlmostEqual(get_business_helper.queryIncaQhawax('qH001'),'green')
-		self.assertAlmostEqual(get_business_helper.queryIncaQhawax('qH100'),None)
 
 	def test_get_installation_date_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate)
@@ -189,25 +177,12 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
-		y = [('qH002', 'Cliente', 'OFF', 'STATIC', -1.0, 303, 2, 1, 'Calibrador dev', -12.043, -77.028, 'Zona de Protección Especial'), 
-			 ('qH004', 'Calibracion', 'OFF', 'STATIC', -1.0, 304, 4, 1, 'qHAWAX 04 en dev', -12.0444, -77.028888, 'Zona de Protección Especial'), 
+		y = [('qH002', 'Cliente', 'OFF', 'STATIC', -1.0, 303, 2, 1, 'Calibrador dev', -12.043, -77.028, 'Zona de Protección Especial'),
+			 ('qH004', 'Cliente', 'ON', 'STATIC', 0.0, 304, 4, 1, 'qHAWAX 04 en dev', -12.0444, -77.028888, 'Zona de Protección Especial'), 
+			 ('qH006', 'Cliente', 'ON', 'STATIC', 1.0, 314, 6, 1, 'test-unicef', -12.1, -77.1, 'Zona de Protección Especial'), 
 			 ('qH021', 'Cliente', 'OFF', 'STATIC', -1.0, 305, 21, 1, 'UNICEF TEST', -12.04333333, -77.0281111, 'Zona de Protección Especial')]
 
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
-
-	def test_get_qhawax_status_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,40)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,True)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,4.5)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,None)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,{"name":"qH001"},1)
-
-	def test_get_qhawax_status_valid(self):
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH001'),'OFF')
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH004'),'OFF')
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH100'),None)
 
 	def test_query_noise_data_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getNoiseData)
