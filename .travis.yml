@@ -6,7 +6,8 @@ cache: pip
 install:
 - pip install -r requirements.txt
 - pip install coverage==4.5.4
-- apt install ruby-coveralls
+- pip install python-coveralls
+- pip install pytest pytest-cov
 script:
 - pytest -v
 - coverage run -m pytest project/test/
