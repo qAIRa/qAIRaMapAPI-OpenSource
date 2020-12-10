@@ -32,12 +32,13 @@ def getProcessedData():
 
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
-    """ To record processed measurement and valid processed measurement every five seconds  """
+    """
+    To record processed measurement and valid processed measurement every five seconds
+    qHAWAX: Record new measurement
+    """
+    flag_email = False
+    data_json = request.get_json()
     try:
-        data_json = request.get_json()
-        i_temperature = None
-        if('I_temperature' in data_json):
-            i_temperature = data_json['I_temperature']
         product_id = data_json['ID']
         data_json = util_helper.validTimeJsonProcessed(data_json)
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
@@ -45,24 +46,25 @@ def handleProcessedData():
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
         qhawax_id = same_helper.getQhawaxID(product_id)
-        mode = same_helper.getQhawaxMode(product_id)
-        if(mode == "Cliente"):
-            qhawax_zone = get_data_helper.getNoiseData(product_id)
-            data_json['zone'] = qhawax_zone
-            minutes_difference,last_time_turn_on = get_data_helper.getHoursDifference(qhawax_id)
+        mode = same_helper.queryGetMode(product_id)
+        inca_value = get_business_helper.getMainIncaQhawax(product_id)
+        if(mode == "Cliente" and inca_value!=None):
+            data_json['zone'] = get_business_helper.getNoiseData(product_id)
+            minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(qhawax_id)
             if(minutes_difference!=None):
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
+                        post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        post_data_helper.storeValidProcessedDataInDB(data_json,qhawax_id)
-        data_json = util_helper.NanToCeroJsonProcessed(data_json,i_temperature)
+                        post_data_helper.validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value)
+        data_json = util_helper.NanToCeroJsonProcessed(data_json)
         socketio.emit('new_data_summary_processed', data_json)
         return make_response('OK', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+
 
 @app.route('/api/processed_measurements_period/', methods=['GET'])
 def getProcessedMeasurementsTimePeriod():

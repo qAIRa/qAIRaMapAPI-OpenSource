@@ -2,49 +2,14 @@ from flask import jsonify, make_response, request
 import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
+import project.main.exceptions as exception_helper
 from project import app
-
-@app.route('/api/newQhawaxInstallation/', methods=['POST'])
-def newQhawaxInstallation():
-    """ To create a qHAWAX in Field """
-    data_json = request.get_json()
-    try:
-        qhawax_id = data_json['qhawax_id']
-        qhawax_id = data_json['description']
-        person_in_charge = data_json['person_in_charge']
-        post_business_helper.storeNewQhawaxInstallation(data_json)
-        post_business_helper.util_qhawax_installation_set_up(qhawax_id,'Occupied','Cliente',description,person_in_charge)
-    except Exception as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-    else:
-        return make_response({'Success': 'Save new qHAWAX in field'}, 200)
-
-@app.route('/api/saveEndWorkField/', methods=['POST'])
-def saveEndWorkField():
-    """Save last date of qHAWAX in field """
-    data_json = request.get_json()
-    try:
-        qhawax_id = data_json['qhawax_id']
-        end_date = data_json['end_date']
-        description = data_json['description']
-        person_in_charge = data_json['person_in_charge']
-        date_format = '%d-%m-%Y %H:%M:%S.%f'
-        post_business_helper.saveEndWorkFieldDate(qhawax_id, end_date,date_format)
-        post_business_helper.util_qhawax_installation_set_up(qhawax_id,'Available','Stand By',description,person_in_charge)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-    else:
-        return make_response('Success: Save qHAWAX last day in field', 200)
-
 
 @app.route('/api/AllQhawaxInMap/', methods=['GET'])
 def getQhawaxInMap():
     """ Get list of qHAWAXs filter by company ID """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
-        print(qhawax_in_field)
         qhawax_in_field_list = [installation._asdict() for installation in qhawax_in_field]
         return make_response(jsonify(qhawax_in_field_list), 200)
     except TypeError as e:
@@ -70,20 +35,46 @@ def getInstallationDate():
             return str(installation_date)
         return make_response({'Success ':'qHAWAX ID '+str(qhawax_id)+' has not been found in field'}, 200)
 
+@app.route('/api/newQhawaxInstallation/', methods=['POST'])
+def newQhawaxInstallation():
+    """ To create a qHAWAX in Field """
+    data_json = request.get_json()
+    try:
+        qH_id, description, in_charge = exception_helper.getInstallationFields(data_json)
+        post_business_helper.storeNewQhawaxInstallation(data_json)
+        post_business_helper.util_qhawax_installation_set_up(qH_id,'Occupied','Cliente',description,in_charge)
+    except Exception as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
+        return make_response({'Success': 'Save new qHAWAX in field'}, 200)
+
+@app.route('/api/saveEndWorkField/', methods=['POST'])
+def saveEndWorkField():
+    """Save last date of qHAWAX in field """
+    data_json = request.get_json()
+    date_format = '%d-%m-%Y %H:%M:%S.%f'
+    try:
+        qH_id, end_date, description, person_in_charge = exception_helper.validEndWorkFieldJson(data_json)
+        post_business_helper.saveEndWorkFieldDate(qH_id, end_date,date_format)
+        post_business_helper.util_qhawax_installation_set_up(qH_id,'Available','Stand By',description,person_in_charge)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+    else:
+        return make_response('Success: Save qHAWAX last day in field', 200)
+
 @app.route('/api/updateQhawaxInstallation/', methods=['POST'])
 def updateQhawaxInstallation():
     """ To update qHAWAX in Field """
+    data_json = request.get_json()
     try:
-        data_json = request.get_json()
-        qhawax_id = int(data_json['qhawax_id'])
-        description = int(data_json['description'])
-        person_in_charge = data_json['person_in_charge']
+        qH_id, description, in_charge = exception_helper.getInstallationFields(data_json)
         post_business_helper.updateQhawaxInstallation(data_json)
-        qhawax_name = same_helper.getQhawaxName(qhawax_id)
-        helper.writeBitacora(qhawax_name,description,person_in_charge)
+        qH_name = same_helper.getQhawaxName(qH_id)
+        helper.writeBitacora(qH_name,description,in_charge)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
     else:
         return make_response({'Sucess': 'Update data of qHAWAX in field'}, 200)
-

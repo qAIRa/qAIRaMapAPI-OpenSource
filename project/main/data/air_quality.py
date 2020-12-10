@@ -8,8 +8,9 @@ import project.main.util_helper as util_helper
 @app.route('/api/air_quality_measurements/', methods=['POST'])
 def storeAirQualityData():
     """ POST: To record processed measurement and valid processed measurement every five seconds """
+    data_json = request.get_json()
     try:
-        data_json = request.get_json()
+        #revisar el json con un exception
         post_data_helper.storeAirQualityDataInDB(data_json)
         return make_response('OK', 200)
     except TypeError as e:
@@ -37,9 +38,9 @@ def getAirQualityMeasurementsTimePeriod():
 @app.route('/api/gas_average_measurement/', methods=['GET'])
 def getGasAverageMeasurementsEvery24():
     """ To list all values by a define gas or dust in ug/m3 of air quality measurement table of the last 24 hours """
+    qhawax_name = str(request.args.get('qhawax'))
+    gas_name = str(request.args.get('gas'))
     try:
-        qhawax_name = request.args.get('qhawax')
-        gas_name = request.args.get('gas')
         gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement(qhawax_name, gas_name)
         gas_average_measurement_list = util_helper.getFormatData(gas_average_measurement)
         if(gas_average_measurement_list is not None):

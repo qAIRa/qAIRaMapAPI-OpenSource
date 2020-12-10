@@ -52,20 +52,6 @@ def gasSensorJson(json,sensors):
 
     return initial
 
-def getColorBaseOnIncaValue(qhawax_inca):
-    if(isinstance(qhawax_inca, int) is not True):
-        raise TypeError("qHAWAX Inca value "+str(qhawax_inca)+" should be integer")
-
-    if qhawax_inca == 50:
-        return 'green'
-    elif qhawax_inca == 100:
-        return'yellow'
-    elif qhawax_inca == 500:
-        return'orange'
-    elif qhawax_inca == 600:
-        return'red'
-    return 'green'
-
 def validTimeJsonProcessed(data_json):
     if(isinstance(data_json, dict) is not True):
         raise TypeError("json "+str(data_json)+" should be Json Format")
@@ -96,6 +82,7 @@ def gasConversionPPBtoMG(data_json,season):
 
     if(isinstance(season, list) is not True):
         raise TypeError("season "+str(season)+" should be List Format")
+
     data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': None,'H2S': data_json['H2S'],
           'H2S_ug_m3': None,'NO2': data_json['NO2'],'NO2_ug_m3': None,'O3': data_json['O3'],
           'O3_ug_m3': None, 'PM1': data_json['PM1'],'PM10': data_json['PM10'],'PM25': data_json['PM25'],
@@ -103,7 +90,9 @@ def gasConversionPPBtoMG(data_json,season):
           'UVA': data_json['UVA'],'UVB': data_json['UVB'],'humidity': data_json['humidity'],
           'lat':data_json['lat'],'lon':data_json['lon'],'pressure': data_json['pressure'],
           'temperature': data_json['temperature'],'timestamp': data_json['timestamp'],
-          'timestamp_zone': data_json['timestamp_zone']}
+          'timestamp_zone': data_json['timestamp_zone'],'VOC': data_json['VOC'] if ('VOC' in data_json) else None,
+          'CO2': data_json['CO2'] if ('CO2' in data_json) else None,
+          'I_temperature': data_json['I_temperature'] if ('I_temperature' in data_json) else None}
 
     for key in data:
         if(key in pollutant):
@@ -243,7 +232,5 @@ def setNoneStringElements(data_json):
             data_json[key]=None
     return data_json
 
-def NanToCeroJsonProcessed(data_json,i_temperature):
-    data_json['I_temperature'] = i_temperature
-    data_json = setNoneStringElements(data_json)
-    return data_json
+def NanToCeroJsonProcessed(data_json):
+    return setNoneStringElements(data_json)

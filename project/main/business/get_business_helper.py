@@ -35,45 +35,34 @@ def queryGetEcaNoise(eca_noise_id):
         return session.query(*fields).filter_by(id= eca_noise_id).first()
     return None
 
-def getOffsetsFromProductID(qhawax_name):
-    """ Helper Gas Sensor function to get offsets from qHAWAX ID """
-    attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, \
-                  GasSensor.sensitivity, GasSensor.sensitivity_2)
+def getConstantsFromProductID(qhawax_name, constant_type):
+    if(isinstance(constant_type, str) is not True):  
+        raise TypeError("Variable "+str(constant_type)+" should be string")
 
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id is not None):
-        offsets_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
-        offset_json = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}
-        return util_helper.gasSensorJson(offset_json,offsets_sensors)
-    return None
+    attributes = ""
+    constant_json = {}
 
-def getControlledOffsetsFromProductID(qhawax_name):
-    """ Helper Gas Sensor function to get controlled offsets from qHAWAX ID """
-    attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
+    if(constant_type=='offsets'):
+      #offset
+      attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, GasSensor.sensitivity, 
+                  GasSensor.sensitivity_2, GasSensor.algorithm, GasSensor.WEt, GasSensor.AEt)
+      constant_json = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0,\
+                       'algorithm': 0, 'WEt': 0.0, 'AEt': 0.0}
+    elif(constant_type=='controlled-offsets'):
+      #controlled-offset
+      attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
+      constant_json = {'C0': 0.0, 'C1': 0.0, 'C2': 0.0}
 
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id is not None):
-        controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
-        controlled_offset_json = {'C0': 0.0, 'C1': 0.0, 'C2': 0.0}
-        return util_helper.gasSensorJson(controlled_offset_json,controlled_sensors)
-    return None
+    elif(constant_type=='non-controlled-offsets'):
+      #non-controlled-offset
+      attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
+      constant_json = {'NC1': 0.0, 'NC0': 0.0}
 
-def getNonControlledOffsetsFromProductID(qhawax_name):
-    """ Helper Gas Sensor function to get non controlled offsets from qHAWAX name """
-    attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id is not None):
-        non_controlled_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
-        non_controlled_offsets = {'NC1': 0.0, 'NC0': 0.0}
-        return util_helper.gasSensorJson(non_controlled_offsets,non_controlled_sensors)
-    return None
-
-def queryIncaQhawax(name):
-    """ Helper qHAWAX function to get main inca value """
-    qhawax_id = same_helper.getQhawaxID(name)
-    if(qhawax_id is not None):
-        qhawax_inca = int(same_helper.getMainIncaQhawaxTable(qhawax_id))
-        return util_helper.getColorBaseOnIncaValue(qhawax_inca)
+    if(attributes!="" and constant_json!={}):
+      qhawax_id = same_helper.getQhawaxID(qhawax_name)
+      if(qhawax_id is not None):
+          constant_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
+          return util_helper.gasSensorJson(constant_json,constant_sensors)
     return None
 
 def getInstallationDate(qhawax_id):
@@ -93,7 +82,6 @@ def getFirstTimestampValidProcessed(qhawax_id):
                                  order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()
         return None if (first_timestamp==None) else first_timestamp[0]
     return None
-
 
 def queryGetLastQhawax():
     """ Helper qHAWAX function to get last qHAWAX ID """
@@ -142,3 +130,45 @@ def getQhawaxStatus(qhawax_name):
     if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
         return session.query(Qhawax.state).filter_by(name=qhawax_name).one()[0]
     return None
+
+def getNoiseData(qhawax_name):
+    """Helper Processed Measurement function to get Noise Area Description"""
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).\
+                               filter_by(id=installation_id).first()
+        return session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
+    return None
+
+def getHoursDifference(qhawax_id):
+    """Helper Processed Measurement function to get minutes difference
+      between last_registration_time and last_time_physically_turn_on """
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
+        values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
+                               QhawaxInstallationHistory.last_registration_time_zone).\
+                         filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
+        if(values!=None):
+            if (values[0]!=None and values[1]!=None):
+                minutes_difference = int((values[0] - values[1]).total_seconds() / 60)
+                return minutes_difference, values[0]
+    return None, None
+
+def getMainIncaQhawax(name):
+    installation_id=same_helper.getInstallationIdBaseName(name)
+    qhawax_list = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).all()
+    if(qhawax_list == []):
+        return None
+    return session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).one()[0]
+
+def setLastValuesOfQhawax(qH_name):
+    if(isItFieldQhawax(qH_name) == True):
+        post_business_helper.turnOnAfterCalibration(qH_name)
+        mode = "Cliente"
+        description="Se cambió a modo cliente"
+        main_inca = 0
+    else:
+        mode = "Stand By"
+        description="Se cambió a modo stand by"
+        main_inca = -1
+
+    return mode, description, main_inca

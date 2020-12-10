@@ -46,19 +46,6 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.gasSensorJson,5,[4,4])
 		self.assertRaises(TypeError,util_helper.gasSensorJson,None)
 
-	def test_get_color_base_on_inca_value_not_valid(self):
-		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue)
-		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,"resultado")
-		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,None)
-		self.assertRaises(TypeError,util_helper.getColorBaseOnIncaValue,{"name":"qH001"})
-
-	def test_get_color_base_on_inca_value_valid(self):
-		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(50),'green')
-		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(100),'yellow')
-		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(500),'orange')
-		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(600),'red')
-		self.assertAlmostEqual(util_helper.getColorBaseOnIncaValue(-1),'green')
-
 	def test_valid_time_json_processed_not_valid(self):
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed)
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,"resultado")
@@ -84,15 +71,16 @@ class TestUtilHelper(unittest.TestCase):
 		data={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
 			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
 			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
-			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00",'VOC':1}
 		data_without={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
 			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
 			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
-			  'temperature': 20,'timestamp': "2020-01-01 00:00:00"}
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'VOC':1}
 		data_pressure={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
 			  		   'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
 			  		   'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 1.0,
-			  		   'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+			  		   'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00",
+			  		   'VOC':1,'CO2':None,'I_temperature':None}
 		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data),data_pressure)
 		self.assertAlmostEqual(util_helper.validAndBeautyJsonProcessed(data_without),data_pressure)
 
@@ -194,7 +182,8 @@ class TestUtilHelper(unittest.TestCase):
 		data={'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
 			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
 			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
-			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00",
+			  'VOC':None,'CO2':None,'I_temperature':None}
 		arr_season=[2.62,1.88,1.96,1.15,1.39]
 		self.assertAlmostEqual(util_helper.gasConversionPPBtoMG(data,arr_season),data)
 

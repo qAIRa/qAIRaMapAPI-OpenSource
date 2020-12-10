@@ -17,7 +17,8 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,"String_")
 
 	def test_query_qhawax_mode_customer_valid(self):
-		y = [('qH002', 'Cliente', 'ON', 'STATIC', 50.0, 268, 2, 1, 'Socket 2', -12.03, -77.03, 'Zona de Protección Especial')]
+		y = [('qH004', 'Cliente', 'ON', 'STATIC', 0.0, 304, 4, 1, 'qHAWAX 04 en dev', -12.0444, -77.028888, 'Zona de Protección Especial'), 
+			 ('qH006', 'Cliente', 'ON', 'STATIC', 1.0, 314, 6, 1, 'test-unicef', -12.1, -77.1, 'Zona de Protección Especial')]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
 
 	def test_query_get_areas_not_valid(self):
@@ -51,73 +52,46 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertAlmostEqual(get_business_helper.queryGetEcaNoise(5),None)
 
 	def test_query_get_offsets_from_productID_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID)
-		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,4.33)
-		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,None)
-		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,True)
-		self.assertRaises(TypeError,get_business_helper.getOffsetsFromProductID,"qH001",1)
+		self.assertRaises(TypeError,get_business_helper.getConstantsFromProductID)
+		self.assertRaises(TypeError,get_business_helper.getConstantsFromProductID,{"name":"qH001"})
+		self.assertRaises(TypeError,get_business_helper.getConstantsFromProductID,4.33)
+		self.assertRaises(TypeError,get_business_helper.getConstantsFromProductID,None)
+		self.assertRaises(TypeError,get_business_helper.getConstantsFromProductID,True)
+		self.assertRaises(TypeError,get_business_helper.getConstantsFromProductID,"qH001",1)
 
 	def test_query_get_offsets_from_productID(self):
-		qhawax_name= 'qH001'
-		offset_sensor ={'CO': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
-					   'SO2': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
-		               'H2S': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
-		                'O3': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
-		                'NO': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}, 
-		               'NO2': {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0}}
-		self.assertAlmostEqual(get_business_helper.getOffsetsFromProductID(qhawax_name),offset_sensor)
-		self.assertAlmostEqual(get_business_helper.getOffsetsFromProductID('qH100'),None)
-
-	def test_query_get_controlled_offsets_from_productID_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID)
-		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,4)
-		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,None)
-		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,True)
-		self.assertRaises(TypeError,get_business_helper.getControlledOffsetsFromProductID,"qH001",1)
+		qhawax_name= 'qH002'
+		offset_sensor ={'CO': {'WE': 337,'WEt': 2.0, 'AE': 356, 'AEt': 1.0, 'algorithm': 1,'sensitivity': 0.45, 'sensitivity_2': 0.0}, 
+					   'SO2': {'WE': 346,'WEt': 7.0, 'AE': 360, 'AEt': 1.0, 'algorithm': 1,'sensitivity': 0.37, 'sensitivity_2': 0.0}, 
+		               'H2S': {'WE': 350,'WEt': 3.0, 'AE': 346, 'AEt': 1.0, 'algorithm': 1,'sensitivity': 1.724,'sensitivity_2': 0.0}, 
+		                'O3': {'WE': 224,'WEt': 6.0, 'AE': 234, 'AEt': 1.0, 'algorithm': 1,'sensitivity': 0.326, 'sensitivity_2': 0.0}, 
+		                'NO': {'WE': 300,'WEt': 4.0, 'AE': 300, 'AEt': 1.0, 'algorithm': 1,'sensitivity': 0.3, 'sensitivity_2': 0.0}, 
+		               'NO2': {'WE': 228,'WEt': 5.0, 'AE': 235, 'AEt': 1.0, 'algorithm': 1,'sensitivity': 0.234, 'sensitivity_2': 0.0}}
+		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID(qhawax_name,'offsets'),offset_sensor)
+		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID('qH100','offsets'),None)
+		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID('qH021','none'),None)
 
 	def test_query_get_controlled_offsets_from_productID(self):
-		qhawax_name= 'qH004'
-		offset_sensor ={'CO': {'C2': 0.0, 'C1': 0.0, 'C0': -100.0}, 
+		qhawax_name= 'qH002'
+		offset_sensor ={'CO':  {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
 						'SO2': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
-						'H2S': {'C2': 0.0, 'C1': 0.0, 'C0': -200.0}, 
-						'O3': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
-						'NO': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}, 
-						'NO2': {'C2': 0.0, 'C1': 0.0, 'C0': 4.0}}
-		self.assertAlmostEqual(get_business_helper.getControlledOffsetsFromProductID(qhawax_name),offset_sensor)
-		self.assertAlmostEqual(get_business_helper.getControlledOffsetsFromProductID('qH100'),None)
-
-	def test_query_get_non_controlled_offsets_from_productID_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID)
-		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,4)
-		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,None)
-		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,True)
-		self.assertRaises(TypeError,get_business_helper.getNonControlledOffsetsFromProductID,"qH001",1)
+						'H2S': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
+						'O3':  {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
+						'NO':  {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}, 
+						'NO2': {'C2': 0.0, 'C1': 0.0, 'C0': 0.0}}
+		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID(qhawax_name,'controlled-offsets'),offset_sensor)
+		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID('qH100','controlled-offsets'),None)
 
 	def test_query_get_non_controlled_offsets_from_productID(self):
-		qhawax_name= 'qH001'
-		offset_sensor ={'CO': {'NC1': 0.0, 'NC0': 0.0}, 
-		               'SO2': {'NC1': 0.0, 'NC0': 1.0}, 
-		               'H2S': {'NC1': 0.0, 'NC0': 0.0}, 
-		                'O3': {'NC1': 0.0, 'NC0': 2.0}, 
-		                'NO': {'NC1': 0.0, 'NC0': 0.0}, 
-		               'NO2': {'NC1': 0.0, 'NC0': 0.0}}
-		self.assertAlmostEqual(get_business_helper.getNonControlledOffsetsFromProductID(qhawax_name),offset_sensor)
-		self.assertAlmostEqual(get_business_helper.getNonControlledOffsetsFromProductID('qH100'),None)
-
-	def test_query_inca_qhawax_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,4)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,None)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,True)
-		self.assertRaises(TypeError,get_business_helper.queryIncaQhawax,"qH001",1)
-
-	def test_query_inca_qhawax_valid(self):
-		self.assertAlmostEqual(get_business_helper.queryIncaQhawax('qH001'),'green')
-		self.assertAlmostEqual(get_business_helper.queryIncaQhawax('qH100'),None)
+		qhawax_name= 'qH002'
+		offset_sensor ={'CO': {'NC0': 1.0, 'NC1': 0.0}, 
+		               'SO2': {'NC0': 0.0, 'NC1': 0.0}, 
+		               'H2S': {'NC0': 0.0, 'NC1': -1.0}, 
+		                'O3': {'NC0': 0.0, 'NC1':  1.0}, 
+		                'NO': {'NC0': 1.0, 'NC1': -9.0}, 
+		               'NO2': {'NC0': 0.0, 'NC1': -1.0}}
+		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID(qhawax_name,'non-controlled-offsets'),offset_sensor)
+		self.assertAlmostEqual(get_business_helper.getConstantsFromProductID('qH100','non-controlled-offsets'),None)
 
 	def test_get_installation_date_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate)
@@ -127,13 +101,13 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,"342")
 
 	def test_get_installation_date_valid(self):
-		naive_time = datetime.time(4,48,32,919000)
-		date = datetime.date(2020, 8, 9)
+		naive_time = datetime.time(17,36,53)
+		date = datetime.date(2020, 11, 11)
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
 		self.assertAlmostEqual(get_business_helper.getInstallationDate(1),None)
-		self.assertAlmostEqual(get_business_helper.getInstallationDate(4),aware_datetime)
+		self.assertAlmostEqual(get_business_helper.getInstallationDate(2),aware_datetime)
 
 	def test_get_first_time_valid_processed_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed)
@@ -143,13 +117,13 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getFirstTimestampValidProcessed,"342")
 
 	def test_get_first_time_valid_processed_valid(self):
-		naive_time = datetime.time(17,5,17)
-		date = datetime.date(2020, 8, 19)
+		naive_time = datetime.time(19,37,6)
+		date = datetime.date(2020, 11, 11)
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
-		aware_datetime = timezone.localize(naive_datetime) 
+		aware_datetime = timezone.localize(naive_datetime)
 		self.assertAlmostEqual(get_business_helper.getFirstTimestampValidProcessed(1),None)
-		self.assertAlmostEqual(get_business_helper.getFirstTimestampValidProcessed(4),aware_datetime)
+		self.assertAlmostEqual(get_business_helper.getFirstTimestampValidProcessed(2),aware_datetime)
 
 	def test_get_last_qhawax_id_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetLastQhawax,40)
@@ -203,26 +177,36 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
-		y = [('qH002', 'Cliente', 'ON', 'STATIC', 50.0, 268, 2, 1, 'Socket 2', -12.03, -77.03, 'Zona de Protección Especial'), 
-			 ('qH004', 'Cliente', 'OFF', 'STATIC', -1.0, 51, 4, 1, 'Test Aguitas 2.0', -12.042111, -77.028233, 'Zona de Protección Especial'), 
-			 ('qH008', 'Cliente', 'OFF', 'STATIC', -1.0, 266, 8, 1, 'prueba Socket', -12.0444, -77.02888, 'Zona de Protección Especial'), 
-			 ('qH021', 'Cliente', 'OFF', 'STATIC', 500.0, 53, 21, 2, 'UNICEF ESTATICO', -12.04325, -77.02855, 'Zona Residencial'),
-			 ('qH034', 'Cliente', 'OFF', 'STATIC', 0.0, 52, 34, 1, 'Prueba en la Oficina', -12.139502, -77.022529, 'Zona de Protección Especial')]
+		y = [('qH002', 'Cliente', 'OFF', 'STATIC', -1.0, 303, 2, 1, 'Calibrador dev', -12.043, -77.028, 'Zona de Protección Especial'),
+			 ('qH004', 'Cliente', 'ON', 'STATIC', 0.0, 304, 4, 1, 'qHAWAX 04 en dev', -12.0444, -77.028888, 'Zona de Protección Especial'), 
+			 ('qH006', 'Cliente', 'ON', 'STATIC', 1.0, 314, 6, 1, 'test-unicef', -12.1, -77.1, 'Zona de Protección Especial'), 
+			 ('qH021', 'Cliente', 'OFF', 'STATIC', -1.0, 305, 21, 1, 'UNICEF TEST', -12.04333333, -77.0281111, 'Zona de Protección Especial')]
+
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
 
-	def test_get_qhawax_status_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,40)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,True)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,4.5)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,None)
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.getQhawaxStatus,{"name":"qH001"},1)
+	def test_query_noise_data_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.getNoiseData)
+		self.assertRaises(TypeError,get_business_helper.getNoiseData,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_business_helper.getNoiseData,True)
+		self.assertRaises(TypeError,get_business_helper.getNoiseData,-5.0)
+		self.assertRaises(TypeError,get_business_helper.getNoiseData,None)
+		self.assertRaises(TypeError,get_business_helper.getNoiseData,"qH001",1,2)
 
-	def test_get_qhawax_status_valid(self):
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH001'),'ON')
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH004'),'OFF')
-		self.assertAlmostEqual(get_business_helper.getQhawaxStatus('qH100'),None)
+	def test_query_noise_data_valid(self):
+		self.assertAlmostEqual(get_business_helper.getNoiseData("qH004"),"Zona de Protección Especial")
+		self.assertAlmostEqual(get_business_helper.getNoiseData("qH100"),None)
+
+	def test_get_hours_difference_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.getHoursDifference)
+		self.assertRaises(TypeError,get_business_helper.getHoursDifference,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_business_helper.getHoursDifference,True)
+		self.assertRaises(TypeError,get_business_helper.getHoursDifference,-5.0)
+		self.assertRaises(TypeError,get_business_helper.getHoursDifference,None)
+		self.assertRaises(TypeError,get_business_helper.getHoursDifference,"qH001",1,2)
+
+	def test_get_hours_difference_valid(self):
+		self.assertAlmostEqual(get_business_helper.getHoursDifference(100),(None,None))
+		self.assertAlmostEqual(get_business_helper.getHoursDifference(9),(None,None))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

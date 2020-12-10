@@ -97,7 +97,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getInstallationId,True)
 
 	def test_get_installation_valid(self):
-		self.assertAlmostEqual(same_helper.getInstallationId(4),51)
+		self.assertAlmostEqual(same_helper.getInstallationId(4),304)
 		self.assertAlmostEqual(same_helper.getInstallationId(100),None)
 
 	def test_get_qhawax_name_not_valid(self):
@@ -119,7 +119,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName,True)
 
 	def test_get_installation_id_based_name_valid(self):
-		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH004"),51)
+		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH004"),304)
 		self.assertAlmostEqual(same_helper.getInstallationIdBaseName("qH100"),None)
 
 	def test_get_main_inca_not_valid(self):
@@ -130,9 +130,8 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,True)
 
 	def test_get_main_inca_valid(self):
-		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(4),-1.0)
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(4),0.0)
 		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable(100),None)
-
 
 	def test_get_qhawax_mode_not_valid(self):
 		self.assertRaises(TypeError,same_helper.getQhawaxMode)
@@ -155,13 +154,13 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,"qH001")
 
 	def test_query_time_qhawax_history_valid(self):
-		initial_timestamp = "05-11-2020 14:52:59.137324+00:00"
-		last_timestamp = "27-09-2020 00:00:00.877701+00:00"
+		initial_timestamp = "02-12-2020 18:01:54.169514+00:00"
+		last_timestamp = "02-12-2020 21:29:41.0+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
 		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
-		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time} 
-		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(51),values)
+		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time}
+		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(305),values)
 		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory(800),None)
 
 

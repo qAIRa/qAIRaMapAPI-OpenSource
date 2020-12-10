@@ -1,5 +1,4 @@
 from project import db
-from sqlalchemy.ext.declarative import declared_attr
 
 class Company(db.Model):
     __tablename__ = 'company'
@@ -16,7 +15,7 @@ class Company(db.Model):
                              cascade='delete, delete-orphan')
 class Qhawax(db.Model):
     __tablename__ = 'qhawax'
-
+    
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False, unique=True)
@@ -26,19 +25,11 @@ class Qhawax(db.Model):
     state = db.Column(db.String(5), nullable=False, unique=True)
     availability = db.Column(db.String(100), nullable=False, unique=True)
     mode = db.Column(db.String(100), nullable=False, unique=True)
-    
-    processed_measurements = db.relationship('ProcessedMeasurement', backref='qhawax', lazy='subquery',
-                                                cascade='delete, delete-orphan')
-    air_quality_measurements = db.relationship('AirQualityMeasurement', backref='qhawax', lazy='subquery',
-                                                cascade='delete, delete-orphan')
-    gas_sensors = db.relationship('GasSensor', backref='qhawax', lazy='subquery') # Don't delete gas sensor if qhawax is deleted
-    
-    gas_inca = db.relationship('GasInca', backref='qhawax', lazy='subquery',
-                                                cascade='delete, delete-orphan')
-    qhawax_installation_historys = db.relationship('QhawaxInstallationHistory', backref='qhawax', lazy='subquery',
-                                                cascade='delete, delete-orphan')
-    bitacoras = db.relationship('Bitacora', backref='qhawax', lazy='subquery',
-                                                cascade='delete, delete-orphan')
+    firmware_version_id = db.Column(db.Integer, db.ForeignKey('firmware_version.id'))
+    last_firmware_update = db.Column(db.DateTime, nullable=False)
+    on_loop = db.Column(db.Integer)
+    first_time_loop = db.Column(db.DateTime, nullable=False)
+
 class GasSensor(db.Model):
     __tablename__ = 'gas_sensor'
 
@@ -56,7 +47,11 @@ class GasSensor(db.Model):
     C0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
     NC1 = db.Column(db.Float, nullable=False, default=1, server_default='1')
     NC0 = db.Column(db.Float, nullable=False, default=0, server_default='0')
+    A_OPC = db.Column(db.Float, nullable=False, default=1, server_default='1')
+    B_OPC = db.Column(db.Float, nullable=False, default=0, server_default='0')
     algorithm = db.Column(db.Integer)
+    WEt = db.Column(db.Float)
+    AEt = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 class GasInca(db.Model):
@@ -93,7 +88,7 @@ class EcaNoise(db.Model):
 class QhawaxInstallationHistory(db.Model):
     __tablename__ = 'qhawax_installation_history'
 
-    # Column's definition
+        # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
@@ -116,10 +111,10 @@ class QhawaxInstallationHistory(db.Model):
     is_public  = db.Column(db.String(10), nullable=False, unique=True)
     last_registration_time_zone = db.Column(db.DateTime, nullable=False)
     main_inca = db.Column(db.Float) 
-    valid_processed_measurements = db.relationship('ValidProcessedMeasurement', \
-                                                   backref='qhawax_installation_history', 
-                                                   lazy='subquery',
-                                                   cascade='delete, delete-orphan')
+    last_cleaning_equipment_date = db.Column(db.DateTime, nullable=False)
+    last_cleaning_area_date = db.Column(db.DateTime, nullable=False)
+    last_maintenance_date = db.Column(db.DateTime, nullable=False)
+
 class Bitacora(db.Model):
     __tablename__ = 'bitacora'
 
@@ -133,7 +128,6 @@ class Bitacora(db.Model):
     start_date_zone = db.Column(db.DateTime, nullable=False)
     end_date_zone = db.Column(db.DateTime, nullable=False)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
 
 class AirDailyMeasurement(db.Model):
     __tablename__ = 'air_daily_measurement'
@@ -156,9 +150,9 @@ class AirDailyMeasurement(db.Model):
     SO2_ug_m3 = db.Column(db.Float)
     humidity = db.Column(db.Float)
     pressure = db.Column(db.Float)
-    spl = db.Column(db.Float)
-    uv = db.Column(db.Float)
     temperature = db.Column(db.Float)
+    UV = db.Column(db.Float)
+    spl = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 class AirQualityMeasurement(db.Model):
@@ -166,6 +160,7 @@ class AirQualityMeasurement(db.Model):
 
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
@@ -189,6 +184,7 @@ class AirQualityMeasurement(db.Model):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
+    I_temperature = db.Column(db.Float)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 class ProcessedMeasurement(db.Model):
@@ -232,10 +228,10 @@ class ValidProcessedMeasurement(db.Model):
     __tablename__ = 'valid_processed_measurement'
 
     # Column's definition
-    timestamp_zone = db.Column(db.DateTime, nullable=False)
     id = db.Column(db.Integer, primary_key=True)
-    CO = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
+    CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     CO2 = db.Column(db.Float)
     H2S = db.Column(db.Float)
@@ -261,6 +257,49 @@ class ValidProcessedMeasurement(db.Model):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
+    I_temperature = db.Column(db.Float)
     qhawax_installation_id = db.Column(db.Integer, db.ForeignKey('qhawax_installation_history.id'))
+
+class FirmwareUpdate(db.Model):
+    __tablename__ = 'firmware_update'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    date_of_update = db.Column(db.DateTime, nullable=False)
+    url_of_bif_file = db.Column(db.String(1000), nullable=False, unique=True)
+    number_of_frames = db.Column(db.Integer)
+    number_of_bytes = db.Column(db.Integer)
+    firmware_version_id = db.Column(db.Integer, db.ForeignKey('firmware_version.id'))
+    frames = db.relationship('Frame', backref='firmware_update', lazy='subquery',
+                                                cascade='delete, delete-orphan')
+
+class Frame(db.Model):
+    __tablename__ = 'frame'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    firmware_update_id = db.Column(db.Integer, db.ForeignKey('firmware_update.id'))
+    numbering_by_frame = db.Column(db.Integer)
+    data_lenght = db.Column(db.Integer)
+    data = db.Column(db.String(1000), nullable=False, unique=True)
+    crc1 = db.Column(db.Integer)
+    crc2 = db.Column(db.Integer)
+    crc3 = db.Column(db.Integer)
+    crc4 = db.Column(db.Integer)
+
+class FirmwareVersion(db.Model):
+    __tablename__ = 'firmware_version'
+
+    # Column's definition
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20))
+    description = db.Column(db.String(250))
+    qhawax_type = db.Column(db.String(100))
+    creation_date = db.Column(db.DateTime, nullable=False)
+    qhawaxs = db.relationship('Qhawax', backref='firmware_version', lazy='subquery',
+                                                cascade='delete, delete-orphan')
+    firmware_updates = db.relationship('FirmwareUpdate', backref='firmware_version', lazy='subquery',
+                                                cascade='delete, delete-orphan')
 
 import project.database.utils as utils
