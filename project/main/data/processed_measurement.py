@@ -46,7 +46,7 @@ def handleProcessedData():
         data_json['ID'] = product_id
         data_json['zone'] = "Zona No Definida"
         qhawax_id = same_helper.getQhawaxID(product_id)
-        mode = same_helper.queryGetMode(product_id)
+        mode = same_helper.getQhawaxMode(product_id)
         inca_value = get_business_helper.getMainIncaQhawax(product_id)
         if(mode == "Cliente" and inca_value!=None):
             data_json['zone'] = get_business_helper.getNoiseData(product_id)

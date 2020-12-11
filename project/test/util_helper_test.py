@@ -40,12 +40,6 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertAlmostEqual(util_helper.getValidTime(1,datetime_test),datetime_test_10m)
 		self.assertAlmostEqual(util_helper.getValidTime(10,datetime_test),datetime_test_02h)
 
-	def test_get_gas_sensor_json_not_valid(self):
-		self.assertRaises(TypeError,util_helper.gasSensorJson)
-		self.assertRaises(TypeError,util_helper.gasSensorJson,{"name":"qH001"},5)
-		self.assertRaises(TypeError,util_helper.gasSensorJson,5,[4,4])
-		self.assertRaises(TypeError,util_helper.gasSensorJson,None)
-
 	def test_valid_time_json_processed_not_valid(self):
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed)
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,"resultado")
@@ -141,24 +135,6 @@ class TestUtilHelper(unittest.TestCase):
 				  'humidity': 71.9, 'lat': -12.072736,'lon': -77.082687, 'pressure': 100743.24, 
 				  'temperature': 19.1,'timestamp': '2020-08-31 00:00:00.0-05:00'}
 		self.assertAlmostEqual(util_helper.roundUpThree(y),last_y)
-
-	def test_average_measurements_not_valid(self):
-		self.assertRaises(TypeError,util_helper.averageMeasurements)
-		self.assertRaises(TypeError,util_helper.averageMeasurements,5)
-		self.assertRaises(TypeError,util_helper.averageMeasurements,"resultado")
-		self.assertRaises(TypeError,util_helper.averageMeasurements,None)
-		self.assertRaises(TypeError,util_helper.averageMeasurements,True)
-
-	def test_average_measurements_valid(self):
-		y = [{'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
-			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
-			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
-			  'temperature': 20,'timestamp': "2020-01-01 00:00:00"},
-			 {'ID': 1,'CO': 1, 'CO_ug_m3': 1.15,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': 1,'NO2_ug_m3': 1.88,'O3':1,
-			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
-			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
-			  'temperature': 20,'timestamp': "2020-01-01 00:00:00"}]
-		self.assertAlmostEqual(util_helper.averageMeasurements(y),y[0])
 
 	def test_get_date_range_from_week_not_valid(self):
 		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek)

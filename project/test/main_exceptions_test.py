@@ -18,30 +18,11 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertRaises(TypeError,exception_helper.getCompanyTargetofJson,True)
 		self.assertRaises(ValueError,exception_helper.getCompanyTargetofJson,data)
 
-	def test_query_gas_sensor_target_json_not_valid(self):
-		data_product_id = {'description':'test','person_in_charge':'test','gas_sensor_json':{}}
-		data_description = {'product_id':1,'person_in_charge':'test','gas_sensor_json':{}}
-		data_person_in_charge = {'product_id':1,'description':'test','gas_sensor_json':{}}
-		data_gas_sensor = {'product_id':1,'description':'test','person_in_charge':'test'}
-		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson)
-		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,"Json")
-		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,4.33)
-		self.assertRaises(TypeError,exception_helper.getGasSensorTargetofJson,True)
-		self.assertRaises(ValueError,exception_helper.getGasSensorTargetofJson,data_product_id)
-		self.assertRaises(ValueError,exception_helper.getGasSensorTargetofJson,data_description)
-		self.assertRaises(ValueError,exception_helper.getGasSensorTargetofJson,data_person_in_charge)
-		self.assertRaises(ValueError,exception_helper.getGasSensorTargetofJson,data_gas_sensor)
-
-	def test_query_gas_sensor_target_json_valid(self):
-		data = {'product_id':1,'description':'test','person_in_charge':'test', 'gas_sensor_json':{}}
-		self.assertAlmostEqual(exception_helper.getGasSensorTargetofJson(data),(int(data['product_id']),data['gas_sensor_json'],data['description'],data['person_in_charge']))
-
 	def test_query_qhawax_target_json_not_valid(self):
-		data_qhawax_name= {'qhawax_type':'test','person_in_charge':'test','firmware_version_id':1,'description':'test'}
-		data_qhawax_type = {'qhawax_name':'test','person_in_charge':'test','firmware_version_id':1,'description':'test'}
-		data_person_in_charge = {'qhawax_name':'test','qhawax_type':'test','firmware_version_id':1,'description':'test'}
-		data_description = {'qhawax_name':'test','qhawax_type':'test','firmware_version_id':1,'person_in_charge':'test'}
-		data_firmware_version = {'qhawax_name':'test','qhawax_type':'test','description':'test','person_in_charge':'test'}
+		data_qhawax_name= {'qhawax_type':'test','person_in_charge':'test','description':'test'}
+		data_qhawax_type = {'qhawax_name':'test','person_in_charge':'test','description':'test'}
+		data_person_in_charge = {'qhawax_name':'test','qhawax_type':'test','description':'test'}
+		data_description = {'qhawax_name':'test','qhawax_type':'test','person_in_charge':'test'}
 		self.assertRaises(TypeError,exception_helper.getQhawaxTargetofJson)
 		self.assertRaises(TypeError,exception_helper.getQhawaxTargetofJson,"Json")
 		self.assertRaises(TypeError,exception_helper.getQhawaxTargetofJson,4.33)
@@ -51,15 +32,13 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertRaises(ValueError,exception_helper.getQhawaxTargetofJson,data_qhawax_type)
 		self.assertRaises(ValueError,exception_helper.getQhawaxTargetofJson,data_person_in_charge)
 		self.assertRaises(ValueError,exception_helper.getQhawaxTargetofJson,data_description)
-		self.assertRaises(ValueError,exception_helper.getQhawaxTargetofJson,data_firmware_version)
 
 	def test_query_qhawax_target_json_valid(self):
-		data = {'qhawax_name':'test','description':'test','person_in_charge':'test', 'qhawax_type':'test','firmware_version_id':1}
+		data = {'qhawax_name':'test','description':'test','person_in_charge':'test', 'qhawax_type':'test'}
 		self.assertAlmostEqual(exception_helper.getQhawaxTargetofJson(data),(str(data['qhawax_name']),\
 																			str(data['qhawax_type']),\
-																			int(data['firmware_version_id']),\
-																			str(data['description']),\
-																			str(data['person_in_charge'])))
+																			str(data['person_in_charge']),\
+																			str(data['description'])))
 	def test_query_inca_target_json_not_valid(self):
 		data_qhawax_name= {'value_inca':'test'}
 		data_value_inca= {'name':'test'}
@@ -130,42 +109,42 @@ class TestMainExceptions(unittest.TestCase):
 																			  str(data['person_in_charge'])))
 
 	def test_query_installation_fields_json_not_valid(self):
-		data_qhawax_id= {'description':'test','person_in_charge':'test'}
-		data_description = {'qhawax_id':1,'person_in_charge':'test'}
-		data_person_in_charge= {'qhawax_id':1,'description':'test'}
+		data_qhawax_name= {'description':'test','person_in_charge':'test'}
+		data_description = {'qhawax_name':'test','person_in_charge':'test'}
+		data_person_in_charge= {'qhawax_name':'test','description':'test'}
 		self.assertRaises(TypeError,exception_helper.getInstallationFields)
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,"Json")
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,4.33)
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,None)
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,True)
-		self.assertRaises(ValueError,exception_helper.getInstallationFields,data_qhawax_id)
+		self.assertRaises(ValueError,exception_helper.getInstallationFields,data_qhawax_name)
 		self.assertRaises(ValueError,exception_helper.getInstallationFields,data_description)
 		self.assertRaises(ValueError,exception_helper.getInstallationFields,data_person_in_charge)
 
 	def test_query_installation_fields_json_valid(self):
-		data = {'qhawax_id':1,'person_in_charge':'test','description':'test'}
-		self.assertAlmostEqual(exception_helper.getInstallationFields(data),(int(data['qhawax_id']),\
+		data = {'qhawax_name':'test','person_in_charge':'test','description':'test'}
+		self.assertAlmostEqual(exception_helper.getInstallationFields(data),(str(data['qhawax_name']),\
 																			str(data['person_in_charge']),\
 																			str(data['description'])))
 
 	def test_query_end_work_fields_json_not_valid(self):
-		data_qhawax_id= {'description':'test','person_in_charge':'test','end_date':'test'}
-		data_description = {'qhawax_id':1,'person_in_charge':'test','end_date':'test'}
-		data_person_in_charge= {'qhawax_id':1,'description':'test','end_date':'test'}
-		data_end_date= {'qhawax_id':1,'description':'test','person_in_charge':'test'}
+		data_qhawax_name= {'description':'test','person_in_charge':'test','end_date':'test'}
+		data_description = {'qhawax_name':'test','person_in_charge':'test','end_date':'test'}
+		data_person_in_charge= {'qhawax_name':'test','description':'test','end_date':'test'}
+		data_end_date= {'qhawax_name':'test','description':'test','person_in_charge':'test'}
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson)
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,"Json")
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,4.33)
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,None)
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,True)
-		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_qhawax_id)
+		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_qhawax_name)
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_description)
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_person_in_charge)
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_end_date)
 
 	def test_query_end_work_fields_json_not_valid(self):
-		data = {'qhawax_id':1,'person_in_charge':'test','description':'test','end_date':'test'}
-		self.assertAlmostEqual(exception_helper.validEndWorkFieldJson(data),(int(data['qhawax_id']),\
+		data = {'qhawax_name':'test','person_in_charge':'test','description':'test','end_date':'test'}
+		self.assertAlmostEqual(exception_helper.validEndWorkFieldJson(data),(str(data['qhawax_name']),\
 																			data['end_date'],\
 																			str(data['person_in_charge']),\
 																			str(data['description'])))

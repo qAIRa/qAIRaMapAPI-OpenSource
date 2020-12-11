@@ -1,9 +1,9 @@
 from flask import jsonify, make_response, request
-import datetime
-from project import app
 import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
 import project.main.util_helper as util_helper
+from project import app
+import datetime
 
 @app.route('/api/air_quality_measurements/', methods=['POST'])
 def storeAirQualityData():
@@ -47,5 +47,42 @@ def getGasAverageMeasurementsEvery24():
             return make_response(jsonify(gas_average_measurement_list), 200)
         return make_response(jsonify('Measurements not found'), 200)
     except (ValueError,TypeError) as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/average_valid_processed_period/', methods=['GET'])
+def getAverageValidProcessedMeasurementsTimePeriodByCompany():
+    """ To list all average measurement of valid processed measurement table in a define period of time and company """
+    try:
+        qhawax_id = int(request.args.get('qhawax_id'))
+        initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+        final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+
+        average_valid_processed_measurements = get_data_helper.queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp)
+        average_valid_processed_measurements_list = [measurement._asdict() for measurement in average_valid_processed_measurements]
+        return make_response(jsonify(average_valid_processed_measurements_list), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/measurementPromedio/', methods=['GET'])
+def requestProm():
+    """ get average of determine pollutant (CO,H2S,NO2,O3,PM10,PM25,SO2) """
+    name = request.args.get('name')
+    sensor = request.args.get('sensor')
+    hoursSensor = request.args.get('hoursSensor')
+    minutes_diff = int(request.args.get('minutes_diff'))
+    qhawax_measurement_sensor=-1
+    try:
+        if(minutes_diff<5):
+            last_time_turn_on = dateutil.parser.parse(request.args.get('last_time_turn_on')) + datetime.timedelta(minutes=10)
+        elif(minutes_diff>=5):
+            last_time_turn_on = dateutil.parser.parse(request.args.get('last_time_turn_on')) + datetime.timedelta(hours=2)
+        final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+        initial_timestamp = final_timestamp - datetime.timedelta(hours=int(hoursSensor))
+        if(initial_timestamp.replace(tzinfo=None)>=last_time_turn_on.replace(tzinfo=None)):
+            qhawax_measurement_sensor = get_data_helper.queryDBPROM(name, sensor, initial_timestamp, final_timestamp)
+        return str(qhawax_measurement_sensor)
+    except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

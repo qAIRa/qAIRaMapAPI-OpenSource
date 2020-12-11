@@ -22,9 +22,10 @@ def getTimeAllActiveQhawax():
     name = request.args.get('name')
     try:
         installation_id = same_helper.getInstallationIdBaseName(name)
-        values = same_helper.getTimeQhawaxHistory(installation_id)
-        if(values is not None):
-            return make_response(jsonify(values), 200)
+        if(installation_id!=None):
+            values = same_helper.getTimeQhawaxHistory(installation_id)
+            if(values is not None):
+                return make_response(jsonify(values), 200)
         return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
@@ -92,9 +93,8 @@ def createQhawax():
     """ Endpoint to create a qHAWAX """
     req_json = request.get_json()
     try:
-        qH_name, qH_type, firmware_version_id, in_charge, description = exception_helper.getQhawaxTargetofJson(req_json)
-        post_business_helper.createQhawax(qH_name,qH_type,firmware_version_id)
-        post_business_helper.insertDefaultOffsets(qH_name)
+        qH_name, qH_type, in_charge, description = exception_helper.getQhawaxTargetofJson(req_json)
+        post_business_helper.createQhawax(qH_name,qH_type)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
         return make_response({'Success': 'qHAWAX & Sensors have been created'}, 200)
     except (TypeError,ValueError) as e:
@@ -132,7 +132,9 @@ def qhawaxEndCalibration():
     req_json = request.get_json()
     try:
         qH_name, in_charge = exception_helper.getEndCalibrationFields(req_json)
-        mode, description, main_inca = get_business_helper.setLastValuesOfQhawax(qH_name)
+        mode, description, main_inca = get_business_helper.getLastValuesOfQhawax(qH_name)
+        if(mode == 'Cliente'): 
+            post_business_helper.turnOnAfterCalibration(qH_name)
         post_business_helper.changeMode(qH_name,mode)
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qH_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qH_name)

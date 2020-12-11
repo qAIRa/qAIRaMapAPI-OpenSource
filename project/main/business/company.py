@@ -1,13 +1,13 @@
 from flask import jsonify, make_response, request
-import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
+import project.main.exceptions as exception_helper
 from project import app
 
 @app.route('/api/create_company/', methods=['POST'])
 def createCompany():
+    req_json = request.get_json()
     try:
-        req_json = request.get_json()
-        util_helper.getCompanyTargetofJson(req_json)
+        exception_helper.getCompanyTargetofJson(req_json)
         post_business_helper.createCompany(req_json)
     except (TypeError, ValueError ) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

@@ -1,6 +1,5 @@
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, \
-                                    ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise, \
-                                    AirDailyMeasurement
+                                    ValidProcessedMeasurement, Qhawax, QhawaxInstallationHistory, EcaNoise
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 import project.main.business.post_business_helper as post_business_helper
@@ -168,56 +167,43 @@ def getLatestTimestampValidProcessed(qhawax_name):
         return valid_processed_measurement_timestamp
     return None
 
-def queryDBDailyValidProcessedByQhawaxScript(installation_id, initial_timestamp, final_timestamp,date_format):
-    """ Helper Valid Processed Measurement function to valid measurement filter by time """
-    sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.CO_ug_m3,ValidProcessedMeasurement.H2S,
-               ValidProcessedMeasurement.H2S_ug_m3,ValidProcessedMeasurement.NO2, ValidProcessedMeasurement.NO2_ug_m3,
-               ValidProcessedMeasurement.O3,ValidProcessedMeasurement.O3_ug_m3, ValidProcessedMeasurement.PM25,
-               ValidProcessedMeasurement.PM10, ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.SO2_ug_m3,
-               ValidProcessedMeasurement.humidity,ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, 
-               ValidProcessedMeasurement.timestamp_zone)
+def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp):
+    """ Helper function to get Air Quality measurement """
+    sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, 
+               AirQualityMeasurement.NO2_ug_m3, AirQualityMeasurement.O3_ug_m3, 
+               AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, AirQualityMeasurement.SO2_ug_m3, 
+               AirQualityMeasurement.uv.label('UV'), AirQualityMeasurement.spl.label('SPL') ,
+               AirQualityMeasurement.humidity, AirQualityMeasurement.pressure, 
+               AirQualityMeasurement.temperature, AirQualityMeasurement.lat,AirQualityMeasurement.lon, 
+               AirQualityMeasurement.timestamp_zone)
+    
+    return session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
+                                    filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
+                                    filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
+                                    order_by(AirQualityMeasurement.timestamp_zone).all()
 
-    if(isinstance(initial_timestamp, str) is not True):  
-        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
-
-    if(isinstance(final_timestamp, str) is not True):  
-        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
-
-    initial_timestamp = datetime.datetime.strptime(initial_timestamp,date_format)
-    final_timestamp = datetime.datetime.strptime(final_timestamp, date_format)
-
-    if(same_helper.qhawaxInstallationExistBasedOnID(installation_id)):
-        valid_processed = session.query(*sensors). \
-                                  filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                  filter(ValidProcessedMeasurement.timestamp_zone > initial_timestamp). \
-                                  filter(ValidProcessedMeasurement.timestamp_zone < final_timestamp). \
-                                  order_by(ValidProcessedMeasurement.timestamp_zone).all()
-        return [daily_valid_measurement._asdict() for daily_valid_measurement in valid_processed]
-    return None
-
-def queryDBAirDailyQuality(qhawax_id, init_week, init_year,end_week, end_year):
-    """ Air Daily Measurement function helper to get daily average measurement based on week number and year """
-
-    sensors = (AirDailyMeasurement.CO, AirDailyMeasurement.CO_ug_m3,AirDailyMeasurement.H2S, 
-               AirDailyMeasurement.H2S_ug_m3, AirDailyMeasurement.NO2, AirDailyMeasurement.NO2_ug_m3,
-               AirDailyMeasurement.O3, AirDailyMeasurement.O3_ug_m3, AirDailyMeasurement.PM25, 
-               AirDailyMeasurement.PM10, AirDailyMeasurement.SO2, AirDailyMeasurement.SO2_ug_m3,
-               AirDailyMeasurement.timestamp_zone,AirDailyMeasurement.UV, AirDailyMeasurement.spl,
-               AirDailyMeasurement.humidity, AirDailyMeasurement.pressure, AirDailyMeasurement.temperature)
-
-    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
-
-        init_firstdate, init_lastdate =  util_helper.getDateRangeFromWeek(init_year,init_week)
-        end_firstdate, end_lastdate =  util_helper.getDateRangeFromWeek(end_year,end_week)
-
-        if(str(init_firstdate)>str(end_lastdate)):
-            raise ValueError("init_week and init_year must be lower than end_week and end_year")
-
-        air_daily_measurements = session.query(*sensors).filter(AirDailyMeasurement.qhawax_id == qhawax_id). \
-                                         filter(AirDailyMeasurement.timestamp_zone >= init_firstdate). \
-                                         filter(AirDailyMeasurement.timestamp_zone <= end_lastdate). \
-                                         order_by(AirDailyMeasurement.timestamp_zone).all()
-        return [measurement._asdict() for measurement in air_daily_measurements]
-    return None
-
-
+def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
+    """ Helper Gas Sensor function to save non controlled offsets from qHAWAX ID """
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    air_quality_column = [AirQualityMeasurement.CO_ug_m3,AirQualityMeasurement.NO2_ug_m3,AirQualityMeasurement.PM10,
+                          AirQualityMeasurement.PM25,AirQualityMeasurement.SO2_ug_m3,AirQualityMeasurement.O3_ug_m3,
+                          AirQualityMeasurement.H2S_ug_m3]
+    resultado=[]
+    sum = 0
+    if(qhawax_id!=None):
+        idx = util_helper.getHoursPerSensor(sensor,air_quality_column)
+        if(idx!=-1):
+            datos = air_quality_column[idx]
+            resultado = session.query(datos).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
+                                             filter(AirQualityMeasurement.timestamp_zone > initial_timestamp). \
+                                             filter(AirQualityMeasurement.timestamp_zone < final_timestamp). \
+                                             order_by(AirQualityMeasurement.timestamp_zone).all()
+            resultado_without_none = util_helper.checkNoneValues(resultado)
+            if len(resultado_without_none) == 0 :
+                return -1
+            else :
+                for i in range(len(resultado_without_none)):
+                    sum = sum + resultado_without_none[i]
+                promf = sum /len(resultado_without_none)
+            return promf
+    return -1

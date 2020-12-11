@@ -114,13 +114,11 @@ def getMainIncaQhawaxTable(qhawax_id):
         return session.query(Qhawax.main_inca).filter_by(id=qhawax_id).first()[0]
     return None
 
-
 def getQhawaxMode(qhawax_name):
     """ Get qHAWAX mode based on name """
     if(qhawaxExistBasedOnName(qhawax_name)):
-        return session.query(Qhawax.mode).filter_by(name=qhawax_name).one()[0]
+        return session.query(Qhawax.mode).filter_by(name=qhawax_name).first()[0]
     return None
-
 
 def getTimeQhawaxHistory(installation_id):
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
@@ -130,12 +128,4 @@ def getTimeQhawaxHistory(installation_id):
         values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
         if (values!=None):
             return {'last_time_on': values[0], 'last_time_registration': values[1]} 
-    
     return None
-
-def queryGetMode(name):
-    """ Get qHAWAX Mode """
-    qhawax_list = session.query(Qhawax.mode).filter(Qhawax.name == name).all()
-    if(qhawax_list == []):
-        raise TypeError("The qHAWAX name could not be found")
-    return session.query(Qhawax.mode).filter(Qhawax.name == name).one()[0]

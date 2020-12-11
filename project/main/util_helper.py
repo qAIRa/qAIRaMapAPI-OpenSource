@@ -12,7 +12,7 @@ array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
                'O3_ug_m3','PM1','PM10','PM25','SO2','SO2_ug_m3','spl','UV',\
                'UVA','UVB','humidity','pressure']
 
-array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_id',\
+array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_name',\
                          'connection_type','season','is_public','person_in_charge']
 
 def check_valid_date(date,date_format):
@@ -31,26 +31,6 @@ def getValidTime(minutes_diff, date_util):
     if(minutes_diff<5):
         return date_util + datetime.timedelta(minutes=10)
     return date_util + datetime.timedelta(hours=2)
-
-def gasSensorJson(json,sensors):
-    all_sensors=['CO','SO2','H2S','O3','NO','NO2']
-
-    if(isinstance(json, dict) is not True):
-        raise TypeError("json "+str(json)+" should be Json Format")
-
-    if(isinstance(sensors, list) is not True):
-        raise TypeError("sensors "+str(sensors)+" should be List Format")
-
-    initial = {}
-
-    for sensor in all_sensors:
-        initial[sensor] = json
-
-    for sensor in sensors:
-        sensor_dict = sensor._asdict()
-        initial[sensor_dict.pop('type')] = sensor_dict
-
-    return initial
 
 def validTimeJsonProcessed(data_json):
     if(isinstance(data_json, dict) is not True):
@@ -137,7 +117,6 @@ def checkNegatives(data_json):
 
     return data_json
 
-
 def areFieldsValid(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("qHAWAX installation variable "+str(data)+" should be Json Format")
@@ -146,31 +125,6 @@ def areFieldsValid(data):
         if(data[array_installation[i]]=='' or data[array_installation[i]]==None):
             return False
     return True
-
-def averageMeasurements(measurements):
-    SKIP_KEYS = ['timestamp', 'lat', 'lon']
-
-    if(isinstance(measurements, list) is not True):
-        raise TypeError("Measurement variable "+str(measurements)+" should be List Format")
-
-    average_measurement = {}
-
-    for sensor_name in measurements[0]:
-        if sensor_name in SKIP_KEYS:
-            continue
-        
-        sensor_values = [measurement[sensor_name] for measurement in measurements]
-        if all([value is None for value in sensor_values]):
-            average_measurement[sensor_name] = None
-        else:
-            sensor_values_without_none = [value for value in sensor_values if value is not None]
-            average_measurement[sensor_name] = sum(sensor_values_without_none)/len(sensor_values_without_none)
-
-    average_measurement['timestamp'] = measurements[-1]['timestamp']
-    average_measurement['lat'] = measurements[-1]['lat']
-    average_measurement['lon'] = measurements[-1]['lon']
-
-    return average_measurement
 
 def getDateRangeFromWeek(p_year,p_week):
     """ Helper to get date range from week """
@@ -234,3 +188,29 @@ def setNoneStringElements(data_json):
 
 def NanToCeroJsonProcessed(data_json):
     return setNoneStringElements(data_json)
+
+def getHoursPerSensor(sensor,air_quality_column):
+    idx = -1
+    if sensor == 'CO':
+        idx = 0
+    elif sensor == 'NO2':
+        idx = 1
+    elif sensor == 'PM10':
+        idx = 2
+    elif sensor == 'PM25':
+        idx = 3
+    elif sensor == 'SO2':
+        idx = 4
+    elif sensor == 'O3':
+        idx = 5
+    elif sensor == 'H2S':
+        idx = 6
+    return idx
+
+def checkNoneValues(resultado):
+    not_none_number = []
+    for i in range(len(resultado)):
+        if(resultado[i][0] is not None):
+            not_none_number.append(resultado[i][0])
+    return not_none_number
+

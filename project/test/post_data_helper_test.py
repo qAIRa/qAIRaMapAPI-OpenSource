@@ -45,13 +45,6 @@ class TestPostDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_data_helper.storeValidProcessedDataInDB,None)
 		self.assertRaises(TypeError,post_data_helper.storeValidProcessedDataInDB,"String_")
 
-	def test_store_air_daily_quality_data_not_valid(self):
-		self.assertRaises(TypeError,post_data_helper.storeAirDailyQualityDataInDB)
-		self.assertRaises(TypeError,post_data_helper.storeAirDailyQualityDataInDB,True,1)
-		self.assertRaises(TypeError,post_data_helper.storeAirDailyQualityDataInDB,True)
-		self.assertRaises(TypeError,post_data_helper.storeAirDailyQualityDataInDB,-5.0)
-		self.assertRaises(TypeError,post_data_helper.storeAirDailyQualityDataInDB,None)
-		self.assertRaises(TypeError,post_data_helper.storeAirDailyQualityDataInDB,"String_")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

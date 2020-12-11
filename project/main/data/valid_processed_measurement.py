@@ -66,30 +66,6 @@ def getTimeOfValidProcessed():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-@app.route('/api/daily_valid_processed_measurements/', methods=['GET'])
-def getDailyValidProcessedData():
-    """ To list all measurement of valid processed measurement table in a define period of time """
-    qhawax_id = int(request.args.get('id')) \
-                if request.args.get('id') is not None else 0
-    initial_timestamp_utc = str(request.args.get('start_date'))\
-                            if request.args.get('start_date') is not None else "2020-01-01 00:00:00"
-    final_timestamp_utc = str(request.args.get('end_date'))\
-                          if request.args.get('end_date') is not None else "2020-01-01 01:00:00"
-    try:
-        installation_id = same_helper.getInstallationId(qhawax_id)
-        if(installation_id is not None):
-            date_format = '%Y-%m-%d %H:%M:%S'
-            valid_processed_measurements = get_data_helper.queryDBDailyValidProcessedByQhawaxScript(installation_id, \
-                                                                            initial_timestamp_utc, final_timestamp_utc,\
-                                                                            date_format)
-            if valid_processed_measurements is not None:
-                return make_response(jsonify(valid_processed_measurements), 200)
-            return make_response(jsonify('Daily Valid Measurements not found'), 200)
-        return make_response(jsonify('qHAWAX ID does not exist in field'), 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-
 @app.route('/api/get_time_valid_processed_data_active_qhawax/', methods=['GET'])
 def getQhawaxValidProcessedLatestTimestamp():
     """ To get qHAWAX Valid Processed Measurement latest timestamp """
