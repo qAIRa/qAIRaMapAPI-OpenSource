@@ -156,9 +156,6 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
     if(isinstance(description, str) is not True):
         raise TypeError("Binnacle description should be string")
 
-    if(isinstance(person_in_charge, str) is not True):
-        raise TypeError("Person in Charge should be string")
-
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
         bitacora = {'timestamp_zone': datetime.datetime.now(dateutil.tz.tzutc()), \
