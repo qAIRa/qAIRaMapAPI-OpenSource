@@ -68,5 +68,6 @@ def validAndBeautyJsonValidProcessed(data_json,qhawax_id,product_id,inca_value):
 
     storeValidProcessedDataInDB(data_json, qhawax_id)
     if(inca_value==0.0):
-      post_business_helper.updateMainIncaInDB(1,product_id)
+      post_business_helper.updateMainIncaQhawaxTable(1,product_id)
+      post_business_helper.updateMainIncaQhawaxInstallationTable(1,product_id)
 
