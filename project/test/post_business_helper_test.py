@@ -19,7 +19,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxTable,100,None)
 
 	def test_update_main_inca_qhawax_valid(self):
-		post_business_helper.updateMainIncaQhawaxTable(-1,'qH001')
+		post_business_helper.updateMainIncaQhawaxTable(-1,'qH021')
 
 	def test_update_main_inca_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxInstallationTable)
@@ -31,7 +31,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxInstallationTable,100,None)
 
 	#def test_update_main_inca_qhawax_installation_valid(self):
-	#	post_business_helper.updateMainIncaQhawaxInstallationTable(-1,'qH004')
+	#	post_business_helper.updateMainIncaQhawaxInstallationTable(-1,'qH105')
 
 	def test_save_status_off_qhawax_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable)
@@ -41,8 +41,8 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable,True)
 
 	def test_save_status_off_qhawax_valid(self):
-		post_business_helper.saveStatusQhawaxTable('qH001','ON',0)
-		post_business_helper.saveStatusQhawaxTable('qH004','OFF',-1)
+		post_business_helper.saveStatusQhawaxTable('qH021','ON',0)
+		post_business_helper.saveStatusQhawaxTable('qH105','OFF',-1)
 
 	def test_save_status_off_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveStatusOffQhawaxInstallationTable)
@@ -80,9 +80,10 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.setAvailabilityQhawax,"qH004")
 		self.assertRaises(TypeError,post_business_helper.setAvailabilityQhawax,True)
 
-	def test_set_occupied_qhawax_valid(self):
-		post_business_helper.setAvailabilityQhawax("qH004",'Occupied')
-		post_business_helper.setAvailabilityQhawax("qH004",'Available')
+	def test_qhawax_installation_set_up_valid(self):
+		description = 'Qhawax Installation Set Up'
+		person_in_charge = 'l.montalvo'
+		post_business_helper.util_qhawax_installation_set_up("qH021",'Available','Stand By',description,person_in_charge)
 
 	def test_save_end_date_work_field_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveEndWorkFieldDate)
@@ -102,9 +103,6 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.changeMode,True)
 		self.assertRaises(TypeError,post_business_helper.changeMode,True,"Cliente")
 
-	def test_change_mode_valid(self):
-		post_business_helper.changeMode("qH001","Stand By")
-
 	def test_update_qhawax_installation_not_valid(self):
 		installation_json = {'lat':None,'lon':None,'comercial_name':None,
 							 'company_id':1,'eca_noise_id':1,'qhawax_name':"qH050",
@@ -117,11 +115,11 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateQhawaxInstallation,True)
 		self.assertRaises(Exception,post_business_helper.updateQhawaxInstallation,installation_json)
 
-	#def test_update_qhawax_installation_valid(self):
-	#	installation_json = {'lat':'-12.0000499','lon':'-77.9000000','comercial_name':'Unit Test Coveralls',
-	#						 'company_id':1,'eca_noise_id':1,'qhawax_name':"qH001",'connection_type':'Panel Solar',
-	#						 'season':'Primavera','is_public':'no','person_in_charge':'l.montalvo'}
-	#	post_business_helper.updateQhawaxInstallation(installation_json)
+	def test_update_qhawax_installation_valid(self):
+		installation_json = {'lat':'-12.0000499','lon':'-77.9000000','comercial_name':'Unit Test Coveralls',
+							 'company_id':1,'eca_noise_id':1,'qhawax_name':"qH105",'connection_type':'Panel Solar',
+							 'season':'Primavera','is_public':'no','person_in_charge':'l.montalvo'}
+		post_business_helper.updateQhawaxInstallation(installation_json)
 
 	def test_create_qhawax_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.createQhawax)
@@ -136,10 +134,10 @@ class TestPostBusinessHelper(unittest.TestCase):
 		end_date_string = "2020-10-30 00:00:00.255258"
 		date_format_end_date = '%Y-%m-%d %H:%M:%S.%f'
 		person_in_charge = 'l.montalvo'
-		qhawax_name = 'qH105'
+		qhawax_name = 'qH085'
 		post_business_helper.createQhawax(qhawax_name,'STATIC')
-		installation_json = {'lat':'-12.0000499','lon':'-77.9000000',
-							 'comercial_name':'Unit Test '+str(randint(0, 20))+' Coveralls',
+		installation_json = {'lat':'-7.0000499','lon':'-70.9000000',
+							 'comercial_name':'Unit Test '+str(randint(0, 30))+' Coveralls',
 							 'company_id':1,'eca_noise_id':1,'qhawax_name':qhawax_name,
 							 'connection_type':'Panel Solar','season':'Primavera','is_public':'no',
 							 'person_in_charge':person_in_charge,"instalation_date":installation_date,

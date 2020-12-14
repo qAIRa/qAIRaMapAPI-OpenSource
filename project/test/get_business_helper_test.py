@@ -16,10 +16,11 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,10,None)
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,"String_")
 
-	#def test_query_qhawax_mode_customer_valid(self):
+	def test_query_qhawax_mode_customer_valid(self):
 		#y = [('qH004', 'Cliente', 'ON', 'STATIC', 0.0, 304, 4, 1, 'qHAWAX 04 en dev', -12.0444, -77.028888, 'Zona de Protección Especial'), 
 		#	 ('qH006', 'Cliente', 'ON', 'STATIC', 1.0, 314, 6, 1, 'test-unicef', -12.1, -77.1, 'Zona de Protección Especial')]
-	#	self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
+		y =[]
+		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
 
 	def test_query_get_areas_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryGetAreas,{"name":"qH001"})
