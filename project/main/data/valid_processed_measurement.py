@@ -28,7 +28,6 @@ def getValidProcessedMeasurementsTimePeriod():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-
 @app.route('/api/valid_processed_measurements/', methods=['GET'])
 def getValidProcessedData():
     """ To list all measurement of valid processed measurement table record the last N minutes """

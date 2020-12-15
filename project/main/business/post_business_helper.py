@@ -137,11 +137,9 @@ def storeNewQhawaxInstallation(data):
         raise Exception("qHAWAX Installation fields have to have data")
         
     data['qhawax_id'] = same_helper.getQhawaxID(data['qhawax_name'])
-    installation_date = datetime.datetime.strptime(data['instalation_date'], '%Y-%m-%d %H:%M:%S.%f%z')
     data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
-    data['installation_date_zone'] = str(installation_date)
-    data['last_time_physically_turn_on_zone'] = str(installation_date)
-    data['last_registration_time_zone'] = str(installation_date - datetime.timedelta(minutes=30))
+    data['installation_date_zone'] = data['instalation_date']
+    data['last_time_physically_turn_on_zone'] = data['instalation_date']
     data.pop('instalation_date', None)
     data.pop('qhawax_name', None)
     qhawax_installation = QhawaxInstallationHistory(**data)
