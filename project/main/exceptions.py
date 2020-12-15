@@ -45,10 +45,8 @@ def getStatusOffTargetofJson(data):
         raise ValueError("No target qhawax_name in given json")
     if 'qhawax_lost_timestamp' not in data:
         raise ValueError("No target qhawax_lost_timestamp in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
 
-    return str(data['qhawax_name']).strip(), data['qhawax_lost_timestamp'], data['description']
+    return str(data['qhawax_name']).strip(), data['qhawax_lost_timestamp']
 
 def getChangeCalibrationFields(data):
     if(isinstance(data, dict) is not True):
@@ -97,10 +95,8 @@ def validEndWorkFieldJson(data):
         raise ValueError("No target end_date in given json")
     if 'person_in_charge' not in data:
         raise ValueError("No target person_in_charge in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
 
-    return str(data['qhawax_name']), data['end_date'], str(data['person_in_charge']), str(data['description'])
+    return str(data['qhawax_name']), data['end_date'], str(data['person_in_charge'])
 
 def getCompanyTargetofJson(data):
     if(isinstance(data, dict) is not True):
@@ -119,3 +115,13 @@ def getCompanyTargetofJson(data):
     if 'address' not in data:
         raise ValueError("No target address in given json")
 
+def getQhawaxSignalJson(data):
+    if(isinstance(data, dict) is not True):
+        raise TypeError("Signal variable "+str(data)+" should be json") 
+
+    if 'qhawax_name' not in data:
+        raise ValueError("No target qhawax_name in given json")
+    if 'timestamp_turn_on_conection' not in data:
+        raise ValueError("No target timestamp_turn_on_conection in given json")
+
+    return str(data['qhawax_name']).strip(),str(data['timestamp_turn_on_conection'])
