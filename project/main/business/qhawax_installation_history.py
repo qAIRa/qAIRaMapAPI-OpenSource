@@ -40,7 +40,8 @@ def newQhawaxInstallation():
     """ To create a qHAWAX in Field """
     data_json = request.get_json()
     try:
-        qH_name, description, in_charge = exception_helper.getInstallationFields(data_json)
+        qH_name, in_charge = exception_helper.getInstallationFields(data_json)
+        description="qHAWAX was recorded in field"
         post_business_helper.storeNewQhawaxInstallation(data_json)
         post_business_helper.util_qhawax_installation_set_up(qH_name,'Occupied','Cliente',description,in_charge)
     except Exception as e:
@@ -69,7 +70,8 @@ def updateQhawaxInstallation():
     """ To update qHAWAX in Field """
     data_json = request.get_json()
     try:
-        qH_name, description, in_charge = exception_helper.getInstallationFields(data_json)
+        qH_name, in_charge = exception_helper.getInstallationFields(data_json)
+        escription="Some fields of qHAWAX installation were updated"
         post_business_helper.updateQhawaxInstallation(data_json)
         helper.writeBitacora(qH_name,description,in_charge)
     except TypeError as e:
