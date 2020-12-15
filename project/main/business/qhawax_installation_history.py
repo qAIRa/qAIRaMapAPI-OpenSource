@@ -53,11 +53,10 @@ def newQhawaxInstallation():
 def saveEndWorkField():
     """Save last date of qHAWAX in field """
     data_json = request.get_json()
-    date_format = '%d-%m-%Y %H:%M:%S.%f'
     try:
         qH_name, end_date, person_in_charge = exception_helper.validEndWorkFieldJson(data_json)
         description="qHAWAX finished work in field"
-        post_business_helper.saveEndWorkFieldDate(qH_name, end_date,date_format)
+        post_business_helper.saveEndWorkFieldDate(qH_name, end_date)
         post_business_helper.util_qhawax_installation_set_up(qH_name,'Available','Stand By',description,person_in_charge)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

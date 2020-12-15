@@ -207,3 +207,11 @@ def queryDBPROM(qhawax_name, sensor, initial_timestamp, final_timestamp):
                 promf = sum /len(resultado_without_none)
             return promf
     return -1
+
+def queryLastMainInca(qhawax_name):
+    """Helper function to get last main inca based on qHAWAX ID """
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    inca = session.query(GasInca.main_inca).filter(GasInca.qhawax_id == qhawax_id).order_by(GasInca.id).all()
+    if(inca==[]):
+      return None
+    return session.query(GasInca.main_inca).filter(GasInca.qhawax_id == qhawax_id).order_by(GasInca.id.desc()).first()[0]

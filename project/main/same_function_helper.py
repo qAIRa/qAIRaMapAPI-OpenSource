@@ -5,7 +5,6 @@ import project.main.util_helper as util_helper
 session = db.session
 
 """ Helper functions to check one parameter"""
-
 def qhawaxExistBasedOnID(qhawax_id):
     """ Helper function to check if qHAWAX id exist """
     if(type(qhawax_id) not in [int]):
@@ -137,7 +136,12 @@ def getQhawaxStatus(qhawax_name):
 
 def getComercialName(qhawax_name):
     """ Helper Processed Measurement function to get qHAWAX comercial name """
-    if(getInstallationIdBaseName(qhawax_name) is not None):
-        return session.query(QhawaxInstallationHistory.comercial_name).filter_by(qhawax_id=qhawax_id, end_date_zone=None).one()[0]
+    qhawax_installation_id = getInstallationIdBaseName(qhawax_name)
+    if(qhawax_installation_id!= None):
+        return session.query(QhawaxInstallationHistory.comercial_name).filter_by(id=qhawax_installation_id).one()[0]
     return qhawax_name
 
+def getQhawaxOnLoop(qhawax_name):
+    if(qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.on_loop).filter_by(name=qhawax_name).one()[0]
+    return None

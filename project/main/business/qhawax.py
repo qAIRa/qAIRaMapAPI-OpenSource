@@ -3,6 +3,8 @@ import project.main.same_function_helper as same_helper
 import project.main.exceptions as exception_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
+import project.main.data.get_data_helper as get_data_helper
+import project.main.set_up_email as set_up
 from project import app, socketio
 
 @app.route('/api/get_qhawaxs/', methods=['GET'])
@@ -172,27 +174,23 @@ def sendQhawaxStatusOnBaseOnLossSignal():
             comercial_name = same_helper.getComercialName(qH_name)
             if(qhawax_state=='OFF'):
                 post_business_helper.saveStatusQhawaxTable(qH_name, "ON",0)
-                json_email = set_up.set_email_text("qHAWAX signal", comercial_name, qhawax_name, mode,timestamp,ENV_TYPE)
-                response = post_business_helper.setEmailBody(bcrypt.hash(app.config['SECRET_KEY']), json_email['subject'],\
-                                                             json_email['content1'], json_email['content2'])
+                json_email = set_up.set_email_text("qHAWAX signal", comercial_name, qH_name, mode,timestamp)
                 if(mode =='Cliente'):
-                    last_main_inca_value = get_data_helper.queryLastMainInca(qhawax_name)
+                    last_main_inca_value = get_data_helper.queryLastMainInca(qH_name)
                     if(last_main_inca_value!=None):
-                        post_business_helper.updateMainIncaInDB(last_main_inca_value,qhawax_name)
-                    last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qhawax_name)
+                        post_business_helper.updateMainIncaQhawaxInstallationTable(int(last_main_inca_value),qH_name)
+                        post_business_helper.updateMainIncaQhawaxTable(int(last_main_inca_value),qH_name)
+                    last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qH_name)
                     if(last_time_of_turn_off_binnacle!=None):
-                        post_business_helper.updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle,qhawax_name)
-                post_business_helper.writeBitacora(qhawax_name,json_email['observation_type'],json_email['description'],\
-                                                   json_email['person_in_charge'])
-                post_business_helper.reset_on_loop(qhawax_name,0)
+                        post_business_helper.updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle,qH_name)
+                post_business_helper.writeBinnacle(qH_name,json_email['description'],json_email['person_in_charge'])
+                post_business_helper.reset_on_loop(qH_name,0)
                 return make_response('qHAWAX ON based on loss signal', 200)
             else:
                 on_loop = int(same_helper.getQhawaxOnLoop(qH_name)) +1
                 if(on_loop==20):
                     first_time = str(get_business_helper.getFirstTimeLoop(qH_name) - datetime.timedelta(hours=5))
-                    json_email = set_up.set_email_text("qHAWAX loop", comercial_name, qH_name, mode,first_time,ENV_TYPE)
-                    response = post_business_helper.setEmailBody(bcrypt.hash(app.config['SECRET_KEY']), json_email['subject'],\
-                                                                 json_email['content1'], json_email['content2'])
+                    json_email = set_up.set_email_text("qHAWAX loop", comercial_name, qH_name, mode,first_time)
                     post_business_helper.reset_on_loop(qH_name,0)
                 else:
                     post_business_helper.reset_on_loop(qH_name,on_loop)

@@ -66,10 +66,8 @@ def turnOnAfterCalibration(qhawax_name):
                 update(values={'last_time_physically_turn_on_zone': now.replace(tzinfo=None)})
         session.commit()
 
-def saveEndWorkFieldDate(qhawax_name,end_date,date_format):
+def saveEndWorkFieldDate(qhawax_name,end_date):
     """ Save End Work in Field"""
-    util_helper.check_valid_date(end_date,date_format)
-
     installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).\
@@ -171,3 +169,22 @@ def util_qhawax_installation_set_up(qhawax_name,availability,mode,description,pe
     changeMode(qhawax_name, mode)
     writeBinnacle(qhawax_name,description,person_in_charge)
 
+def updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle, qhawax_name):
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    session.query(QhawaxInstallationHistory).filter_by(id=installation_id).\
+            update(values={'last_registration_time_zone':last_time_of_turn_off_binnacle})
+    session.commit()
+
+def reset_on_loop(qhawax_name, loop):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    session.query(Qhawax). \
+            filter_by(id=qhawax_id). \
+            update(values={'on_loop':loop})
+    session.commit()
+
+def record_first_time_loop(qhawax_name, timestamp):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    session.query(Qhawax). \
+            filter_by(id=qhawax_id). \
+            update(values={'first_time_loop':timestamp})
+    session.commit()

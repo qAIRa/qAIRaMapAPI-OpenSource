@@ -2,7 +2,7 @@ import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 from project import app, db
 from project.database.models import Qhawax, EcaNoise, QhawaxInstallationHistory, \
-                                    Company, ProcessedMeasurement, ValidProcessedMeasurement
+                                    Company, ProcessedMeasurement, ValidProcessedMeasurement,Bitacora
 session = db.session
 
 columns_qhawax = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, 
@@ -129,3 +129,27 @@ def queryAllQhawax():
     """ Get all qHAWAXs - No parameters required """
     columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
     return session.query(*columns).order_by(Qhawax.id).all()
+
+def queryLastTimeOffDueLackEnergy(qhawax_name):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        list_last_turn_off= session.query(Bitacora.timestamp_zone). \
+                                    filter_by(qhawax_id=qhawax_id). \
+                                    filter_by(description="Se apagó el qHAWAX por falta de energía"). \
+                                    order_by(Bitacora.timestamp_zone.desc()).\
+                                    limit(2).all()
+        if(list_last_turn_off != []):
+            return list_last_turn_off[1][0]
+        else:
+            list_last_turn_on= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone). \
+                                    filter_by(qhawax_id=qhawax_id). \
+                                    filter_by(end_date_zone=None). \
+                                    limit(1).all()
+            return list_last_turn_on[0]
+
+    return None
+
+def getFirstTimeLoop(qhawax_name):
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.first_time_loop).filter_by(name=qhawax_name).one()[0]
+    return None
