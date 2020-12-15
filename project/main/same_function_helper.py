@@ -129,3 +129,18 @@ def getTimeQhawaxHistory(installation_id):
         if (values!=None):
             return {'last_time_on': values[0], 'last_time_registration': values[1]} 
     return None
+
+def getQhawaxStatus(qhawax_name):
+    if(qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.state).filter_by(name=qhawax_name).one()[0]
+    return None
+
+def getComercialName(qhawax_name):
+    """ Helper Processed Measurement function to get qHAWAX comercial name """
+    qhawax_id = getQhawaxID(qhawax_name)
+
+    comercial_name = session.query(QhawaxInstallationHistory.comercial_name).filter_by(qhawax_id=qhawax_id, end_date_zone=None).all()
+    if(comercial_name == []):
+        raise TypeError("The qHAWAX Installation has not been found")
+    comercial_name = session.query(QhawaxInstallationHistory.comercial_name).filter_by(qhawax_id=qhawax_id, end_date_zone=None).one()[0]
+    return comercial_name

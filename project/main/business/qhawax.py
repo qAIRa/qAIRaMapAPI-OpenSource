@@ -5,6 +5,19 @@ import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 from project import app, socketio
 
+@app.route('/api/get_qhawaxs/', methods=['GET'])
+def getAllQhawax():
+    """ Get All qHAWAXs without condition """
+    try:
+        qhawaxs = get_business_helper.queryAllQhawax()
+        if qhawaxs is not None:
+            qhawax_list = [qhawax._asdict() for qhawax in qhawaxs]
+            return make_response(jsonify(qhawax_list), 200)
+        return make_response(jsonify('qHAWAXs not found'), 400)
+    except TypeError as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)
+
 @app.route('/api/get_qhawaxs_active_mode_customer/', methods=['GET'])
 def getActiveQhawaxModeCustomer():
     """ To get all active qHAWAXs that are in field in mode costumer - No parameters required """
@@ -145,4 +158,54 @@ def qhawaxEndCalibration():
         return make_response(json_message, 400)
     except (Exception) as e:
         json_message = jsonify({'database error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/turn_on_based_on_loss_signal/', methods=['POST'])
+def sendQhawaxStatusOnBaseOnLossSignal():
+    """ Set qHAWAX ON Base On Loss Signal  - It should set last main inca value, set last last_time_off record and last last_time_on """
+    req_json = request.get_json()
+    try:
+        qhawax_name = str(req_json['qhawax_name']).strip()
+        timestamp = str(req_json['timestamp_turn_on_conection'])
+        if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+            qhawax_state = same_helper.getQhawaxStatus(qhawax_name)
+            mode = same_helper.getQhawaxMode(qhawax_name)
+            comercial_name = same_helper.getComercialName(qhawax_name) if(mode =='Cliente') else qhawax_name
+            if(qhawax_state=='OFF'):
+                #post_business_helper.saveStatusOn(qhawax_name) #state de OFF a ON
+                post_business_helper.saveStatusQhawaxTable(qhawax_name,'ON',0)
+                if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
+                    post_business_helper.saveTurnOnLastTime(qhawax_name)
+                json_email = set_up.set_email_text("qHAWAX signal", comercial_name, qhawax_name, mode,timestamp,ENV_TYPE)
+                response = post_business_helper.setEmailBody(bcrypt.hash(app.config['SECRET_KEY']), json_email['subject'],\
+                                                             json_email['content1'], json_email['content2'])
+                if(mode =='Cliente'):
+                    last_main_inca_value = get_data_helper.queryLastMainInca(qhawax_name)
+                    if(last_main_inca_value!=None):
+                        post_business_helper.updateMainIncaInDB(last_main_inca_value,qhawax_name)
+                    last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qhawax_name)
+                    if(last_time_of_turn_off_binnacle!=None):
+                        post_business_helper.updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle,qhawax_name)
+                else:
+                    post_business_helper.updateMainIncaInDB(0,qhawax_name)
+                post_business_helper.writeBitacora(qhawax_name,json_email['observation_type'],json_email['description'],\
+                                                   json_email['person_in_charge'])
+                post_business_helper.reset_on_loop(qhawax_name,0)
+                return make_response('qHAWAX ON based on loss signal', 200)
+            else:
+                on_loop = int(same_helper.getQhawaxOnLoop(qhawax_name)) +1
+                if(on_loop==20):
+                    first_time = str(get_business_helper.getFirstTimeLoop(qhawax_name) - datetime.timedelta(hours=5))
+                    json_email = set_up.set_email_text("qHAWAX loop", comercial_name, qhawax_name, mode,first_time,ENV_TYPE)
+                    response = post_business_helper.setEmailBody(bcrypt.hash(app.config['SECRET_KEY']), json_email['subject'],\
+                                                                 json_email['content1'], json_email['content2'])
+                    post_business_helper.reset_on_loop(qhawax_name,0)
+                else:
+                    post_business_helper.reset_on_loop(qhawax_name,on_loop)
+                    if(on_loop==1):
+                        post_business_helper.record_first_time_loop(qhawax_name,timestamp)
+            return make_response('qHAWAX is already ON ', 200)
+        return make_response('qHAWAX name has not been found', 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

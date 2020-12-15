@@ -124,3 +124,8 @@ def getLastValuesOfQhawax(qH_name):
         main_inca = -1
 
     return mode, description, main_inca
+
+def queryAllQhawax():
+    """ Get all qHAWAXs - No parameters required """
+    columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
+    return session.query(*columns).order_by(Qhawax.id).all()
