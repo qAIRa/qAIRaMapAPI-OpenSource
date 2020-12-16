@@ -201,3 +201,14 @@ def sendQhawaxStatusOnBaseOnLossSignal():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+
+@app.route('/api/qhawax_exist/', methods=['GET'])
+def verifyIfQhawaxExist():
+    """ Get All qHAWAXs without condition """
+    name = request.args.get('name')
+    try:
+        qhawax_check = same_helper.qhawaxExistBasedOnName(name)
+        return str(qhawax_check)
+    except TypeError as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)
