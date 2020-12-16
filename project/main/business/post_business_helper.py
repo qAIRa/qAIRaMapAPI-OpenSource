@@ -135,17 +135,21 @@ def storeNewQhawaxInstallation(data):
 
     if(util_helper.areFieldsValid(data)==False):
         raise Exception("qHAWAX Installation fields have to have data")
-    data['qhawax_id'] = same_helper.getQhawaxID(data['qhawax_name'])
-    data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
-    data['installation_date_zone'] = data['instalation_date']
-    data['last_time_physically_turn_on_zone'] = data['instalation_date']
-    data.pop('instalation_date', None)
-    data.pop('qhawax_name', None)
-    if('id' in data):
-        data.pop('id', None)
-    qhawax_installation = QhawaxInstallationHistory(**data)
-    session.add(qhawax_installation)
-    session.commit()
+
+    qhawax_id = same_helper.getQhawaxID(data['qhawax_name'])
+
+    if(qhawax_id!=None):
+        data['qhawax_id'] = int(qhawax_id)
+        data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
+        data['installation_date_zone'] = data['instalation_date']
+        data['last_time_physically_turn_on_zone'] = data['instalation_date']
+        data.pop('instalation_date', None)
+        data.pop('qhawax_name', None)
+        if('id' in data):
+            data.pop('id', None)
+        qhawax_installation = QhawaxInstallationHistory(**data)
+        session.add(qhawax_installation)
+        session.commit()
 
 def writeBinnacle(qhawax_name,description,person_in_charge):
     """ Write observations in Binnacle"""
