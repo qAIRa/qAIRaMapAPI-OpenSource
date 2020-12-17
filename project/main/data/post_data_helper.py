@@ -43,7 +43,6 @@ def storeProcessedDataInDB(data):
         raise TypeError("Processed variable "+str(data)+" should be Json")
 
     qhawax_name = data.pop('ID', None)
-    data.pop('timestamp', None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     processed_measurement = ProcessedMeasurement(**data, qhawax_id=qhawax_id)
     session.add(processed_measurement)
