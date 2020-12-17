@@ -55,7 +55,7 @@ def updateIncaData():
         name, value_inca = exception_helper.getIncaTargetofJson(req_json)
         post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
         if(same_helper.getQhawaxMode(name)=='Cliente'):
-            post_business_helper.updateMainIncaInDB(value_inca, name)
+            post_business_helper.updateMainIncaQhawaxInstallationTable(value_inca, name)
         jsonsend['main_inca'] = value_inca
         jsonsend['name'] = name 
         socketio.emit('update_inca', jsonsend)
