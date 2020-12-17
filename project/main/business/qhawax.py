@@ -6,6 +6,10 @@ import project.main.business.post_business_helper as post_business_helper
 import project.main.data.get_data_helper as get_data_helper
 import project.main.set_up_email as set_up
 from project import app, socketio
+from datetime import timedelta
+import dateutil.parser
+import dateutil.tz
+import datetime
 
 @app.route('/api/get_qhawaxs/', methods=['GET'])
 def getAllQhawax():
@@ -123,7 +127,7 @@ def createQhawax():
 def qhawaxChangeToCalibration():
     """ qHAWAX update to Calibration mode, set main inca -2 value """
     req_json = request.get_json()
-    qhawax_time_off = now.replace(tzinfo=None)
+    qhawax_time_off = datetime.datetime.now(dateutil.tz.tzutc())
     try:
         qH_name, in_charge, description = exception_helper.getChangeCalibrationFields(req_json)
         post_business_helper.saveStatusOffQhawaxTable(qH_name)
