@@ -216,3 +216,13 @@ def verifyIfQhawaxExist():
     except TypeError as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
+
+@app.route('/api/qhawax_status/', methods=['GET'])
+def getQhawaxStatus():
+    """ Get qHAWAX Status """
+    name = request.args.get('name')
+    try:
+        return same_helper.getQhawaxStatus(name)
+    except Exception as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)

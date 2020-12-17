@@ -13,11 +13,15 @@ def storeAirQualityDataInDB(data):
     qhawax_name = data.pop('ID', None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id!=None):
-        data['uv'] = data['UV']
-        data['spl'] = data['SPL']
-        data.pop('SPL', None)
-        data.pop('UV', None)
-        air_quality_measurement = AirQualityMeasurement(**data, qhawax_id=qhawax_id)
+        air_quality_data = {'CO': data['CO'], 'CO_ug_m3': data['CO_ug_m3'],'H2S': data['H2S'], 
+                          'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],'SO2_ug_m3': data['SO2_ug_m3'], 
+                          'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],'O3': data['O3'],
+                          'O3_ug_m3': data['O3_ug_m3'], 'PM25': data['PM25'], 'PM10': data['PM10'], 
+                          'lat': data['lat'],'lon': data['lon'], 'alt': data['alt'], 'uv':data['UV'],
+                          'spl':data['SPL'], 'humidity':data['humidity'],'pressure':data['pressure'],
+                          'temperature':data['temperature'],'timestamp_zone': data['timestamp_zone'],
+                          'I_temperature':data['I_temperature']}
+        air_quality_measurement = AirQualityMeasurement(**air_quality_data, qhawax_id=qhawax_id)
         session.add(air_quality_measurement)
         session.commit()
 
@@ -25,10 +29,11 @@ def storeGasIncaInDB(data):
     """ Helper function to record GAS INCA measurement"""
     if(isinstance(data, dict) is not True):
         raise TypeError("Gas Inca variable "+str(data)+" should be Json")
-
-    qhawax_name = data.pop('ID', None)
+    gas_inca_data = {'CO': data['CO'], 'H2S': data['H2S'], 'SO2': data['SO2'], 'NO2': data['NO2'],
+                       'O3': data['O3'],'PM25': data['PM25'], 'PM10': data['PM10'],
+                       'main_inca':data['main_inca'], 'timestamp_zone': data['timestamp_zone']}
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    gas_inca_processed = GasInca(**data, qhawax_id=qhawax_id)
+    gas_inca_processed = GasInca(**gas_inca_data, qhawax_id=qhawax_id)
     session.add(gas_inca_processed)
     session.commit()
                                   
@@ -38,6 +43,7 @@ def storeProcessedDataInDB(data):
         raise TypeError("Processed variable "+str(data)+" should be Json")
 
     qhawax_name = data.pop('ID', None)
+    data.pop('timestamp', None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     processed_measurement = ProcessedMeasurement(**data, qhawax_id=qhawax_id)
     session.add(processed_measurement)

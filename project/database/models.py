@@ -26,7 +26,6 @@ class Qhawax(db.Model):
 class GasInca(db.Model):
     __tablename__ = 'gas_inca'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO2 = db.Column(db.Float)
@@ -88,7 +87,6 @@ class Bitacora(db.Model):
 class AirQualityMeasurement(db.Model):
     __tablename__ = 'air_quality_measurement'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
