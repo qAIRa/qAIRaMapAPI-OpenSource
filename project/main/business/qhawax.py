@@ -10,6 +10,7 @@ from datetime import timedelta
 import dateutil.parser
 import dateutil.tz
 import datetime
+import dateutil
 
 @app.route('/api/get_qhawaxs/', methods=['GET'])
 def getAllQhawax():
@@ -130,7 +131,6 @@ def qhawaxChangeToCalibration():
     qhawax_time_off = datetime.datetime.now(dateutil.tz.tzutc())
     try:
         qH_name, in_charge, description = exception_helper.getChangeCalibrationFields(req_json)
-        post_business_helper.saveStatusOffQhawaxTable(qH_name)
         post_business_helper.updateMainIncaQhawaxTable(-2,qH_name)
         if(same_helper.getQhawaxMode(qH_name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off)
