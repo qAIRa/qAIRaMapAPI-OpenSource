@@ -153,8 +153,7 @@ def qhawaxEndCalibration():
     try:
         qH_name, in_charge = exception_helper.getEndCalibrationFields(req_json)
         mode, description, main_inca = get_business_helper.getLastValuesOfQhawax(qH_name)
-        if(mode == 'Cliente'): 
-            post_business_helper.turnOnAfterCalibration(qH_name)
+        
         post_business_helper.changeMode(qH_name,mode)
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qH_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qH_name)

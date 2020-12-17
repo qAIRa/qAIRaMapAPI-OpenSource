@@ -117,13 +117,16 @@ def getLastValuesOfQhawax(qH_name):
     if(isItFieldQhawax(qH_name) == True):
         mode = "Cliente"
         description="Se cambió a modo cliente"
-        main_inca = 0
     else:
         mode = "Stand By"
         description="Se cambió a modo stand by"
-        main_inca = -1
 
+    main_inca = 0 if(queryQhawaxStatus(qH_name)=='ON') else -1
     return mode, description, main_inca
+
+
+def queryQhawaxStatus(name):
+    return session.query(Qhawax.state).filter_by(name=name).one()[0]
 
 def queryAllQhawax():
     """ Get all qHAWAXs - No parameters required """
