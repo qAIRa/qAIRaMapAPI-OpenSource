@@ -32,6 +32,7 @@ def storeGasIncaInDB(data):
     gas_inca_data = {'CO': data['CO'], 'H2S': data['H2S'], 'SO2': data['SO2'], 'NO2': data['NO2'],
                        'O3': data['O3'],'PM25': data['PM25'], 'PM10': data['PM10'],
                        'main_inca':data['main_inca'], 'timestamp_zone': data['timestamp_zone']}
+    qhawax_name = data.pop('ID', None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     gas_inca_processed = GasInca(**gas_inca_data, qhawax_id=qhawax_id)
     session.add(gas_inca_processed)
