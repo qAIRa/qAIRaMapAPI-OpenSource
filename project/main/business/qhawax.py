@@ -130,14 +130,15 @@ def qhawaxChangeToCalibration():
     req_json = request.get_json()
     qhawax_time_off = datetime.datetime.now(dateutil.tz.tzutc())
     try:
-        qH_name, in_charge, description = exception_helper.getChangeCalibrationFields(req_json)
+        qH_name, in_charge = exception_helper.getChangeCalibrationFields(req_json)
         post_business_helper.updateMainIncaQhawaxTable(-2,qH_name)
         if(same_helper.getQhawaxMode(qH_name)=='Cliente'):
             post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off)
             post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qH_name)
         post_business_helper.changeMode(qH_name,"Calibracion")
+        description = "qHAWAX have changed to calibration mode"
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
-        return make_response({'Success': 'qHAWAX have changed to calibration mode'}, 200)
+        return make_response({'Success': 'qHAWAX have changed to calibration mode - open'}, 200)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -158,7 +159,7 @@ def qhawaxEndCalibration():
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qH_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qH_name)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
-        return make_response({'Success': 'qHAWAX have changed to original mode'}, 200)
+        return make_response({'Success': 'qHAWAX have changed to original mode - open'}, 200)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

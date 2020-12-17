@@ -56,10 +56,8 @@ def getChangeCalibrationFields(data):
         raise ValueError("No target qhawax_name in given json")
     if 'person_in_charge' not in data:
         raise ValueError("No target person_in_charge in given json")
-    if 'description' not in data:
-        raise ValueError("No target description in given json")
 
-    return str(data['qhawax_name']).strip(), str(data['person_in_charge']), str(data['description'])
+    return str(data['qhawax_name']).strip(), str(data['person_in_charge'])
 
 def getEndCalibrationFields(data):
     if(isinstance(data, dict) is not True):
