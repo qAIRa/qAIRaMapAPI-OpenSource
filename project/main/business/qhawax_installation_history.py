@@ -74,7 +74,7 @@ def updateQhawaxInstallation():
         qH_name, in_charge = exception_helper.getInstallationFields(data_json)
         escription="Some fields of qHAWAX installation were updated"
         post_business_helper.updateQhawaxInstallation(data_json)
-        helper.writeBitacora(qH_name,description,in_charge)
+        post_business_helper.writeBinnacle(qH_name,description,in_charge)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
