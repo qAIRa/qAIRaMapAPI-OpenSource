@@ -58,7 +58,8 @@ def saveEndWorkField():
         qH_name, end_date, person_in_charge = exception_helper.validEndWorkFieldJson(data_json)
         description="qHAWAX finished work in field"
         post_business_helper.saveEndWorkFieldDate(qH_name, end_date)
-        post_business_helper.util_qhawax_installation_set_up(qH_name,'Available','Stand By',description,person_in_charge)
+        mode = 'Stand By' if (same_helper.getQhawaxMode(qH_name) == 'Cliente') else same_helper.getQhawaxMode(qH_name)
+        post_business_helper.util_qhawax_installation_set_up(qH_name,'Available',mode,description,person_in_charge)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
