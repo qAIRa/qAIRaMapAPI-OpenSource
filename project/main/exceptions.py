@@ -35,7 +35,7 @@ def getIncaTargetofJson(data):
     if 'value_inca' not in data:
         raise ValueError("No target value_inca in given json")
 
-    return str(data['name']).strip(),data['value_inca']
+    return str(data['name']).strip(),int(data['value_inca'])
 
 def getStatusOffTargetofJson(data):
     if(isinstance(data, dict) is not True):
