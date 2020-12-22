@@ -78,7 +78,6 @@ def queryQhawaxInFieldInPublicMode():
                    join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
                    join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
                    group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                   filter(QhawaxInstallationHistory.is_public == 'si'). \
                    filter(QhawaxInstallationHistory.end_date_zone == None). \
                    order_by(Qhawax.id).all() 
 
