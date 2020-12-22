@@ -72,7 +72,7 @@ def updateQhawaxInstallation():
     data_json = request.get_json()
     try:
         qH_name, in_charge = exception_helper.getInstallationFields(data_json)
-        escription="Some fields of qHAWAX installation were updated"
+        description="Some fields of qHAWAX installation were updated"
         post_business_helper.updateQhawaxInstallation(data_json)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
     except TypeError as e:
