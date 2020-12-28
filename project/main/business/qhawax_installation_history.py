@@ -40,9 +40,10 @@ def newQhawaxInstallation():
     """ To create a qHAWAX in Field """
     data_json = request.get_json()
     try:
-        qH_id, description, in_charge = exception_helper.getInstallationFields(data_json)
+        qH_name, in_charge = exception_helper.getInstallationFields(data_json)
+        description="qHAWAX was recorded in field"
         post_business_helper.storeNewQhawaxInstallation(data_json)
-        post_business_helper.util_qhawax_installation_set_up(qH_id,'Occupied','Cliente',description,in_charge)
+        post_business_helper.util_qhawax_installation_set_up(qH_name,'Occupied','Cliente',description,in_charge)
     except Exception as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -53,11 +54,12 @@ def newQhawaxInstallation():
 def saveEndWorkField():
     """Save last date of qHAWAX in field """
     data_json = request.get_json()
-    date_format = '%d-%m-%Y %H:%M:%S.%f'
     try:
-        qH_id, end_date, description, person_in_charge = exception_helper.validEndWorkFieldJson(data_json)
-        post_business_helper.saveEndWorkFieldDate(qH_id, end_date,date_format)
-        post_business_helper.util_qhawax_installation_set_up(qH_id,'Available','Stand By',description,person_in_charge)
+        qH_name, end_date, person_in_charge = exception_helper.validEndWorkFieldJson(data_json)
+        description="qHAWAX finished work in field"
+        post_business_helper.saveEndWorkFieldDate(qH_name, end_date)
+        mode = 'Stand By' if (same_helper.getQhawaxMode(qH_name) == 'Cliente') else same_helper.getQhawaxMode(qH_name)
+        post_business_helper.util_qhawax_installation_set_up(qH_name,'Available',mode,description,person_in_charge)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -69,10 +71,10 @@ def updateQhawaxInstallation():
     """ To update qHAWAX in Field """
     data_json = request.get_json()
     try:
-        qH_id, description, in_charge = exception_helper.getInstallationFields(data_json)
+        qH_name, in_charge = exception_helper.getInstallationFields(data_json)
+        description="Some fields of qHAWAX installation were updated"
         post_business_helper.updateQhawaxInstallation(data_json)
-        qH_name = same_helper.getQhawaxName(qH_id)
-        helper.writeBitacora(qH_name,description,in_charge)
+        post_business_helper.writeBinnacle(qH_name,description,in_charge)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

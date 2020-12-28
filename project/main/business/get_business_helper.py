@@ -1,9 +1,8 @@
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
 from project import app, db
-from project.database.models import GasSensor, Qhawax, EcaNoise, QhawaxInstallationHistory, \
-                                    Company, AirQualityMeasurement, ProcessedMeasurement, \
-                                    ValidProcessedMeasurement
+from project.database.models import Qhawax, EcaNoise, QhawaxInstallationHistory, \
+                                    Company, ProcessedMeasurement, ValidProcessedMeasurement,Bitacora
 session = db.session
 
 columns_qhawax = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, 
@@ -35,36 +34,6 @@ def queryGetEcaNoise(eca_noise_id):
         return session.query(*fields).filter_by(id= eca_noise_id).first()
     return None
 
-def getConstantsFromProductID(qhawax_name, constant_type):
-    if(isinstance(constant_type, str) is not True):  
-        raise TypeError("Variable "+str(constant_type)+" should be string")
-
-    attributes = ""
-    constant_json = {}
-
-    if(constant_type=='offsets'):
-      #offset
-      attributes = (GasSensor.type, GasSensor.WE, GasSensor.AE, GasSensor.sensitivity, 
-                  GasSensor.sensitivity_2, GasSensor.algorithm, GasSensor.WEt, GasSensor.AEt)
-      constant_json = {'WE': 0.0, 'AE': 0.0, 'sensitivity': 0.0, 'sensitivity_2': 0.0,\
-                       'algorithm': 0, 'WEt': 0.0, 'AEt': 0.0}
-    elif(constant_type=='controlled-offsets'):
-      #controlled-offset
-      attributes = (GasSensor.type, GasSensor.C2, GasSensor.C1, GasSensor.C0)
-      constant_json = {'C0': 0.0, 'C1': 0.0, 'C2': 0.0}
-
-    elif(constant_type=='non-controlled-offsets'):
-      #non-controlled-offset
-      attributes = (GasSensor.type, GasSensor.NC1, GasSensor.NC0)
-      constant_json = {'NC1': 0.0, 'NC0': 0.0}
-
-    if(attributes!="" and constant_json!={}):
-      qhawax_id = same_helper.getQhawaxID(qhawax_name)
-      if(qhawax_id is not None):
-          constant_sensors = session.query(*attributes).filter_by(qhawax_id=qhawax_id).all()
-          return util_helper.gasSensorJson(constant_json,constant_sensors)
-    return None
-
 def getInstallationDate(qhawax_id):
     """ Helper qHAWAX function to get Installation Date """
     installation_id = same_helper.getInstallationId(qhawax_id)
@@ -82,18 +51,6 @@ def getFirstTimestampValidProcessed(qhawax_id):
                                  order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()
         return None if (first_timestamp==None) else first_timestamp[0]
     return None
-
-def queryGetLastQhawax():
-    """ Helper qHAWAX function to get last qHAWAX ID """
-    qhawax_list = session.query(Qhawax.id).all()
-    return None if (qhawax_list== []) else session.query(Qhawax.id).\
-                                                   order_by(Qhawax.id.desc()).all()[0]
-
-def queryGetLastGasSensor():
-    """ Helper Gas Sensor function to get last Gas Sensor ID """
-    gas_sensor_list = session.query(GasSensor.id).all()
-    return None if(gas_sensor_list==[]) else session.query(GasSensor.id).\
-                                                     order_by(GasSensor.id.desc()).all()[0]
 
 def isItFieldQhawax(qhawax_name):
     """Check qhawax in field """
@@ -121,15 +78,8 @@ def queryQhawaxInFieldInPublicMode():
                    join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
                    join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
                    group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                   filter(QhawaxInstallationHistory.is_public == 'si'). \
                    filter(QhawaxInstallationHistory.end_date_zone == None). \
                    order_by(Qhawax.id).all() 
-
-def getQhawaxStatus(qhawax_name):
-    """Get qHAWAX status based on name """
-    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
-        return session.query(Qhawax.state).filter_by(name=qhawax_name).one()[0]
-    return None
 
 def getNoiseData(qhawax_name):
     """Helper Processed Measurement function to get Noise Area Description"""
@@ -155,20 +105,53 @@ def getHoursDifference(qhawax_id):
 
 def getMainIncaQhawax(name):
     installation_id=same_helper.getInstallationIdBaseName(name)
-    qhawax_list = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).all()
-    if(qhawax_list == []):
-        return None
-    return session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).one()[0]
+    if(installation_id is not None):
+      qhawax_list = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).all()
+      if(qhawax_list == []):
+          return None
+      return session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).one()[0]
+    return None
 
-def setLastValuesOfQhawax(qH_name):
+def getLastValuesOfQhawax(qH_name):
     if(isItFieldQhawax(qH_name) == True):
-        post_business_helper.turnOnAfterCalibration(qH_name)
         mode = "Cliente"
         description="Se cambió a modo cliente"
-        main_inca = 0
     else:
         mode = "Stand By"
         description="Se cambió a modo stand by"
-        main_inca = -1
 
+    main_inca = 0 if(queryQhawaxStatus(qH_name)=='ON') else -1
     return mode, description, main_inca
+
+
+def queryQhawaxStatus(name):
+    return session.query(Qhawax.state).filter_by(name=name).one()[0]
+
+def queryAllQhawax():
+    """ Get all qHAWAXs - No parameters required """
+    columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
+    return session.query(*columns).order_by(Qhawax.id).all()
+
+def queryLastTimeOffDueLackEnergy(qhawax_name):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        list_last_turn_off= session.query(Bitacora.timestamp_zone). \
+                                    filter_by(qhawax_id=qhawax_id). \
+                                    filter_by(description="Se apagó el qHAWAX por falta de energía"). \
+                                    order_by(Bitacora.timestamp_zone.desc()).\
+                                    limit(2).all()
+        if(list_last_turn_off != []):
+            return list_last_turn_off[1][0]
+        else:
+            list_last_turn_on= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone). \
+                                    filter_by(qhawax_id=qhawax_id). \
+                                    filter_by(end_date_zone=None). \
+                                    limit(1).all()
+            return list_last_turn_on[0]
+
+    return None
+
+def getFirstTimeLoop(qhawax_name):
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.first_time_loop).filter_by(name=qhawax_name).one()[0]
+    return None
