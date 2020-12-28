@@ -147,6 +147,8 @@ def storeNewQhawaxInstallation(data):
         data.pop('qhawax_name', None)
         if('id' in data):
             data.pop('id', None)
+        if('company_name' in data):
+            data.pop('company_name', None)
         qhawax_installation = QhawaxInstallationHistory(**data)
         session.add(qhawax_installation)
         session.commit()
