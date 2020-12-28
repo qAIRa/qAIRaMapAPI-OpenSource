@@ -64,20 +64,11 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
                                        order_by(AirQualityMeasurement.timestamp_zone.asc()).all()
     return None
 
-def queryDBGasInca(initial_timestamp, final_timestamp,date_format):
+def queryDBGasInca(initial_timestamp, final_timestamp):
     """ Helper function to get GAS INCA measurement"""
     sensors = (GasInca.CO, GasInca.H2S, GasInca.SO2, GasInca.NO2,GasInca.O3, 
                GasInca.PM25, GasInca.PM10, GasInca.SO2,GasInca.timestamp_zone, 
                GasInca.qhawax_id, GasInca.main_inca, Qhawax.name.label('qhawax_name'))
-    
-    if(isinstance(initial_timestamp, str) is not True):  
-        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
-
-    if(isinstance(final_timestamp, str) is not True):  
-        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
-
-    initial_timestamp = datetime.datetime.strptime(initial_timestamp, date_format)
-    final_timestamp = datetime.datetime.strptime(final_timestamp, date_format)
 
     gas_inca = session.query(*sensors).\
                        join(Qhawax, GasInca.qhawax_id == Qhawax.id). \
