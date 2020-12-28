@@ -12,6 +12,20 @@ import dateutil.tz
 import datetime
 import dateutil
 
+
+@app.route('/api/get_qhawaxID/', methods=['GET'])
+def getQhawaxID():
+    """ Get Time All Active qHAWAX - Script """
+    name = request.args.get('name')
+    try:
+        qhawax_id = same_helper.getQhawaxID(name)
+        if(qhawax_id!=None):
+            return str(qhawax_id)
+        return make_response(jsonify({'Warning':'qHAWAX name not exist'}), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
 @app.route('/api/get_qhawaxs/', methods=['GET'])
 def getAllQhawax():
     """ Get All qHAWAXs without condition """
