@@ -24,9 +24,7 @@ def getLastGasIncaData():
     try:
         final_timestamp_gases = datetime.datetime.now(dateutil.tz.tzutc())
         initial_timestamp_gases = final_timestamp_gases - datetime.timedelta(hours=1)
-        date_format = '%Y-%m-%d %H:%M:%S.%f%z'
-        gas_inca_last_data = get_data_helper.queryDBGasInca(str(initial_timestamp_gases), \
-                                                            str(final_timestamp_gases),date_format)
+        gas_inca_last_data = get_data_helper.queryDBGasInca(initial_timestamp_gases, final_timestamp_gases)
         if gas_inca_last_data is not []: 
             return make_response(jsonify(gas_inca_last_data), 200)
         return make_response(jsonify('We could not found any gas inca measurement'), 200)
