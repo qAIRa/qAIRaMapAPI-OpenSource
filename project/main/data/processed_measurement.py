@@ -20,9 +20,8 @@ def getProcessedData():
 
         final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
         initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes) 
-        date_format = '%Y-%m-%d %H:%M:%S.%f%z'
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, str(initial_timestamp), \
-                                                                  str(final_timestamp),date_format)
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, \
+                                                                  final_timestamp)
         if processed_measurements is not None:
             return make_response(jsonify(processed_measurements), 200)
         return make_response(jsonify('Measurements not found'), 200)
@@ -61,24 +60,6 @@ def handleProcessedData():
         data_json = util_helper.NanToCeroJsonProcessed(data_json)
         socketio.emit('new_data_summary_processed', data_json)
         return make_response('OK', 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-
-
-@app.route('/api/processed_measurements_period/', methods=['GET'])
-def getProcessedMeasurementsTimePeriod():
-    """ To list all measurement of processed measurement table in a define period of time """
-    try:
-        qhawax_name = request.args.get('name')
-        initial_timestamp = request.args.get('initial_timestamp')
-        final_timestamp = request.args.get('final_timestamp')
-        date_format = '%d-%m-%Y %H:%M:%S'
-        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, \
-                                                 initial_timestamp, final_timestamp,date_format)
-        if processed_measurements is not None:
-            return make_response(jsonify(processed_measurements), 200)
-        return make_response(jsonify('Measurements not found'), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
