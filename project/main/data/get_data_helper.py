@@ -77,16 +77,7 @@ def queryDBGasInca(initial_timestamp, final_timestamp):
                        filter(GasInca.timestamp_zone <= final_timestamp).all()
     return [measurement._asdict() for measurement in gas_inca]
                                   
-def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp,date_format):
-
-    if(isinstance(initial_timestamp, str) is not True):  
-        raise TypeError("Initial timestamp"+str(initial_timestamp)+" should be string")
-
-    if(isinstance(final_timestamp, str) is not True):  
-        raise TypeError("Last timestamp"+str(final_timestamp)+" should be string")
-
-    initial_timestamp = datetime.datetime.strptime(initial_timestamp, date_format)
-    final_timestamp = datetime.datetime.strptime(final_timestamp, date_format)
+def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
 
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
