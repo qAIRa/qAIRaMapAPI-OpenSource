@@ -19,7 +19,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxTable,100,None)
 
 	#def test_update_main_inca_qhawax_valid(self):
-	#	post_business_helper.updateMainIncaQhawaxTable(-1,'qH021')
+	#	post_business_helper.updateMainIncaQhawaxTable(-1,'qH057')
 
 	def test_update_main_inca_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxInstallationTable)
@@ -31,18 +31,36 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxInstallationTable,100,None)
 
 	#def test_update_main_inca_qhawax_installation_valid(self):
-	#	post_business_helper.updateMainIncaQhawaxInstallationTable(-1,'qH105')
+	#	post_business_helper.updateMainIncaQhawaxInstallationTable(-1,'qH057')
 
-	def test_save_status_off_qhawax_not_valid(self):
+	def test_save_turn_on_after_calibration_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration)
+		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,None)
+		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,50)
+		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,True)
+
+	#def test_save_turn_on_after_calibration_valid(self):
+	#	post_business_helper.turnOnAfterCalibration('qH057')
+
+	def test_save_turn_on_qhawax_installation_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime)
+		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,None)
+		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,50)
+		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,True)
+
+	#def test_save_turn_on_qhawax_installation_valid(self):
+	#	post_business_helper.saveTurnOnLastTime('qH057')
+
+	def test_save_status_qhawax_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable)
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable,None)
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable,50)
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable,100.0)
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable,True)
 
-	#def test_save_status_off_qhawax_valid(self):
-	#	post_business_helper.saveStatusQhawaxTable('qH021','ON',0)
-	#	post_business_helper.saveStatusQhawaxTable('qH105','OFF',-1)
+	#def test_save_status_qhawax_valid(self):
+	#	post_business_helper.saveStatusQhawaxTable('qH057','ON',0)
+	#	post_business_helper.saveStatusQhawaxTable('qH057','OFF',-1)
 
 	def test_save_status_off_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveStatusOffQhawaxInstallationTable)
@@ -54,25 +72,10 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.saveStatusOffQhawaxInstallationTable,True)
 
 	#def test_save_status_off_qhawax_installation_valid(self):
-	#	initial_timestamp = "27-09-2020 00:00:00.877701+00:00"
+	#	initial_timestamp = "28-12-2020 00:00:00.877701+00:00"
 	#	date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 	#	last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
-		#post_business_helper.saveStatusOffQhawaxInstallationTable('qH004',last_time_turn_on)
-
-	def test_save_turn_on_qhawax_installation_not_valid(self):
-		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime)
-		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,None)
-		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,50)
-		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,True)
-
-	#def test_save_turn_on_qhawax_installation_valid(self):
-		#post_business_helper.saveTurnOnLastTime('qH004')
-
-	def test_save_turn_on_after_calibration_not_valid(self):
-		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration)
-		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,None)
-		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,50)
-		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,True)
+	#	post_business_helper.saveStatusOffQhawaxInstallationTable('qH057',last_time_turn_on)
 
 	def test_set_occupied_qhawax_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.setAvailabilityQhawax)
@@ -81,9 +84,9 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.setAvailabilityQhawax,True)
 
 	#def test_qhawax_installation_set_up_valid(self):
-	#	description = 'Qhawax Installation Set Up'
+	#	description = 'Qhawax Installation Set Up Test'
 	#	person_in_charge = 'l.montalvo'
-	#	post_business_helper.util_qhawax_installation_set_up("qH021",'Available','Stand By',description,person_in_charge)
+	#	post_business_helper.util_qhawax_installation_set_up("qH057",'Available','Stand By',description,person_in_charge)
 
 	def test_save_end_date_work_field_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveEndWorkFieldDate)
@@ -115,12 +118,6 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateQhawaxInstallation,True)
 		self.assertRaises(Exception,post_business_helper.updateQhawaxInstallation,installation_json)
 
-	#def test_update_qhawax_installation_valid(self):
-	#	installation_json = {'lat':'-12.0000499','lon':'-77.9000000','comercial_name':'Unit Test Coveralls',
-	#						 'company_id':1,'eca_noise_id':1,'qhawax_name':"qH105",'connection_type':'Panel Solar',
-	#						 'season':'Primavera','is_public':'no','person_in_charge':'l.montalvo'}
-	#	post_business_helper.updateQhawaxInstallation(installation_json)
-
 	def test_create_qhawax_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.createQhawax)
 		self.assertRaises(TypeError,post_business_helper.createQhawax,None)
@@ -130,11 +127,11 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(Exception,post_business_helper.createQhawax,"qH050",50)
 
 	#def test_create_qhawax_and_default_sensors_valid(self):
-	#	installation_date = "2020-10-01 08:44:00.0-05:00"
-	#	end_date_string = "2020-10-30 00:00:00.255258"
+	#	installation_date = "2020-12-29 00:44:00.0-05:00"
+	#	end_date_string = "2020-12-29 01:00:00.255258"
 	#	date_format_end_date = '%Y-%m-%d %H:%M:%S.%f'
 	#	person_in_charge = 'l.montalvo'
-	#	qhawax_name = 'qH085'
+	#	qhawax_name = 'qH134'
 	#	post_business_helper.createQhawax(qhawax_name,'STATIC')
 	#	installation_json = {'lat':'-7.0000499','lon':'-70.9000000',
 	#						 'comercial_name':'Unit Test '+str(randint(0, 30))+' Coveralls',
@@ -145,6 +142,10 @@ class TestPostBusinessHelper(unittest.TestCase):
 	#	post_business_helper.storeNewQhawaxInstallation(installation_json)
 	#	description = 'qHAWAX record in field'
 	#	post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+	#	installation_json_update = {'lat':'-12.0000499','lon':'-77.9000000','comercial_name':'Unit Test Coveralls '+str(randint(0, 30)),
+	#						 		'company_id':1,'eca_noise_id':1,'qhawax_name':qhawax_name,'connection_type':'Panel Solar',
+	#						 		'season':'Primavera','is_public':'no','person_in_charge':'l.montalvo'}
+	#	post_business_helper.updateQhawaxInstallation(installation_json_update)
 	#	post_business_helper.saveEndWorkFieldDate(qhawax_name,end_date_string,date_format_end_date)
 	#	description = 'qHAWAX save end work in field'
 	#	post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
@@ -180,8 +181,8 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH080",None,None)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH080",None,4)
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004",4,"l.montalvo")
-		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004","Se apago el qHAWAX")
-		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004","description",True)
+		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004","Se apago el qHAWAX",True)
+		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004",True,"hola")
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004")
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,None)
 	

@@ -17,10 +17,9 @@ def getAllQhawax():
     """ Get All qHAWAXs without condition """
     try:
         qhawaxs = get_business_helper.queryAllQhawax()
-        if qhawaxs is not None:
-            qhawax_list = [qhawax._asdict() for qhawax in qhawaxs]
-            return make_response(jsonify(qhawax_list), 200)
-        return make_response(jsonify('qHAWAXs not found'), 400)
+        if (qhawaxs!=[]):
+            return make_response(jsonify(qhawaxs), 200)
+        return make_response(jsonify({'Warning':'qHAWAXs not found'}), 400)
     except TypeError as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
@@ -30,8 +29,9 @@ def getActiveQhawaxModeCustomer():
     """ To get all active qHAWAXs that are in field in mode costumer - No parameters required """
     try:
         qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-        qhawaxs_list = [qhawax._asdict() for qhawax in qhawaxs]
-        return make_response(jsonify(qhawaxs_list), 200)
+        if(qhawaxs!=[]):
+            return make_response(jsonify(qhawaxs), 200)
+        return make_response(jsonify({'Warning':'qHAWAXs not found'}), 400)
     except TypeError as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
@@ -41,14 +41,32 @@ def getTimeAllActiveQhawax():
     """ Get Time All Active qHAWAX - Script """
     name = request.args.get('name')
     try:
-        installation_id = same_helper.getInstallationIdBaseName(name)
-        if(installation_id!=None):
-            values = same_helper.getTimeQhawaxHistory(installation_id)
-            if(values is not None):
-                return make_response(jsonify(values), 200)
-        return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 200)
+        values = same_helper.getTimeQhawaxHistory(name)
+        if(values is not None):
+            return make_response(jsonify(values), 200)
+        return make_response(jsonify({'Warning':'qHAWAX name is not in field'}), 400)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/qhawax_exist/', methods=['GET'])
+def verifyIfQhawaxExist():
+    """ Verify if qHAWAX exist """
+    name = request.args.get('name')
+    try:
+        return str(same_helper.qhawaxExistBasedOnName(name))
+    except TypeError as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/qhawax_status/', methods=['GET'])
+def getQhawaxStatus():
+    """ Get qHAWAX Status """
+    name = request.args.get('name')
+    try:
+        return str(same_helper.getQhawaxStatus(name)) if (same_helper.getQhawaxStatus(name)!=None) else make_response({'Warning': 'qHAWAX name has not been found'}, 400)
+    except Exception as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
 
 @app.route('/api/save_main_inca/', methods=['POST'])
@@ -59,8 +77,7 @@ def updateIncaData():
     try:
         name, value_inca = exception_helper.getIncaTargetofJson(req_json)
         post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
-        if(same_helper.getQhawaxMode(name)=='Cliente'):
-            post_business_helper.updateMainIncaQhawaxInstallationTable(value_inca, name)
+        post_business_helper.updateMainIncaQhawaxInstallationTable(value_inca, name)
         jsonsend['main_inca'] = value_inca
         jsonsend['name'] = name 
         socketio.emit('update_inca', jsonsend)
@@ -74,17 +91,16 @@ def sendQhawaxStatusOff():
     """ Server Open Source lo apagara / Web Comercial lo pagara y enviara correo- Endpoint to set qHAWAX OFF because script detect no new data within five minutes  """
     jsonsend = {}
     req_json = request.get_json()
+    description = "qHAWAX off"
     try:
         qH_name, qH_time_off = exception_helper.getStatusOffTargetofJson(req_json)
-        description = "qHAWAX off"
         post_business_helper.saveStatusQhawaxTable(qH_name,'OFF',-1)
-        if(same_helper.getQhawaxMode(qH_name)=='Cliente'):
-            post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qH_time_off)
+        post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qH_time_off)
         post_business_helper.writeBinnacle(qH_name,description,None)
         jsonsend['main_inca'] = -1
         jsonsend['name'] = qH_name 
         socketio.emit('update_inca', jsonsend)
-        return make_response({'Success': 'qHAWAX off'}, 200)
+        return make_response({'Success': 'qHAWAX OFF'}, 200)
     except (ValueError, TypeError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -94,12 +110,11 @@ def sendQhawaxStatusOn():
     """ qHAWAX / Web Comercial - Set qHAWAX ON due to module reset (sensors reset) """
     jsonsend = {}
     req_json = request.get_json()
+    description="qHAWAX turned on after a general reset"
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
-        description="qHAWAX turned on after a general reset"
         post_business_helper.saveStatusQhawaxTable(qhawax_name,'ON',0)
-        if(same_helper.getQhawaxMode(qhawax_name)=='Cliente'):
-            post_business_helper.saveTurnOnLastTime(qhawax_name)
+        post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,None)
         jsonsend['main_inca'] = 0
         jsonsend['name'] = qhawax_name 
@@ -129,14 +144,13 @@ def qhawaxChangeToCalibration():
     """ qHAWAX update to Calibration mode, set main inca -2 value """
     req_json = request.get_json()
     qhawax_time_off = datetime.datetime.now(dateutil.tz.tzutc())
+    description = "qHAWAX have changed to calibration mode"
     try:
         qH_name, in_charge = exception_helper.getChangeCalibrationFields(req_json)
         post_business_helper.updateMainIncaQhawaxTable(-2,qH_name)
-        if(same_helper.getQhawaxMode(qH_name)=='Cliente'):
-            post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off)
-            post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qH_name)
+        post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off)
+        post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qH_name)
         post_business_helper.changeMode(qH_name,"Calibracion")
-        description = "qHAWAX have changed to calibration mode"
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
         return make_response({'Success': 'qHAWAX have changed to calibration mode - open'}, 200)
     except (TypeError,ValueError) as e:
@@ -153,10 +167,9 @@ def qhawaxEndCalibration():
     try:
         qH_name, in_charge = exception_helper.getEndCalibrationFields(req_json)
         mode, description, main_inca = get_business_helper.getLastValuesOfQhawax(qH_name)
-        
-        post_business_helper.changeMode(qH_name,mode)
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qH_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qH_name)
+        post_business_helper.changeMode(qH_name,mode)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
         return make_response({'Success': 'qHAWAX have changed to original mode - open'}, 200)
     except (TypeError,ValueError) as e:
@@ -189,7 +202,7 @@ def sendQhawaxStatusOnBaseOnLossSignal():
                         post_business_helper.updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle,qH_name)
                 post_business_helper.writeBinnacle(qH_name,json_email['description'],json_email['person_in_charge'])
                 post_business_helper.reset_on_loop(qH_name,0)
-                return make_response('qHAWAX ON based on loss signal', 200)
+                return make_response({'Success': 'qHAWAX ON based on loss signal'}, 200)
             else:
                 on_loop = int(same_helper.getQhawaxOnLoop(qH_name)) +1
                 if(on_loop==20):
@@ -200,29 +213,8 @@ def sendQhawaxStatusOnBaseOnLossSignal():
                     post_business_helper.reset_on_loop(qH_name,on_loop)
                     if(on_loop==1):
                         post_business_helper.record_first_time_loop(qH_name,timestamp)
-            return make_response('qHAWAX is already ON ', 200)
-        return make_response('qHAWAX name has not been found', 200)
+            return make_response({'Success': 'qHAWAX is already ON'}, 200)
+        return make_response({'Warning': 'qHAWAX name has not been found'}, 400)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-
-@app.route('/api/qhawax_exist/', methods=['GET'])
-def verifyIfQhawaxExist():
-    """ Get All qHAWAXs without condition """
-    name = request.args.get('name')
-    try:
-        qhawax_check = same_helper.qhawaxExistBasedOnName(name)
-        return str(qhawax_check)
-    except TypeError as e:
-        json_message = jsonify({'error': ' \'%s\' ' % (e)})
-        return make_response(json_message, 400)
-
-@app.route('/api/qhawax_status/', methods=['GET'])
-def getQhawaxStatus():
-    """ Get qHAWAX Status """
-    name = request.args.get('name')
-    try:
-        return same_helper.getQhawaxStatus(name)
-    except Exception as e:
-        json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)

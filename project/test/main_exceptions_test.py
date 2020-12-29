@@ -9,7 +9,7 @@ class TestMainExceptions(unittest.TestCase):
 
 	"""
 	def test_query_company_target_json_not_valid(self):
-		data = {'company_name':'test','email_group':'test.test','ruc':1001,'address':'test'}
+		data = {'company_name':'test','email_group':'test.test','ruc':1001}
 		self.assertRaises(TypeError,exception_helper.getCompanyTargetofJson)
 		self.assertRaises(TypeError,exception_helper.getCompanyTargetofJson,"Json")
 		self.assertRaises(TypeError,exception_helper.getCompanyTargetofJson,4.33)
@@ -55,9 +55,8 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertAlmostEqual(exception_helper.getIncaTargetofJson(data),(str(data['name']).strip(),data['value_inca']))
 
 	def test_query_off_target_json_not_valid(self):
-		data_qhawax_name= {'qhawax_lost_timestamp':'test','description':'test'}
-		data_qhawax_lost_time= {'qhawax_name':'test','description':'test'}
-		data_description = {'qhawax_name':'test','qhawax_lost_timestamp':'test'}
+		data_qhawax_name= {'qhawax_lost_timestamp':'test'}
+		data_qhawax_lost_time= {'qhawax_name':'test'}
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson)
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson,"Json")
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson,4.33)
@@ -65,18 +64,15 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson,True)
 		self.assertRaises(ValueError,exception_helper.getStatusOffTargetofJson,data_qhawax_name)
 		self.assertRaises(ValueError,exception_helper.getStatusOffTargetofJson,data_qhawax_lost_time)
-		self.assertRaises(ValueError,exception_helper.getStatusOffTargetofJson,data_description)
 
 	def test_query_off_target_json_valid(self):
-		data = {'qhawax_name':'test','qhawax_lost_timestamp':'test','description':'test'}
+		data = {'qhawax_name':'test','qhawax_lost_timestamp':'test'}
 		self.assertAlmostEqual(exception_helper.getStatusOffTargetofJson(data),(str(data['qhawax_name']).strip(),\
-																		   	   data['qhawax_lost_timestamp'],\
-																		   	   data['description']))
+																		   	   data['qhawax_lost_timestamp']))
 
 	def test_query_change_to_calibration_json_not_valid(self):
-		data_qhawax_name= {'person_in_charge':'test','description':'test'}
-		data_person_in_charge= {'qhawax_name':'test','description':'test'}
-		data_description = {'qhawax_name':'test','person_in_charge':'test'}
+		data_qhawax_name= {'person_in_charge':'test'}
+		data_person_in_charge= {'qhawax_name':'test'}
 		self.assertRaises(TypeError,exception_helper.getChangeCalibrationFields)
 		self.assertRaises(TypeError,exception_helper.getChangeCalibrationFields,"Json")
 		self.assertRaises(TypeError,exception_helper.getChangeCalibrationFields,4.33)
@@ -84,13 +80,11 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertRaises(TypeError,exception_helper.getChangeCalibrationFields,True)
 		self.assertRaises(ValueError,exception_helper.getChangeCalibrationFields,data_qhawax_name)
 		self.assertRaises(ValueError,exception_helper.getChangeCalibrationFields,data_person_in_charge)
-		self.assertRaises(ValueError,exception_helper.getChangeCalibrationFields,data_description)
 
 	def test_query_change_to_calibration_json_valid(self):
-		data = {'qhawax_name':'test','person_in_charge':'test','description':'test'}
+		data = {'qhawax_name':'test','person_in_charge':'test'}
 		self.assertAlmostEqual(exception_helper.getChangeCalibrationFields(data),(str(data['qhawax_name']).strip(),\
-																				 data['person_in_charge'],\
-																				 str(data['description'])))
+																				 data['person_in_charge']))
 
 	def test_query_end_calibration_json_not_valid(self):
 		data_qhawax_name= {'person_in_charge':'test'}
@@ -109,45 +103,55 @@ class TestMainExceptions(unittest.TestCase):
 																			  str(data['person_in_charge'])))
 
 	def test_query_installation_fields_json_not_valid(self):
-		data_qhawax_name= {'description':'test','person_in_charge':'test'}
-		data_description = {'qhawax_name':'test','person_in_charge':'test'}
-		data_person_in_charge= {'qhawax_name':'test','description':'test'}
+		data_qhawax_name= {'person_in_charge':'test'}
+		data_person_in_charge= {'qhawax_name':'test'}
 		self.assertRaises(TypeError,exception_helper.getInstallationFields)
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,"Json")
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,4.33)
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,None)
 		self.assertRaises(TypeError,exception_helper.getInstallationFields,True)
 		self.assertRaises(ValueError,exception_helper.getInstallationFields,data_qhawax_name)
-		self.assertRaises(ValueError,exception_helper.getInstallationFields,data_description)
 		self.assertRaises(ValueError,exception_helper.getInstallationFields,data_person_in_charge)
 
 	def test_query_installation_fields_json_valid(self):
-		data = {'qhawax_name':'test','person_in_charge':'test','description':'test'}
+		data = {'qhawax_name':'test','person_in_charge':'test'}
 		self.assertAlmostEqual(exception_helper.getInstallationFields(data),(str(data['qhawax_name']),\
-																			str(data['person_in_charge']),\
-																			str(data['description'])))
+																			str(data['person_in_charge'])))
 
 	def test_query_end_work_fields_json_not_valid(self):
-		data_qhawax_name= {'description':'test','person_in_charge':'test','end_date':'test'}
-		data_description = {'qhawax_name':'test','person_in_charge':'test','end_date':'test'}
-		data_person_in_charge= {'qhawax_name':'test','description':'test','end_date':'test'}
-		data_end_date= {'qhawax_name':'test','description':'test','person_in_charge':'test'}
+		data_qhawax_name= {'person_in_charge':'test','end_date':'test'}
+		data_person_in_charge= {'qhawax_name':'test','end_date':'test'}
+		data_end_date= {'qhawax_name':'test','person_in_charge':'test'}
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson)
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,"Json")
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,4.33)
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,None)
 		self.assertRaises(TypeError,exception_helper.validEndWorkFieldJson,True)
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_qhawax_name)
-		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_description)
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_person_in_charge)
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_end_date)
 
 	def test_query_end_work_fields_json_not_valid(self):
-		data = {'qhawax_name':'test','person_in_charge':'test','description':'test','end_date':'test'}
+		data = {'qhawax_name':'test','person_in_charge':'test','end_date':'test'}
 		self.assertAlmostEqual(exception_helper.validEndWorkFieldJson(data),(str(data['qhawax_name']),\
 																			data['end_date'],\
-																			str(data['person_in_charge']),\
-																			str(data['description'])))
+																			str(data['person_in_charge'])))
+
+	def test_query_end_calibration_json_not_valid(self):
+		data_qhawax_name= {'timestamp_turn_on_conection':'test'}
+		data_timestamp_turn_on_conection = {'qhawax_name':'test'}
+		self.assertRaises(TypeError,exception_helper.getQhawaxSignalJson)
+		self.assertRaises(TypeError,exception_helper.getQhawaxSignalJson,"Json")
+		self.assertRaises(TypeError,exception_helper.getQhawaxSignalJson,4.33)
+		self.assertRaises(TypeError,exception_helper.getQhawaxSignalJson,None)
+		self.assertRaises(TypeError,exception_helper.getQhawaxSignalJson,True)
+		self.assertRaises(ValueError,exception_helper.getQhawaxSignalJson,data_qhawax_name)
+		self.assertRaises(ValueError,exception_helper.getQhawaxSignalJson,data_timestamp_turn_on_conection)
+
+	def test_query_end_calibration_json_valid(self):
+		data = {'qhawax_name':'test','timestamp_turn_on_conection':'test'}
+		self.assertAlmostEqual(exception_helper.getQhawaxSignalJson(data),(str(data['qhawax_name']).strip(),\
+																		   str(data['timestamp_turn_on_conection'])))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

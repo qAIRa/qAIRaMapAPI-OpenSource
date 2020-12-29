@@ -1,8 +1,7 @@
-import project.main.util_helper as util_helper
+from project.database.models import Qhawax, EcaNoise, QhawaxInstallationHistory, Company, Bitacora
 import project.main.same_function_helper as same_helper
+import project.main.util_helper as util_helper
 from project import app, db
-from project.database.models import Qhawax, EcaNoise, QhawaxInstallationHistory, \
-                                    Company, ProcessedMeasurement, ValidProcessedMeasurement,Bitacora
 session = db.session
 
 columns_qhawax = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, 
@@ -12,13 +11,29 @@ columns_qhawax = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawa
 
 def queryQhawaxModeCustomer():
     """ Get qHAWAX list in mode Customer and state ON """
-    return session.query(*columns_qhawax).\
-                   join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
-                   join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
-                   group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                   filter(Qhawax.mode =="Cliente", \
-                          Qhawax.state =="ON", \
-                          QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
+    qhawax_list = session.query(*columns_qhawax).\
+                          join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                          join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                          group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                          filter(Qhawax.mode =="Cliente",Qhawax.state =="ON", \
+                                 QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]
+
+def queryQhawaxInFieldInPublicMode():
+    """ Get list of qHAWAXs in field in public mode """
+    qhawax_public = session.query(*columns_qhawax).\
+                            join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                            join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                            group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                            filter(QhawaxInstallationHistory.end_date_zone == None). \
+                            order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_public]
+
+def queryAllQhawax():
+    """ Get all qHAWAXs - No parameters required """
+    columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
+    qhawax_list =  session.query(*columns).order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]
 
 def queryGetAreas():
     """ Helper Eca Noise function to list all zones  """
@@ -28,8 +43,7 @@ def queryGetAreas():
 
 def queryGetEcaNoise(eca_noise_id):
     """ Helper Eca Noise function to get zone description """
-    fields = (EcaNoise.id, EcaNoise.area_name, EcaNoise.max_daytime_limit, \
-              EcaNoise.max_night_limit)
+    fields = (EcaNoise.id, EcaNoise.area_name, EcaNoise.max_daytime_limit, EcaNoise.max_night_limit)
     if(same_helper.areaExistBasedOnID(eca_noise_id)):
         return session.query(*fields).filter_by(id= eca_noise_id).first()
     return None
@@ -42,58 +56,23 @@ def getInstallationDate(qhawax_id):
                        filter(QhawaxInstallationHistory.id == installation_id).first()[0]
     return None
 
-def getFirstTimestampValidProcessed(qhawax_id):
-    """ Helper qHAWAX Installation function to get first timestamp of Valid Processed  """
-    installation_id = same_helper.getInstallationId(qhawax_id)
-    if(installation_id is not None):
-        first_timestamp =session.query(ValidProcessedMeasurement.timestamp_zone). \
-                                 filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
-                                 order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()
-        return None if (first_timestamp==None) else first_timestamp[0]
-    return None
-
 def isItFieldQhawax(qhawax_name):
     """Check qhawax in field """
     return True if (same_helper.getInstallationIdBaseName(qhawax_name)is not None) else False
 
-def getLatestTimeInProcessedMeasurement(qhawax_name):
-    """ Helper qHAWAX function to get latest timestamp in UTC 00 from Processed Measurement """
+def queryQhawaxStatus(name):
+    return session.query(Qhawax.state).filter_by(name=name).one()[0]
 
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id is not None):
-        processed_measurement_timestamp=""
-        qhawax_time = session.query(ProcessedMeasurement.timestamp_zone).\
-                              filter_by(qhawax_id=qhawax_id).first()
-        if(qhawax_time!=None):
-            processed_measurement_timestamp = session.query(ProcessedMeasurement.timestamp_zone).\
-                                                      filter_by(qhawax_id=qhawax_id).\
-                                                      order_by(ProcessedMeasurement.id.desc()).\
-                                                      first().timestamp_zone
-        return processed_measurement_timestamp
+def getFirstTimeLoop(qhawax_name):
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.first_time_loop).filter_by(name=qhawax_name).one()[0]
     return None
 
-def queryQhawaxInFieldInPublicMode():
-    """ Get list of qHAWAXs in field in public mode """
-    return session.query(*columns_qhawax).\
-                   join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
-                   join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
-                   group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                   filter(QhawaxInstallationHistory.end_date_zone == None). \
-                   order_by(Qhawax.id).all() 
-
-def getNoiseData(qhawax_name):
-    """Helper Processed Measurement function to get Noise Area Description"""
-    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
-    if(installation_id is not None):
-        eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).\
-                               filter_by(id=installation_id).first()
-        return session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
-    return None
-
-def getHoursDifference(qhawax_id):
+def getHoursDifference(qhawax_name):
     """Helper Processed Measurement function to get minutes difference
       between last_registration_time and last_time_physically_turn_on """
-    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
         values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
                                QhawaxInstallationHistory.last_registration_time_zone).\
                          filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
@@ -103,13 +82,14 @@ def getHoursDifference(qhawax_id):
                 return minutes_difference, values[0]
     return None, None
 
-def getMainIncaQhawax(name):
-    installation_id=same_helper.getInstallationIdBaseName(name)
+def getNoiseData(qhawax_name):
+    """Helper Processed Measurement function to get Noise Area Description"""
+    installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
-      qhawax_list = session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).all()
-      if(qhawax_list == []):
-          return None
-      return session.query(QhawaxInstallationHistory.main_inca).filter_by(id=installation_id).one()[0]
+        return session.query(EcaNoise.area_name).\
+                       join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                       group_by(QhawaxInstallationHistory.id,EcaNoise.id). \
+                       filter(QhawaxInstallationHistory.id==installation_id).all()
     return None
 
 def getLastValuesOfQhawax(qH_name):
@@ -122,15 +102,6 @@ def getLastValuesOfQhawax(qH_name):
 
     main_inca = 0 if(queryQhawaxStatus(qH_name)=='ON') else -1
     return mode, description, main_inca
-
-
-def queryQhawaxStatus(name):
-    return session.query(Qhawax.state).filter_by(name=name).one()[0]
-
-def queryAllQhawax():
-    """ Get all qHAWAXs - No parameters required """
-    columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
-    return session.query(*columns).order_by(Qhawax.id).all()
 
 def queryLastTimeOffDueLackEnergy(qhawax_name):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
@@ -149,9 +120,4 @@ def queryLastTimeOffDueLackEnergy(qhawax_name):
                                     limit(1).all()
             return list_last_turn_on[0]
 
-    return None
-
-def getFirstTimeLoop(qhawax_name):
-    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
-        return session.query(Qhawax.first_time_loop).filter_by(name=qhawax_name).one()[0]
     return None

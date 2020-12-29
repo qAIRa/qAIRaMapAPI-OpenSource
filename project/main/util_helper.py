@@ -24,14 +24,6 @@ def check_valid_date(date,date_format):
     except ValueError:
         raise ValueError("Date "+str(date)+" should be datetime "+str(date_format)+" Format")
 
-def getValidTime(minutes_diff, date_util):
-    if(isinstance(minutes_diff, int) is not True): 
-        raise TypeError("Variable "+str(minutes_diff)+" should be integer")
-
-    if(minutes_diff<5):
-        return date_util + datetime.timedelta(minutes=10)
-    return date_util + datetime.timedelta(hours=2)
-
 def validTimeJsonProcessed(data_json):
     if(isinstance(data_json, dict) is not True):
         raise TypeError("json "+str(data_json)+" should be Json Format")
@@ -106,17 +98,6 @@ def checkNumberValues(data_json):
             data_json[array_ppb[i]] = 0
     return data_json
 
-def checkNegatives(data_json):
-    """ Helper Processed Measurement function to valid negatives values """
-    if(isinstance(data_json, dict) is not True):
-        raise TypeError("Measurement variable "+str(data_json)+" should be Json Format")
-
-    for i in range(len(array_ppb)):
-        if(data_json[array_ppb[i]]<0):
-            data_json[array_ppb[i]] = 0
-
-    return data_json
-
 def areFieldsValid(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("qHAWAX installation variable "+str(data)+" should be Json Format")
@@ -125,27 +106,6 @@ def areFieldsValid(data):
         if(data[array_installation[i]]=='' or data[array_installation[i]]==None):
             return False
     return True
-
-def getDateRangeFromWeek(p_year,p_week):
-    """ Helper to get date range from week """
-    if(isinstance(p_year, int) is not True):
-        raise TypeError("Year value "+str(p_year)+" should be integer")
-
-    if(isinstance(p_week, int) is not True):
-        raise TypeError("Week value "+str(p_week)+" should be integer")
-
-    if(p_year<2020):
-        raise ValueError("Year value "+str(p_year)+" should be higher or equal 2020")
-
-    if(p_week<=0 or p_week>=54):
-        raise ValueError("Week value "+str(p_week)+" should be higher than cero and lower than 54")
-
-    d = str(p_year)+'-W'+str((int(p_week)- 1))+'-1'
-
-    firstdayofweek = datetime.datetime.strptime(d, "%Y-W%W-%w").date()
-    lastdayofweek = firstdayofweek + datetime.timedelta(days=6.9)
-    return firstdayofweek, lastdayofweek
-
 
 def getFormatData(gas_average_measurement):
     if(isinstance(gas_average_measurement, list) is not True):
@@ -185,32 +145,4 @@ def setNoneStringElements(data_json):
         if((type(data_json[key]) is str) and (key not in string_fields)):
             data_json[key]=None
     return data_json
-
-def NanToCeroJsonProcessed(data_json):
-    return setNoneStringElements(data_json)
-
-def getHoursPerSensor(sensor,air_quality_column):
-    idx = -1
-    if sensor == 'CO':
-        idx = 0
-    elif sensor == 'NO2':
-        idx = 1
-    elif sensor == 'PM10':
-        idx = 2
-    elif sensor == 'PM25':
-        idx = 3
-    elif sensor == 'SO2':
-        idx = 4
-    elif sensor == 'O3':
-        idx = 5
-    elif sensor == 'H2S':
-        idx = 6
-    return idx
-
-def checkNoneValues(resultado):
-    not_none_number = []
-    for i in range(len(resultado)):
-        if(resultado[i][0] is not None):
-            not_none_number.append(resultado[i][0])
-    return not_none_number
 

@@ -107,10 +107,10 @@ def getInstallationIdBaseName(qhawax_name):
         return getInstallationId(qhawax_id)
     return None
 
-def getMainIncaQhawaxTable(qhawax_id):
+def getMainIncaQhawaxTable(qhawax_name):
     """ Helper function to get qHAWAX Main Inca based on qHAWAX ID """
-    if(qhawaxExistBasedOnID(qhawax_id)):
-        return session.query(Qhawax.main_inca).filter_by(id=qhawax_id).first()[0]
+    if(qhawaxExistBasedOnName(qhawax_name)):
+        return session.query(Qhawax.main_inca).filter_by(name=qhawax_name).first()[0]
     return None
 
 def getQhawaxMode(qhawax_name):
@@ -119,11 +119,13 @@ def getQhawaxMode(qhawax_name):
         return session.query(Qhawax.mode).filter_by(name=qhawax_name).first()[0]
     return None
 
-def getTimeQhawaxHistory(installation_id):
+def getTimeQhawaxHistory(qhawax_name):
     fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
               QhawaxInstallationHistory.last_registration_time_zone)
 
-    if(qhawaxInstallationExistBasedOnID(installation_id)):
+    installation_id = getInstallationIdBaseName(qhawax_name)
+
+    if(installation_id is not None):
         values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
         if (values!=None):
             return {'last_time_on': values[0], 'last_time_registration': values[1]} 
@@ -145,3 +147,14 @@ def getQhawaxOnLoop(qhawax_name):
     if(qhawaxExistBasedOnName(qhawax_name)):
         return session.query(Qhawax.on_loop).filter_by(name=qhawax_name).one()[0]
     return None
+
+def qhawaxQueryUpdate(json, qhawax_name):
+    if(qhawaxExistBasedOnName(qhawax_name)):
+        session.query(Qhawax).filter_by(name=qhawax_name).update(values=json)
+        session.commit()
+
+def qhawaxInstallationQueryUpdate(json, qhawax_name):
+    installation_id=getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None): 
+        session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
+        session.commit()

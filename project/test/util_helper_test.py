@@ -19,27 +19,6 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.check_valid_date,True,date_format)
 		self.assertRaises(ValueError,util_helper.check_valid_date,'2020-09-09 00:00:00',date_format)
 
-	def test_check_time_not_valid(self):
-		test_timestamp = "27-09-2020 00:00:00.877701"
-		date_format = '%d-%m-%Y %H:%M:%S.%f'
-		datetime_test = datetime.datetime.strptime(test_timestamp,date_format)
-		self.assertRaises(TypeError,util_helper.getValidTime)
-		self.assertRaises(TypeError,util_helper.getValidTime,{"name":"qH001"})
-		self.assertRaises(TypeError,util_helper.getValidTime,4.33)
-		self.assertRaises(TypeError,util_helper.getValidTime,5)
-		self.assertRaises(TypeError,util_helper.getValidTime,None,datetime_test)
-
-	def test_check_time_valid(self):
-		test_timestamp = "27-09-2020 00:00:00.877701"
-		test_timestamp_10m = "27-09-2020 00:10:00.877701"
-		test_timestamp_02h = "27-09-2020 02:00:00.877701"
-		date_format = '%d-%m-%Y %H:%M:%S.%f'
-		datetime_test = datetime.datetime.strptime(test_timestamp,date_format)
-		datetime_test_10m = datetime.datetime.strptime(test_timestamp_10m,date_format)
-		datetime_test_02h = datetime.datetime.strptime(test_timestamp_02h,date_format)
-		self.assertAlmostEqual(util_helper.getValidTime(1,datetime_test),datetime_test_10m)
-		self.assertAlmostEqual(util_helper.getValidTime(10,datetime_test),datetime_test_02h)
-
 	def test_valid_time_json_processed_not_valid(self):
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed)
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,"resultado")
@@ -85,23 +64,6 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.areFieldsValid,None)
 		self.assertRaises(TypeError,util_helper.areFieldsValid,True)
 
-	def test_check_negatives_not_valid(self):
-		self.assertRaises(TypeError,util_helper.checkNegatives)
-		self.assertRaises(TypeError,util_helper.checkNegatives,5)
-		self.assertRaises(TypeError,util_helper.checkNegatives,"resultado")
-		self.assertRaises(TypeError,util_helper.checkNegatives,None)
-		self.assertRaises(TypeError,util_helper.checkNegatives,True)
-
-	def test_check_negatives_valid(self):
-		data_negatives={'ID': 1,'CO': -1,'H2S': -1,'NO2': 1,'O3':-1,'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,
-						'spl': 1,'UV': 1,'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
-			  			'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
-		data={'ID': 1,'CO': 0,'H2S': 0,'NO2': 1,'O3':0,'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'spl': 1,'UV': 1,
-			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
-			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00"}
-		self.assertAlmostEqual(util_helper.checkNegatives(data_negatives),data)
-		self.assertAlmostEqual(util_helper.checkNegatives(data),data)
-
 	def test_check_number_values_not_valid(self):
 		self.assertRaises(TypeError,util_helper.checkNumberValues)
 		self.assertRaises(TypeError,util_helper.checkNumberValues,5)
@@ -135,19 +97,6 @@ class TestUtilHelper(unittest.TestCase):
 				  'humidity': 71.9, 'lat': -12.072736,'lon': -77.082687, 'pressure': 100743.24, 
 				  'temperature': 19.1,'timestamp': '2020-08-31 00:00:00.0-05:00'}
 		self.assertAlmostEqual(util_helper.roundUpThree(y),last_y)
-
-	def test_get_date_range_from_week_not_valid(self):
-		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek)
-		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek,5,"week")
-		self.assertRaises(TypeError,util_helper.getDateRangeFromWeek,"year",2020)
-		self.assertRaises(ValueError,util_helper.getDateRangeFromWeek,-1,1)
-		self.assertRaises(ValueError,util_helper.getDateRangeFromWeek,2020,60)
-
-	def test_get_date_range_from_week_valid(self):
-		d = str(2020)+'-W'+str((int(38)- 1))+'-1'
-		firstdayofweek = datetime.datetime.strptime(d, "%Y-W%W-%w").date()
-		lastdayofweek = firstdayofweek + datetime.timedelta(days=6.9)
-		self.assertAlmostEqual(util_helper.getDateRangeFromWeek(2020,38),(firstdayofweek,lastdayofweek))
 
 	def test_gas_conversion_ppb_to_mg_not_valid(self):
 		self.assertRaises(TypeError,util_helper.gasConversionPPBtoMG,5,5)
