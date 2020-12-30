@@ -94,23 +94,6 @@ def validEndWorkFieldJson(data):
 
     return str(data['qhawax_name']), data['end_date'], str(data['person_in_charge'])
 
-def getCompanyTargetofJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Company variable "+str(data)+" should be json")
-
-    if 'company_name' not in data:
-        raise ValueError("No target company_name in given json")
-    if 'email_group' not in data:
-        raise ValueError("No target email_group in given json")
-    if 'ruc' not in data:
-        raise ValueError("No target ruc in given json")
-    if 'phone' not in data:
-        raise ValueError("No target phone in given json")
-    if 'contact_person' not in data:
-        raise ValueError("No target contact_person in given json")
-    if 'address' not in data:
-        raise ValueError("No target address in given json")
-
 def getQhawaxSignalJson(data):
     if(isinstance(data, dict) is not True):
         raise TypeError("Signal variable "+str(data)+" should be json") 
