@@ -86,10 +86,9 @@ def getNoiseData(qhawax_name):
     """Helper Processed Measurement function to get Noise Area Description"""
     installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id is not None):
-        return session.query(EcaNoise.area_name).\
-                       join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
-                       group_by(QhawaxInstallationHistory.id,EcaNoise.id). \
-                       filter(QhawaxInstallationHistory.id==installation_id).all()
+        eca_noise_id = session.query(QhawaxInstallationHistory.eca_noise_id).\
+                               filter_by(id=installation_id).first()
+        return session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).first()[0]
     return None
 
 def getLastValuesOfQhawax(qH_name):

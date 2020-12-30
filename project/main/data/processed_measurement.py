@@ -44,8 +44,6 @@ def handleProcessedData():
         data_json['zone'] = "Zona No Definida"
         mode = same_helper.getQhawaxMode(product_id)
         inca_value = same_helper.getMainIncaQhawaxTable(product_id)
-        data_json['zone'] = get_business_helper.getNoiseData(product_id)
-        print(data_json['zone'])
         if(mode == "Cliente" and inca_value!=None):
             data_json['zone'] = get_business_helper.getNoiseData(product_id)
             minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)

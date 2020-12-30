@@ -74,14 +74,15 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,None)
 		self.assertRaises(TypeError,get_business_helper.getInstallationDate,"342")
 
-	#def test_get_installation_date_valid(self):
-	#	naive_time = datetime.time(17,36,53)
-	#	date = datetime.date(2020, 11, 11)
-	#	naive_datetime = datetime.datetime.combine(date, naive_time)
-	#	timezone = pytz.timezone('UTC')
-	#	aware_datetime = timezone.localize(naive_datetime)
-	#	self.assertAlmostEqual(get_business_helper.getInstallationDate(2),None)
-		#self.assertAlmostEqual(get_business_helper.getInstallationDate(1),aware_datetime)
+	def test_get_installation_date_valid(self):
+		naive_time = datetime.time(3,3,8)
+		date = datetime.date(2020, 12, 29)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		aware_datetime = timezone.localize(naive_datetime)
+		print(aware_datetime)
+		self.assertAlmostEqual(get_business_helper.getInstallationDate(2),None)
+		self.assertAlmostEqual(get_business_helper.getInstallationDate(1),aware_datetime)
 
 	def test_qhawax_in_field_valid(self):
 		self.assertAlmostEqual(get_business_helper.isItFieldQhawax("qH030"),False)
@@ -117,9 +118,9 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getNoiseData,None)
 		self.assertRaises(TypeError,get_business_helper.getNoiseData,"qH001",1,2)
 
-	#def test_query_noise_data_valid(self): hay un error
-	#	self.assertAlmostEqual(get_business_helper.getNoiseData("qH004"),"Residential Zone")
-	#	self.assertAlmostEqual(get_business_helper.getNoiseData("qH100"),None)
+	def test_query_noise_data_valid(self):
+		self.assertAlmostEqual(get_business_helper.getNoiseData("qH004"),"Residential Zone")
+		self.assertAlmostEqual(get_business_helper.getNoiseData("qH100"),None)
 
 	def test_get_hours_difference_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getHoursDifference)
@@ -129,25 +130,24 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getHoursDifference,None)
 		self.assertRaises(TypeError,get_business_helper.getHoursDifference,1,2)
 
-	#def test_get_hours_difference_valid(self):
-	#	naive_time = datetime.time(15,1,12)
-	#	date = datetime.date(2020, 6, 30)
-	#	naive_datetime = datetime.datetime.combine(date, naive_time)
-	#	timezone = pytz.timezone('UTC')
-	#	aware_datetime = timezone.localize(naive_datetime)
-	#	self.assertAlmostEqual(get_business_helper.getHoursDifference(100),(None,None))
-	#	self.assertAlmostEqual(get_business_helper.getHoursDifference(9),(None,None))
-	#	print(get_business_helper.getHoursDifference(21))
-		#self.assertAlmostEqual(get_business_helper.getHoursDifference(21),(0,aware_datetime))
+	def test_get_hours_difference_valid(self):
+		naive_time = datetime.time(17,31,32,410000)
+		date = datetime.date(2020, 9, 11)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		aware_datetime = timezone.localize(naive_datetime)
+		self.assertAlmostEqual(get_business_helper.getHoursDifference('qH040'),(None,None))
+		self.assertAlmostEqual(get_business_helper.getHoursDifference('qH021'),(None,None))
+		self.assertAlmostEqual(get_business_helper.getHoursDifference('qH004'),(0,aware_datetime))
 
 	def test_get_last_value_of_qhawax_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getLastValuesOfQhawax)
 		self.assertRaises(TypeError,get_business_helper.getLastValuesOfQhawax,21)
 		self.assertRaises(TypeError,get_business_helper.getLastValuesOfQhawax,None)
 
-	#def test_set_last_value_of_qhawax_valid(self):
-	#	self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH001'),("Stand By","Se cambió a modo stand by",-1))
-		#self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH021'),("Cliente","Se cambió a modo cliente",0))
+	def test_set_last_value_of_qhawax_valid(self):
+		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH057'),("Stand By","Se cambió a modo stand by",-1))
+		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH004'),("Cliente","Se cambió a modo cliente",-1))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

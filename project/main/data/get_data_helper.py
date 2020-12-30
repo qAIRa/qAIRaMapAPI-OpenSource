@@ -116,3 +116,12 @@ def queryLastMainInca(qhawax_name):
       return None
     return session.query(GasInca.main_inca).filter(GasInca.qhawax_id == qhawax_id).order_by(GasInca.id.desc()).first()[0]
 
+def getFirstTimestampValidProcessed(qhawax_id):
+    """ Helper qHAWAX Installation function to get first timestamp of Valid Processed  """
+    installation_id = same_helper.getInstallationId(qhawax_id)
+    if(installation_id is not None):
+        first_timestamp =session.query(ValidProcessedMeasurement.timestamp_zone). \
+                                 filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
+                                 order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()
+        return None if (first_timestamp==None) else first_timestamp[0]
+    return None

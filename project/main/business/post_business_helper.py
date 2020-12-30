@@ -19,7 +19,7 @@ def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
 
 def saveStatusQhawaxTable(qhawax_name, qhawax_status,main_inca):
     """ Set qHAWAX ON or OFF in qHAWAX table """
-    if(type(main_inca) not in [int]):
+    if(type(main_inca) not in [float]):
         raise TypeError("Inca value "+str(main_inca)+" should be int")
 
     if(isinstance(qhawax_status, str) is not True):
@@ -124,7 +124,7 @@ def storeNewQhawaxInstallation(data):
 
     if(qhawax_id!=None):
         data['qhawax_id'] = int(qhawax_id)
-        data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_id'])
+        data['main_inca'] = same_helper.getMainIncaQhawaxTable(data['qhawax_name'])
         data['installation_date_zone'] = data['instalation_date']
         data['last_time_physically_turn_on_zone'] = data['instalation_date']
         data.pop('instalation_date', None)
