@@ -2,6 +2,7 @@ from project.database.models import Qhawax, EcaNoise, QhawaxInstallationHistory,
 import project.main.business.get_business_helper as get_business_helper
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
+import project.main.exceptions as exceptions
 from project import app, db
 import dateutil.parser
 import datetime
@@ -12,43 +13,32 @@ now = datetime.datetime.now(dateutil.tz.tzutc())
 
 def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
     """ Helper qHAWAX function to save main inca value in qHAWAX table """
-    if(type(new_main_inca) not in [int]):
-        raise TypeError("Inca value "+str(new_main_inca)+" should be int")
+    new_main_inca = exceptions.checkFloatVariable(new_main_inca)
     qhawax_json_main_inca = {'main_inca': new_main_inca}
     same_helper.qhawaxQueryUpdate(qhawax_json_main_inca,qhawax_name)
 
 def saveStatusQhawaxTable(qhawax_name, qhawax_status,main_inca):
     """ Set qHAWAX ON or OFF in qHAWAX table """
-    if(type(main_inca) not in [float]):
-        raise TypeError("Inca value "+str(main_inca)+" should be int")
-
-    if(isinstance(qhawax_status, str) is not True):
-        raise TypeError("Status value "+str(qhawax_status)+" should be string")
-
+    main_inca = exceptions.checkFloatVariable(main_inca)
+    qhawax_status = exceptions.checkStringVariable(qhawax_status)
     qhawax_json_status = {'state': qhawax_status,'main_inca':main_inca}
     same_helper.qhawaxQueryUpdate(qhawax_json_status,qhawax_name)
 
 def setAvailabilityQhawax(qhawax_name, availability):
     """ Update qHAWAX Availability to Occupied or Free """
-    if(isinstance(availability, str) is not True):
-        raise TypeError("Availability value "+str(availability)+" should be string")
-
+    availability = exceptions.checkStringVariable(availability)
     qhawax_json_availability = {'availability': availability}
     same_helper.qhawaxQueryUpdate(qhawax_json_availability,qhawax_name)
 
 def changeMode(qhawax_name, mode):
     """Change To Other Mode"""
-    if(isinstance(mode, str) is not True):
-        raise TypeError("Mode value "+str(mode)+" should be string")
-
+    mode = exceptions.checkStringVariable(mode)
     qhawax_json_mode = {'mode': mode}
     same_helper.qhawaxQueryUpdate(qhawax_json_mode,qhawax_name)
 
 def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
     """ Helper qHAWAX function to save main inca value in qHAWAX Installation table """
-    if(type(new_main_inca) not in [int]):
-        raise TypeError("Inca value "+str(new_main_inca)+" should be int")
-
+    new_main_inca = exceptions.checkFloatVariable(new_main_inca)
     qhawax_json_main_inca_installation = {'main_inca': new_main_inca}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_main_inca_installation,qhawax_name)
 
@@ -139,12 +129,8 @@ def storeNewQhawaxInstallation(data):
 
 def writeBinnacle(qhawax_name,description,person_in_charge):
     """ Write observations in Binnacle"""
-    if(isinstance(description, str) is not True):
-        raise TypeError("Binnacle description should be string")
-
-    if(isinstance(person_in_charge, str) is not True):
-        raise TypeError("Binnacle person_in_charge should be string")
-
+    description = exceptions.checkStringVariable(description)
+    person_in_charge = exceptions.checkStringVariable(person_in_charge)
     qHAWAX_ID = same_helper.getQhawaxID(qhawax_name)
     if(qHAWAX_ID is not None):
         bitacora = {'timestamp_zone': now, 'observation_type': 'Interna','description': description, 'qhawax_id':qHAWAX_ID,\
@@ -169,3 +155,13 @@ def record_first_time_loop(qhawax_name, timestamp):
     if(qhawax_id is not None):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values={'first_time_loop':timestamp})
         session.commit()
+
+def setLastMeasurementOfQhawax(mode,qH_name):
+    if(mode =='Cliente'):
+        last_main_inca_value = get_data_helper.queryLastMainInca(qH_name)
+        if(last_main_inca_value!=None):
+            updateMainIncaQhawaxInstallationTable(int(last_main_inca_value),qH_name)
+            updateMainIncaQhawaxTable(int(last_main_inca_value),qH_name)
+        last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qH_name)
+        if(last_time_of_turn_off_binnacle!=None):
+            updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle,qH_name)

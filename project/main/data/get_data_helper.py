@@ -1,6 +1,7 @@
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca,ValidProcessedMeasurement, Qhawax
 import project.main.business.post_business_helper as post_business_helper
 import project.main.same_function_helper as same_helper
+import project.main.exceptions as exceptions
 from project import app, db
 import datetime
 import math
@@ -43,9 +44,7 @@ def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #vali
 def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     """ Helper function to get gas average measurement based on qHAWAX name and sensor name"""
     sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
-
-    if(isinstance(gas_name, str) is not True):  
-        raise TypeError("Sensor name "+str(gas_name)+" should be string")
+    gas_name = exceptions.checkStringVariable(gas_name)
 
     if(gas_name not in sensor_array):
         raise ValueError("Sensor name "+str(gas_name)+" should be CO, H2S, NO2, O3, PM25, PM10 or SO2")

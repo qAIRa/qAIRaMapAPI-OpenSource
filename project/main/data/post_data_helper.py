@@ -2,6 +2,7 @@ from project.database.models import AirQualityMeasurement, ProcessedMeasurement,
 import project.main.business.post_business_helper as post_business_helper
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
+import project.main.exceptions as exceptions
 from project import app, db, socketio
 from datetime import timedelta
 import dateutil.parser
@@ -11,9 +12,7 @@ import datetime
 session = db.session
 
 def storeAirQualityDataInDB(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Air Quality variable "+str(data)+" should be Json")
-
+    data = exceptions.checkDictionaryVariable(data)
     qhawax_name = data.pop('ID', None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id!=None):
@@ -29,8 +28,7 @@ def storeAirQualityDataInDB(data):
 
 def storeGasIncaInDB(data):
     """ Helper function to record GAS INCA measurement"""
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Gas Inca variable "+str(data)+" should be Json")
+    data = exceptions.checkDictionaryVariable(data)
     gas_inca_data = {'CO': data['CO'],'H2S': data['H2S'],'SO2': data['SO2'],'NO2': data['NO2'],'timestamp_zone':data['timestamp_zone'],
                      'O3': data['O3'],'PM25': data['PM25'],'PM10': data['PM10'],'main_inca':data['main_inca']}
     qhawax_name = data.pop('ID', None)
@@ -41,9 +39,7 @@ def storeGasIncaInDB(data):
                                   
 def storeProcessedDataInDB(data):
     """ Helper Processed Measurement function to store Processed Data """
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Processed variable "+str(data)+" should be Json")
-
+    data = exceptions.checkDictionaryVariable(data)
     qhawax_name = data.pop('ID', None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     processed_measurement = ProcessedMeasurement(**data, qhawax_id=qhawax_id)
@@ -68,9 +64,7 @@ def storeValidProcessedDataInDB(data, product_id):
       socketio.emit(data['ID'], data)
 
 def validAndBeautyJsonValidProcessed(data_json,product_id,inca_value):
-    if(isinstance(data_json, dict) is not True):
-      raise TypeError("Valid Processed variable "+str(data_json)+" should be Json")
-
+    data_json = exceptions.checkDictionaryVariable(data_json)
     storeValidProcessedDataInDB(data_json,product_id)
     if(inca_value==0.0):
       post_business_helper.updateMainIncaQhawaxTable(1,product_id)

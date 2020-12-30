@@ -116,8 +116,6 @@ class AirQualityMeasurement(db.Model):
 class ProcessedMeasurement(db.Model):
     __tablename__ = 'processed_measurement'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, nullable=False)
-    timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
     CO2 = db.Column(db.Float)
@@ -145,6 +143,8 @@ class ProcessedMeasurement(db.Model):
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
     I_temperature = db.Column(db.Float)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp_zone = db.Column(db.DateTime, nullable=False)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
 class ValidProcessedMeasurement(db.Model):
