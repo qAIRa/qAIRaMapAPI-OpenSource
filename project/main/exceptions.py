@@ -1,9 +1,7 @@
 import json
 
 def getCompanyTargetofJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Company variable "+str(data)+" should be json")
-
+    data = checkDictionaryVariable(data)
     array = ['company_name','email_group','ruc','address','phone','contact_person']
 
     for i in range(len(array)):
@@ -11,8 +9,7 @@ def getCompanyTargetofJson(data):
             raise ValueError("No target "+array[i]+" in given json")
 
 def getQhawaxTargetofJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Qhawax variable "+str(data)+" should be json") 
+    data = checkDictionaryVariable(data)
 
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -27,8 +24,7 @@ def getQhawaxTargetofJson(data):
            str(data['person_in_charge']), str(data['description'])
 
 def getIncaTargetofJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Inca variable "+str(data)+" should be json") 
+    data = checkDictionaryVariable(data) 
 
     if 'name' not in data:
         raise ValueError("No target name in given json")
@@ -38,8 +34,7 @@ def getIncaTargetofJson(data):
     return str(data['name']).strip(),int(data['value_inca'])
 
 def getStatusOffTargetofJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Qhawax status off variable "+str(data)+" should be json") 
+    data = checkDictionaryVariable(data) 
 
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -49,8 +44,7 @@ def getStatusOffTargetofJson(data):
     return str(data['qhawax_name']).strip(), data['qhawax_lost_timestamp']
 
 def getChangeCalibrationFields(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Calibration json variable "+str(data)+" should be json")
+    data = checkDictionaryVariable(data)
 
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -60,8 +54,7 @@ def getChangeCalibrationFields(data):
     return str(data['qhawax_name']).strip(), str(data['person_in_charge'])
 
 def getEndCalibrationFields(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Calibration json variable "+str(data)+" should be json")
+    data = checkDictionaryVariable(data)
 
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -71,8 +64,7 @@ def getEndCalibrationFields(data):
     return str(data['qhawax_name']).strip(), str(data['person_in_charge'])
 
 def getInstallationFields(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("qHAWAX Installation variable "+str(data)+" should be json")
+    data = checkDictionaryVariable(data)
 
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -82,9 +74,7 @@ def getInstallationFields(data):
     return str(data['qhawax_name']), str(data['person_in_charge'])
 
 def validEndWorkFieldJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("qHAWAX Installation variable "+str(data)+" should be json")
-
+    data = checkDictionaryVariable(data)
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
     if 'end_date' not in data:
@@ -95,8 +85,7 @@ def validEndWorkFieldJson(data):
     return str(data['qhawax_name']), data['end_date'], str(data['person_in_charge'])
 
 def getQhawaxSignalJson(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("Signal variable "+str(data)+" should be json") 
+    data = checkDictionaryVariable(data)
 
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -104,3 +93,23 @@ def getQhawaxSignalJson(data):
         raise ValueError("No target timestamp_turn_on_conection in given json")
 
     return str(data['qhawax_name']).strip(),str(data['timestamp_turn_on_conection'])
+
+def checkIntegerVariable(variable):
+    if(type(variable) not in [int]):
+        raise TypeError("Variable "+str(variable)+" should be int")
+    return variable
+
+def checkStringVariable(variable):
+    if(isinstance(variable, str) is not True):  
+        raise TypeError("Variable "+str(variable)+" should be string")
+    return variable
+
+def checkFloatVariable(variable):
+    if(type(variable) not in [float]):
+        raise TypeError("Variable "+str(variable)+" should be float")
+    return variable
+
+def checkDictionaryVariable(variable):
+    if(isinstance(variable, dict) is not True):
+        raise TypeError("Variable "+str(variable)+" should be Json")
+    return variable

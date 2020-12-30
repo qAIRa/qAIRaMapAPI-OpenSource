@@ -1,15 +1,14 @@
 from project import app, db
 from project.database.models import  Qhawax, QhawaxInstallationHistory, EcaNoise, Company
 import project.main.util_helper as util_helper
+import project.main.exceptions as exceptions
 
 session = db.session
 
 """ Helper functions to check one parameter"""
 def qhawaxExistBasedOnID(qhawax_id):
     """ Helper function to check if qHAWAX id exist """
-    if(type(qhawax_id) not in [int]):
-        raise TypeError("qHAWAX id should be int")
-
+    qhawax_id = exceptions.checkIntegerVariable(qhawax_id)
     qhawax_list = session.query(Qhawax.name).filter_by(id=qhawax_id).all()
     if(qhawax_list == []):
         return False
@@ -17,9 +16,7 @@ def qhawaxExistBasedOnID(qhawax_id):
 
 def qhawaxExistBasedOnName(qhawax_name):
     """ Helper function to check if qHAWAX name exist """
-    if(isinstance(qhawax_name, str) is not True):  
-        raise TypeError("qHAWAX name "+str(qhawax_name)+" should be string")
-
+    qhawax_name = exceptions.checkStringVariable(qhawax_name)
     qhawax_list = session.query(Qhawax.name).filter_by(name=qhawax_name).all()
     if(qhawax_list == []):
         return False
@@ -27,9 +24,7 @@ def qhawaxExistBasedOnName(qhawax_name):
         
 def qhawaxInstallationExistBasedOnID(installation_id):
     """ Helper function to check if qHAWAX Installation ID exist """
-    if(type(installation_id) not in [int]):
-        raise TypeError("qHAWAX installation ID "+str(installation_id)+" should be int")
-
+    installation_id = exceptions.checkIntegerVariable(installation_id)
     installation_date_zone = session.query(QhawaxInstallationHistory.installation_date_zone).\
                                      filter_by(id= installation_id).all()
     if(installation_date_zone == []):
@@ -38,8 +33,7 @@ def qhawaxInstallationExistBasedOnID(installation_id):
 
 def areaExistBasedOnID(eca_noise_id):
     """ Helper function to check if Area ID exist """
-    if(type(eca_noise_id) not in [int]):
-        raise TypeError("Eca noise ID "+str(eca_noise_id) +"should be int")
+    eca_noise_id = exceptions.checkIntegerVariable(eca_noise_id)
     area_name = session.query(EcaNoise.area_name).\
                         filter_by(id=eca_noise_id).all()
     if(area_name == []):
@@ -48,9 +42,7 @@ def areaExistBasedOnID(eca_noise_id):
 
 def companyExistBasedOnName(company_name):
     """ Helper function to check if company name exist """
-    if(isinstance(company_name, str) is not True):  
-        raise TypeError("Company name "+str(company_name)+" should be string")
-
+    company_name = exceptions.checkStringVariable(company_name)
     company_list = session.query(Company.name).filter_by(name=company_name).all()
     if(company_list == []):
         return False
@@ -58,9 +50,7 @@ def companyExistBasedOnName(company_name):
 
 def companyExistBasedOnRUC(ruc):
     """ Helper function to check if company name exist """
-    if(isinstance(ruc, str) is not True):  
-        raise TypeError("RUC"+str(ruc)+" should be string")
-
+    ruc = exceptions.checkStringVariable(ruc)
     company_list = session.query(Company.ruc).filter_by(ruc=ruc).all()
     if(company_list == []):
         return False
@@ -97,11 +87,9 @@ def getQhawaxName(qhawax_id):
     return None
 
 def getInstallationIdBaseName(qhawax_name):
-
     """ Helper function to get qHAWAX Installation ID  
         qHAWAX name could be exist in qHAWAX table, 
         but it could not exist in qHAWAX Installation table """
-
     if(qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = getQhawaxID(qhawax_name)
         return getInstallationId(qhawax_id)

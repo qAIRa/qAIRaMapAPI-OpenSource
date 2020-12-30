@@ -17,24 +17,6 @@ def storeAirQualityData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-@app.route('/api/air_quality_measurements_period/', methods=['GET'])
-def getAirQualityMeasurementsTimePeriod():
-    """ To list all measurement in ppb of air quality measurement table in a define period of time
-        This is an hourly average measurement """
-    qhawax_name = str(request.args.get('name'))
-    initial_timestamp_utc = str(request.args.get('initial_timestamp'))
-    final_timestamp_utc = str(request.args.get('final_timestamp'))
-    try:
-        date_format = '%Y-%m-%d %H:%M:%S'
-        air_quality_measurements = get_data_helper.queryDBAirQuality(qhawax_name, initial_timestamp_utc, \
-                                                                     final_timestamp_utc,date_format)
-        if air_quality_measurements is not None:
-            return make_response(jsonify(air_quality_measurements), 200)
-        return make_response(jsonify('Measurements not found'), 200)
-    except TypeError as e:
-        json_message = jsonify({'error': '\'%s\'' % (e)})
-        return make_response(json_message, 400)
-
 @app.route('/api/average_valid_processed_period/', methods=['GET'])
 def getAverageValidProcessedMeasurementsTimePeriodByCompany():
     """ To list all average measurement of valid processed measurement table in a define period of time and company """
@@ -42,9 +24,7 @@ def getAverageValidProcessedMeasurementsTimePeriodByCompany():
         qhawax_id = int(request.args.get('qhawax_id'))
         initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
         final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
-
         average_valid_processed_measurements = get_data_helper.queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp)
-        
         return make_response(jsonify(average_valid_processed_measurements_list), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
