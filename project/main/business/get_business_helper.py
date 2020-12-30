@@ -63,11 +63,6 @@ def isItFieldQhawax(qhawax_name):
 def queryQhawaxStatus(name):
     return session.query(Qhawax.state).filter_by(name=name).one()[0]
 
-def getFirstTimeLoop(qhawax_name):
-    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
-        return session.query(Qhawax.first_time_loop).filter_by(name=qhawax_name).one()[0]
-    return None
-
 def getHoursDifference(qhawax_name):
     """Helper Processed Measurement function to get minutes difference
       between last_registration_time and last_time_physically_turn_on """

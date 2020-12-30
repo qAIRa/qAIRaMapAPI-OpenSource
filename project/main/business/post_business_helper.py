@@ -13,13 +13,13 @@ now = datetime.datetime.now(dateutil.tz.tzutc())
 
 def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
     """ Helper qHAWAX function to save main inca value in qHAWAX table """
-    new_main_inca = exceptions.checkFloatVariable(new_main_inca)
+    new_main_inca = exceptions.checkIntegerVariable(new_main_inca)
     qhawax_json_main_inca = {'main_inca': new_main_inca}
     same_helper.qhawaxQueryUpdate(qhawax_json_main_inca,qhawax_name)
 
 def saveStatusQhawaxTable(qhawax_name, qhawax_status,main_inca):
     """ Set qHAWAX ON or OFF in qHAWAX table """
-    main_inca = exceptions.checkFloatVariable(main_inca)
+    main_inca = exceptions.checkIntegerVariable(main_inca)
     qhawax_status = exceptions.checkStringVariable(qhawax_status)
     qhawax_json_status = {'state': qhawax_status,'main_inca':main_inca}
     same_helper.qhawaxQueryUpdate(qhawax_json_status,qhawax_name)
@@ -38,7 +38,7 @@ def changeMode(qhawax_name, mode):
 
 def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
     """ Helper qHAWAX function to save main inca value in qHAWAX Installation table """
-    new_main_inca = exceptions.checkFloatVariable(new_main_inca)
+    new_main_inca = exceptions.checkIntegerVariable(new_main_inca)
     qhawax_json_main_inca_installation = {'main_inca': new_main_inca}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_main_inca_installation,qhawax_name)
 
