@@ -148,5 +148,15 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH057'),("Stand By","Se cambió a modo stand by",-1))
 		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH004'),("Cliente","Se cambió a modo cliente",-1))
 
+	def test_get_first_time_loop_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.getFirstTimeLoop)
+		self.assertRaises(TypeError,get_business_helper.getFirstTimeLoop,21)
+		self.assertRaises(TypeError,get_business_helper.getFirstTimeLoop,None)
+		self.assertRaises(TypeError,get_business_helper.getFirstTimeLoop,True)
+
+	def test_get_first_time_loop_valid(self):
+		self.assertAlmostEqual(get_business_helper.getFirstTimeLoop('qH100'),None)
+		self.assertAlmostEqual(get_business_helper.getFirstTimeLoop('qH004'),None)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
