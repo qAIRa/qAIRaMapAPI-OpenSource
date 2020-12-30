@@ -126,29 +126,6 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.createQhawax,50,"AEREAL")
 		self.assertRaises(Exception,post_business_helper.createQhawax,"qH050",50)
 
-	def test_create_qhawax_and_default_sensors_valid(self):
-		installation_date = "2020-12-29 00:44:00.0-05:00"
-		end_date_string = "2020-12-29 01:00:00.255258"
-		person_in_charge = 'l.montalvo'
-		qhawax_name = 'qH134'
-		post_business_helper.createQhawax(qhawax_name,'STATIC')
-		installation_json = {'lat':'-7.0000499','lon':'-70.9000000',
-							 'comercial_name':'Unit Test '+str(randint(0, 30))+' Coveralls',
-							 'company_id':1,'eca_noise_id':1,'qhawax_name':qhawax_name,
-							 'connection_type':'Panel Solar','season':'Primavera','is_public':'no',
-							 'person_in_charge':person_in_charge,"instalation_date":installation_date,
-							 'link_report':'Test','observations':'Test Obs','district':"La Victoria"}
-		post_business_helper.storeNewQhawaxInstallation(installation_json)
-		description = 'qHAWAX record in field'
-		post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-		installation_json_update = {'lat':'-12.0000499','lon':'-77.9000000','comercial_name':'Unit Test Coveralls '+str(randint(0, 30)),
-							 		'company_id':1,'eca_noise_id':1,'qhawax_name':qhawax_name,'connection_type':'Panel Solar',
-							 		'season':'Primavera','is_public':'no','person_in_charge':'l.montalvo'}
-		post_business_helper.updateQhawaxInstallation(installation_json_update)
-		post_business_helper.saveEndWorkFieldDate(qhawax_name,end_date_string)
-		description = 'qHAWAX save end work in field'
-		post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
-
 	def test_create_company_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.createCompany)
 		self.assertRaises(TypeError,post_business_helper.createCompany,4)
@@ -156,11 +133,6 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.createCompany,"PUCP")
 		self.assertRaises(TypeError,post_business_helper.createCompany,True)
 		self.assertRaises(TypeError,post_business_helper.createCompany,{},4.0)
-
-	def test_create_company_valid(self):
-		json= {"company_name": "Unit Test "+str(randint(0, 20))+"_"+str(randint(0, 20)), "email_group": "unitest"+str(randint(0, 20))+"-"+str(randint(0, 20))+".gob",
-			   "ruc":"12345678"+str(randint(200, 900)),"phone":"998123123","contact_person":"Test","address":"Prueba"}
-		post_business_helper.createCompany(json)
 
 	def test_store_qhawax_installation_not_valid(self):
 		installation_json = {'lat':None,'lon':None,'comercial_name':None,
@@ -184,6 +156,34 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004",True,"hola")
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,"qH004")
 		self.assertRaises(TypeError,post_business_helper.writeBinnacle,None)
+
+	def test_create_qhawax_and_default_sensors_valid(self):
+		installation_date = "2020-12-29 00:44:00.0-05:00"
+		end_date_string = "2020-12-29 01:00:00.255258"
+		person_in_charge = 'l.montalvo'
+		qhawax_name = 'qH134'
+		post_business_helper.createQhawax(qhawax_name,'STATIC')
+		installation_json = {'lat':'-7.0000499','lon':'-70.9000000',
+							 'comercial_name':'Unit Test '+str(randint(0, 30))+' Coveralls',
+							 'company_id':1,'eca_noise_id':1,'qhawax_name':qhawax_name,
+							 'connection_type':'Panel Solar','season':'Primavera','is_public':'no',
+							 'person_in_charge':person_in_charge,"instalation_date":installation_date,
+							 'link_report':'Test','observations':'Test Obs','district':"La Victoria"}
+		post_business_helper.storeNewQhawaxInstallation(installation_json)
+		description = 'qHAWAX record in field'
+		post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+		installation_json_update = {'lat':'-12.0000499','lon':'-77.9000000','comercial_name':'Unit Test Coveralls '+str(randint(0, 30)),
+							 		'company_id':1,'eca_noise_id':1,'qhawax_name':qhawax_name,'connection_type':'Panel Solar',
+							 		'season':'Primavera','is_public':'no','person_in_charge':'l.montalvo'}
+		post_business_helper.updateQhawaxInstallation(installation_json_update)
+		post_business_helper.saveEndWorkFieldDate(qhawax_name,end_date_string)
+		description = 'qHAWAX save end work in field'
+		post_business_helper.writeBinnacle(qhawax_name,description,person_in_charge)
+
+	def test_create_company_valid(self):
+		json= {"company_name": "Unit Test "+str(randint(0, 20))+"_"+str(randint(0, 20)), "email_group": "unitest"+str(randint(0, 20))+"-"+str(randint(0, 20))+".gob",
+			   "ruc":"12345678"+str(randint(200, 900)),"phone":"998123123","contact_person":"Test","address":"Prueba"}
+		post_business_helper.createCompany(json)
 	
 if __name__ == '__main__':
     unittest.main(verbosity=2)
