@@ -80,7 +80,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
-		print(aware_datetime)
 		self.assertAlmostEqual(get_business_helper.getInstallationDate(2),None)
 		self.assertAlmostEqual(get_business_helper.getInstallationDate(1),aware_datetime)
 

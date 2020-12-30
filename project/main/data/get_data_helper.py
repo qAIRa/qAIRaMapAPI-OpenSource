@@ -8,24 +8,6 @@ import math
 
 session = db.session
 
-def queryDBAirQuality(qhawax_name, initial_timestamp, final_timestamp,date_format):  #validar con sabri
-    sensors = (AirQualityMeasurement.CO, AirQualityMeasurement.H2S, AirQualityMeasurement.NO2,
-               AirQualityMeasurement.O3, AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, 
-               AirQualityMeasurement.SO2, AirQualityMeasurement.lat, AirQualityMeasurement.lon, 
-               AirQualityMeasurement.alt, AirQualityMeasurement.timestamp_zone)
-
-    initial_timestamp_utc = datetime.datetime.strptime(initial_timestamp, date_format)
-    final_timestamp_utc = datetime.datetime.strptime(final_timestamp, date_format)
-
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id!=None):
-        air_quality_measurements= session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                          filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
-                                          filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
-                                          order_by(AirQualityMeasurement.timestamp_zone).all()
-        return [measurement._asdict() for measurement in air_quality_measurements]
-    return None
-
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #validar con sabri
     """ Helper function to get Air Quality measurement """
     sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3, 
@@ -35,11 +17,13 @@ def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #vali
                AirQualityMeasurement.temperature, AirQualityMeasurement.lat,AirQualityMeasurement.lon, 
                AirQualityMeasurement.timestamp_zone)
     
-    valid_processed_measurements = session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
-                                           filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
-                                           filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
-                                           order_by(AirQualityMeasurement.timestamp_zone).all()
-    return [measurement._asdict() for measurement in valid_processed_measurements]
+    if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
+      valid_processed_measurements = session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
+                                             filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
+                                             filter(AirQualityMeasurement.timestamp_zone <= final_timestamp). \
+                                             order_by(AirQualityMeasurement.timestamp_zone).all()
+      return [measurement._asdict() for measurement in valid_processed_measurements]
+    return None
 
 def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     """ Helper function to get gas average measurement based on qHAWAX name and sensor name"""
@@ -110,10 +94,12 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
 def queryLastMainInca(qhawax_name):
     """Helper function to get last main inca based on qHAWAX ID """
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    inca = session.query(GasInca.main_inca).filter(GasInca.qhawax_id == qhawax_id).order_by(GasInca.id).all()
-    if(inca==[]):
-      return None
-    return session.query(GasInca.main_inca).filter(GasInca.qhawax_id == qhawax_id).order_by(GasInca.id.desc()).first()[0]
+    if(qhawax_id is not None):
+      inca = session.query(GasInca.main_inca).filter(GasInca.qhawax_id == qhawax_id).order_by(GasInca.id).all()
+      if(inca==[]):
+        return None
+      return session.query(GasInca.main_inca).filter(GasInca.qhawax_id == qhawax_id).order_by(GasInca.id.desc()).first()[0]
+    return None
 
 def getFirstTimestampValidProcessed(qhawax_id):
     """ Helper qHAWAX Installation function to get first timestamp of Valid Processed  """
