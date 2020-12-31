@@ -95,8 +95,8 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.getFirstTimestampValidProcessed,None)
 
 	def test_query_first_timestamp_valid_valid(self):
-		naive_time = datetime.time(1,24,0)
-		date = datetime.date(2020, 12, 29)
+		naive_time = datetime.time(5,0,21)
+		date = datetime.date(2020, 12, 31)
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
