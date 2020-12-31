@@ -12,6 +12,7 @@ import datetime
 session = db.session
 
 def storeAirQualityDataInDB(data):
+    """ Helper function to record Air Quality measurement """
     data = exceptions.checkDictionaryVariable(data)
     qhawax_name = data.pop('ID', None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
@@ -64,6 +65,7 @@ def storeValidProcessedDataInDB(data, product_id):
       socketio.emit(data['ID'], data)
 
 def validAndBeautyJsonValidProcessed(data_json,product_id,inca_value):
+    """ Helper function to valid json Valid Processed table """
     data_json = exceptions.checkDictionaryVariable(data_json)
     storeValidProcessedDataInDB(data_json,product_id)
     if(inca_value==0.0):
@@ -71,6 +73,7 @@ def validAndBeautyJsonValidProcessed(data_json,product_id,inca_value):
       post_business_helper.updateMainIncaQhawaxInstallationTable(1,product_id)
 
 def validTimeOfValidProcessed(time_valid,time_type, last_time_turn_on,data_json,product_id,inca_value):
+    """ Helper function to valid time of Valid Processed table """
     aditional_time = datetime.timedelta(hours=time_valid) if (time_type=="hour") else datetime.timedelta(minutes=time_valid)
     if(last_time_turn_on + aditional_time < datetime.datetime.now(dateutil.tz.tzutc())):
       validAndBeautyJsonValidProcessed(data_json,product_id,inca_value)

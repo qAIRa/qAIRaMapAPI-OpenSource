@@ -19,7 +19,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxTable,100,None)
 
 	def test_update_main_inca_qhawax_valid(self):
-		post_business_helper.updateMainIncaQhawaxTable(-1.0,'qH057')
+		post_business_helper.updateMainIncaQhawaxTable(-1,'qH057')
 
 	def test_update_main_inca_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxInstallationTable)
@@ -31,7 +31,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.updateMainIncaQhawaxInstallationTable,100,None)
 
 	def test_update_main_inca_qhawax_installation_valid(self):
-		post_business_helper.updateMainIncaQhawaxInstallationTable(-1.0,'qH004')
+		post_business_helper.updateMainIncaQhawaxInstallationTable(-1,'qH004')
 
 	def test_save_turn_on_after_calibration_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration)
@@ -59,8 +59,8 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable,True)
 
 	def test_save_status_qhawax_valid(self):
-		post_business_helper.saveStatusQhawaxTable('qH057','ON',0.0)
-		post_business_helper.saveStatusQhawaxTable('qH057','OFF',-1.0)
+		post_business_helper.saveStatusQhawaxTable('qH057','ON',0)
+		post_business_helper.saveStatusQhawaxTable('qH057','OFF',-1)
 
 	def test_save_status_off_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveStatusOffQhawaxInstallationTable)
