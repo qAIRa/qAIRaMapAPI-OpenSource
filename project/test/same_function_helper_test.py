@@ -16,7 +16,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_qhawax_exist_based_on_id_valid(self):
 		self.assertAlmostEqual(same_helper.qhawaxExistBasedOnID(1),True)
-		self.assertAlmostEqual(same_helper.qhawaxExistBasedOnID(100),False)
+		self.assertAlmostEqual(same_helper.qhawaxExistBasedOnID(999),False)
 
 	def test_qhawax_exist_based_on_name_not_valid(self):
 		self.assertRaises(TypeError,same_helper.qhawaxExistBasedOnName)
@@ -38,7 +38,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_qhawax_installation_exist_based_on_id_valid(self):
 		self.assertAlmostEqual(same_helper.qhawaxInstallationExistBasedOnID(1),True)
-		self.assertAlmostEqual(same_helper.qhawaxInstallationExistBasedOnID(100),False)
+		self.assertAlmostEqual(same_helper.qhawaxInstallationExistBasedOnID(999),False)
 
 	def test_area_exist_based_on_id_not_valid(self):
 		self.assertRaises(TypeError,same_helper.areaExistBasedOnID)
@@ -105,7 +105,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_get_qhawax_name_valid(self):
 		self.assertAlmostEqual(same_helper.getQhawaxName(1),"qH004")
-		self.assertAlmostEqual(same_helper.getQhawaxName(100),None)
+		self.assertAlmostEqual(same_helper.getQhawaxName(999),None)
 
 	def test_get_installation_id_based_name_not_valid(self):
 		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName)

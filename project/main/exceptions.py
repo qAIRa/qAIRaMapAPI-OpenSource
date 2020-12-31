@@ -113,3 +113,8 @@ def checkDictionaryVariable(variable):
     if(isinstance(variable, dict) is not True):
         raise TypeError("Variable "+str(variable)+" should be Json")
     return variable
+
+def checkListVariable(variable):
+    if(isinstance(variable, list) is not True):
+        raise TypeError("Variable "+str(variable)+" should be List")
+    return variable

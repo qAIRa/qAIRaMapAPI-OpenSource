@@ -10,15 +10,6 @@ class TestUtilHelper(unittest.TestCase):
 	Test of Get Business Functions
 
 	"""
-	def test_check_date_not_valid(self):
-		date_format = '%d-%m-%Y %H:%M:%S'
-		self.assertRaises(TypeError,util_helper.check_valid_date,{"name":"qH001"})
-		self.assertRaises(TypeError,util_helper.check_valid_date,4.33,date_format)
-		self.assertRaises(TypeError,util_helper.check_valid_date,5,date_format)
-		self.assertRaises(TypeError,util_helper.check_valid_date,None,date_format)
-		self.assertRaises(TypeError,util_helper.check_valid_date,True,date_format)
-		self.assertRaises(ValueError,util_helper.check_valid_date,'2020-09-09 00:00:00',date_format)
-
 	def test_valid_time_json_processed_not_valid(self):
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed)
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,"resultado")

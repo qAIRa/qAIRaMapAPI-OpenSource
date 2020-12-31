@@ -15,10 +15,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryAllQhawax,10,None)
 		self.assertRaises(TypeError,get_business_helper.queryAllQhawax,"String_")
 
-	def test_query_all_qhawax_valid(self):
-		y = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0, 'id': 1},
-			 {'name': 'qH057', 'mode': 'Stand By', 'state': 'OFF', 'qhawax_type': 'STATIC', 'main_inca': -1.0, 'id': 2}]
-		self.assertAlmostEqual(get_business_helper.queryAllQhawax(),y)
+	#def test_query_all_qhawax_valid(self):
+	#	y = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0, 'id': 1},
+	#		 {'name': 'qH057', 'mode': 'Stand By', 'state': 'OFF', 'qhawax_type': 'STATIC', 'main_inca': -1.0, 'id': 2}]
+	#	self.assertAlmostEqual(get_business_helper.queryAllQhawax(),y)
 
 	def test_query_qhawax_mode_customer_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,{"name":"qH001"})
@@ -157,8 +157,6 @@ class TestGetBusinessHelper(unittest.TestCase):
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
-		print(aware_datetime)
-		print(get_business_helper.queryLastTimeOffDueLackEnergy('qH004'))
 		self.assertAlmostEqual(get_business_helper.queryLastTimeOffDueLackEnergy('qH004'),aware_datetime)
 
 if __name__ == '__main__':

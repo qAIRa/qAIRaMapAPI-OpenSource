@@ -2,6 +2,7 @@ import datetime
 from datetime import timedelta
 import dateutil
 import dateutil.parser
+import project.main.exceptions as exceptions
 
 pollutant=['SO2','NO2','O3','CO','H2S']
 
@@ -15,19 +16,8 @@ array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
 array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_name',\
                          'connection_type','season','is_public','person_in_charge']
 
-def check_valid_date(date,date_format):
-    """ Check if it's a valid date. """
-    if(isinstance(date, str) is not True):  
-        raise TypeError("Variable "+str(date)+" should be string")
-    try:
-        date = datetime.datetime.strptime(date,date_format)
-    except ValueError:
-        raise ValueError("Date "+str(date)+" should be datetime "+str(date_format)+" Format")
-
 def validTimeJsonProcessed(data_json):
-    if(isinstance(data_json, dict) is not True):
-        raise TypeError("json "+str(data_json)+" should be Json Format")
-
+    data_json = exceptions.checkDictionaryVariable(data_json)
     datetime_array = data_json['timestamp'].split() 
     measurement_year = datetime.datetime.strptime(datetime_array[0], '%Y-%m-%d').year
     if(measurement_year > datetime.date.today().year):
@@ -36,10 +26,9 @@ def validTimeJsonProcessed(data_json):
     return data_json
 
 def validAndBeautyJsonProcessed(data_json):
-    arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
-    if(isinstance(data_json, dict) is not True):
-        raise TypeError("json "+str(data_json)+" should be Json Format")
-
+    arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C
+    data_json = exceptions.checkDictionaryVariable(data_json)
+    
     if  'timestamp_zone' not in data_json:
         data_json["timestamp_zone"] = data_json["timestamp"]
     data_json = gasConversionPPBtoMG(data_json, arr_season)
@@ -49,11 +38,8 @@ def validAndBeautyJsonProcessed(data_json):
     return data_json
 
 def gasConversionPPBtoMG(data_json,season):
-    if(isinstance(data_json, dict) is not True):
-        raise TypeError("json "+str(data_json)+" should be Json Format")
-
-    if(isinstance(season, list) is not True):
-        raise TypeError("season "+str(season)+" should be List Format")
+    data_json = exceptions.checkDictionaryVariable(data_json)
+    season = exceptions.checkListVariable(season)
 
     data={'ID': data_json['ID'],'CO': data_json['CO'], 'CO_ug_m3': None,'H2S': data_json['H2S'],
           'H2S_ug_m3': None,'NO2': data_json['NO2'],'NO2_ug_m3': None,'O3': data_json['O3'],
@@ -82,8 +68,7 @@ def gasConversionPPBtoMG(data_json,season):
     return data
 
 def roundUpThree(data_json):
-    if(isinstance(data_json, dict) is not True):
-        raise TypeError("Measurement variable "+str(data_json)+" should be Json Format")
+    data_json = exceptions.checkDictionaryVariable(data_json)
     for i in range(len(array_ug_m3)):
         if((type(data_json[array_ug_m3[i]]) is float) or (type(data_json[array_ug_m3[i]]) is int)):
             data_json[array_ug_m3[i]] = round(data_json[array_ug_m3[i]],3)
@@ -91,26 +76,21 @@ def roundUpThree(data_json):
 
 def checkNumberValues(data_json):
     """ Helper Processed Measurement function to check number values """
-    if(isinstance(data_json, dict) is not True):
-        raise TypeError("Measurement variable "+str(data_json)+" should be Json Format")
+    data_json = exceptions.checkDictionaryVariable(data_json)
     for i in range(len(array_ppb)):
         if(data_json[array_ppb[i]]=="Nan"):
             data_json[array_ppb[i]] = 0
     return data_json
 
 def areFieldsValid(data):
-    if(isinstance(data, dict) is not True):
-        raise TypeError("qHAWAX installation variable "+str(data)+" should be Json Format")
-
+    data = exceptions.checkDictionaryVariable(data)
     for i in range(len(array_installation)):
         if(data[array_installation[i]]=='' or data[array_installation[i]]==None):
             return False
     return True
 
 def getFormatData(gas_average_measurement):
-    if(isinstance(gas_average_measurement, list) is not True):
-        raise TypeError("Gas Average Measurement variable "+str(gas_average_measurement)+" should be List Format")
-
+    data = exceptions.checkListVariable(gas_average_measurement)
     gas_average_measurement_list = []
     if gas_average_measurement is not None:
         next_hour = -1
