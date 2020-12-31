@@ -9,11 +9,11 @@ def createCompany():
     try:
         exception_helper.getCompanyTargetofJson(req_json)
         post_business_helper.createCompany(req_json)
+        return make_response({'Success':'Company has been created'}, 200)
     except (TypeError, ValueError ) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
     except (Exception) as e:
         json_message = jsonify({'database error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-    else:
-        return make_response({'Success':'Company has been created'}, 200)
+        

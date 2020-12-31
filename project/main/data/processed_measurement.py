@@ -13,8 +13,8 @@ import datetime
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
     """ To list all measurement of processed measurement table record the last N minutes """
+    qhawax_name = request.args.get('name')
     try:
-        qhawax_name = request.args.get('name')
         interval_minutes = int(request.args.get('interval_minutes')) \
             if request.args.get('interval_minutes') is not None else 60 
         final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())

@@ -6,7 +6,6 @@ import pytz
 
 class TestGetBusinessHelper(unittest.TestCase):
 	""" Test of Get Business Functions """
-
 	def test_query_all_qhawax_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryAllQhawax,{"name":"qH001"})
 		self.assertRaises(TypeError,get_business_helper.queryAllQhawax,4.33)
@@ -16,10 +15,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryAllQhawax,10,None)
 		self.assertRaises(TypeError,get_business_helper.queryAllQhawax,"String_")
 
-	#def test_query_all_qhawax_valid(self):
-	#	y = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'OFF', 'qhawax_type': 'STATIC', 'main_inca': -1.0, 'id': 1}, 
-	#		 {'name': 'qH057', 'mode': 'Stand By', 'state': 'OFF', 'qhawax_type': 'STATIC', 'main_inca': -1.0, 'id': 2}]
-	#	self.assertAlmostEqual(get_business_helper.queryAllQhawax(),y)
+	def test_query_all_qhawax_valid(self):
+		y = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0, 'id': 1},
+			 {'name': 'qH057', 'mode': 'Stand By', 'state': 'OFF', 'qhawax_type': 'STATIC', 'main_inca': -1.0, 'id': 2}]
+		self.assertAlmostEqual(get_business_helper.queryAllQhawax(),y)
 
 	def test_query_qhawax_mode_customer_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,{"name":"qH001"})
@@ -31,10 +30,9 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,"String_")
 
 	def test_query_qhawax_mode_customer_valid(self):
-		#y = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0, 'id': 4, \
-		#	  'qhawax_id': 1, 'eca_noise_id': 2, 'comercial_name': 'FaberCastell', 'lat': -12.0, 'lon': -77.0, \
-		#	  'area_name': 'Residential Zone'}]
-		y = []
+		y = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0,
+			  'id': 4, 'qhawax_id': 1, 'eca_noise_id': 2, 'comercial_name': 'FaberCastell', 'lat': -12.0, 
+			  'lon': -77.0, 'area_name': 'Residential Zone'}]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
 
 	def test_query_get_areas_not_valid(self):
@@ -104,9 +102,9 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
-		z = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'OFF', 'qhawax_type': 'STATIC', 
-			'main_inca': -1.0, 'id': 4, 'qhawax_id': 1, 'eca_noise_id': 2, 'comercial_name': 'FaberCastell', 
-			'lat': -12.0, 'lon': -77.0, 'area_name': 'Residential Zone'}]
+		z = [{'name': 'qH004', 'mode': 'Cliente', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0, 
+			  'id': 4, 'qhawax_id': 1, 'eca_noise_id': 2, 'comercial_name': 'FaberCastell', 'lat': -12.0, 
+			  'lon': -77.0, 'area_name': 'Residential Zone'}]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),z)
 
 	def test_query_noise_data_not_valid(self):
@@ -145,8 +143,23 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.getLastValuesOfQhawax,None)
 
 	def test_set_last_value_of_qhawax_valid(self):
-		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH057'),("Stand By","Se cambió a modo stand by",-1))
-		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH004'),("Cliente","Se cambió a modo cliente",-1))
+		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH057'),("Stand By","qHAWAX has changed to stand by mode",-1))
+		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH004'),("Cliente","qHAWAX has changed to customer mode",0))
+
+	def test_query_last_time_off_due_lack_energy_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.queryLastTimeOffDueLackEnergy)
+		self.assertRaises(TypeError,get_business_helper.queryLastTimeOffDueLackEnergy,21)
+		self.assertRaises(TypeError,get_business_helper.queryLastTimeOffDueLackEnergy,None)
+
+	def test_query_last_time_off_due_lack_energy_valid(self):
+		naive_time = datetime.time(23,25,5,539261)
+		date = datetime.date(2020, 12, 30)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		aware_datetime = timezone.localize(naive_datetime)
+		print(aware_datetime)
+		print(get_business_helper.queryLastTimeOffDueLackEnergy('qH004'))
+		self.assertAlmostEqual(get_business_helper.queryLastTimeOffDueLackEnergy('qH004'),aware_datetime)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -6,10 +6,7 @@ import dateutil
 import dateutil.parser
 
 class TestSameFunctionHelper(unittest.TestCase):
-	"""
-	Test of Same Function Helper
-
-	"""
+	""" Test of Same Function Helper """
 	def test_qhawax_exist_based_on_id_not_valid(self):
 		self.assertRaises(TypeError,same_helper.qhawaxExistBasedOnID)
 		self.assertRaises(TypeError,same_helper.qhawaxExistBasedOnID,{"name":"qH001"})
@@ -129,7 +126,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,True)
 
 	def test_get_main_inca_valid(self):
-		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH004"),-1.0)
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH004"),50.0)
 		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH100"),None)
 
 	def test_get_qhawax_mode_not_valid(self):
@@ -153,7 +150,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,1)
 
 	def test_query_time_qhawax_history_valid(self):
-		initial_timestamp = "30-12-2020 14:35:03.630017+00:00"
+		initial_timestamp = "30-12-2020 23:45:00.154176+00:00"
 		last_timestamp = "30-12-2020 01:26:04.0+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
@@ -161,7 +158,6 @@ class TestSameFunctionHelper(unittest.TestCase):
 		values = {'last_time_on': last_time_turn_on, 'last_time_registration': last_registration_time}
 		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory('qH004'),values)
 		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory('qH100'),None)
-
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -87,22 +87,22 @@ def getNoiseData(qhawax_name):
     return None
 
 def getLastValuesOfQhawax(qH_name):
+    """Helper qHAWAX function to get last values"""
+    mode = "Stand By"
+    description="qHAWAX has changed to stand by mode"
     if(isItFieldQhawax(qH_name) == True):
         mode = "Cliente"
-        description="Se cambió a modo cliente"
-    else:
-        mode = "Stand By"
-        description="Se cambió a modo stand by"
-
+        description="qHAWAX has changed to customer mode"
     main_inca = 0 if(queryQhawaxStatus(qH_name)=='ON') else -1
     return mode, description, main_inca
 
 def queryLastTimeOffDueLackEnergy(qhawax_name):
-    qhawax_id = same_helper.getQhawaxID(qhawax_name)
-    if(qhawax_id is not None):
+    """Helper qHAWAX function to get last time off due to lack energy"""
+    if(same_helper.getInstallationIdBaseName(qhawax_name) is not None): # Enter if qHAWAX is in field
+        qhawax_id = same_helper.getQhawaxID(qhawax_name)
         list_last_turn_off= session.query(Bitacora.timestamp_zone). \
                                     filter_by(qhawax_id=qhawax_id). \
-                                    filter_by(description="Se apagó el qHAWAX por falta de energía"). \
+                                    filter_by(description="qHAWAX off"). \
                                     order_by(Bitacora.timestamp_zone.desc()).\
                                     limit(2).all()
         if(list_last_turn_off != []):
@@ -113,5 +113,4 @@ def queryLastTimeOffDueLackEnergy(qhawax_name):
                                     filter_by(end_date_zone=None). \
                                     limit(1).all()
             return list_last_turn_on[0]
-
     return None

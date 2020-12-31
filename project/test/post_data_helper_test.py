@@ -6,10 +6,7 @@ import dateutil.parser
 import project.main.data.post_data_helper as post_data_helper
 
 class TestPostDataHelper(unittest.TestCase):
-	"""
-	Test of Get Business Functions
-
-	"""
+	""" Test of Post Data Functions """
 	def test_store_air_quality_not_valid(self):
 		self.assertRaises(TypeError,post_data_helper.storeAirQualityDataInDB)
 		self.assertRaises(TypeError,post_data_helper.storeAirQualityDataInDB,True)

@@ -4,10 +4,7 @@ from datetime import timedelta
 import project.main.exceptions as exception_helper
 
 class TestMainExceptions(unittest.TestCase):
-	"""
-	Test of Get Business Functions
-
-	"""
+	"""Test of Main Exceptions Functions"""
 	def test_query_company_target_json_not_valid(self):
 		data = {'company_name':'test','email_group':'test.test','ruc':1001}
 		self.assertRaises(TypeError,exception_helper.getCompanyTargetofJson)
@@ -136,7 +133,6 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertAlmostEqual(exception_helper.validEndWorkFieldJson(data),(str(data['qhawax_name']),\
 																			data['end_date'],\
 																			str(data['person_in_charge'])))
-
 	def test_query_end_calibration_json_not_valid(self):
 		data_qhawax_name= {'timestamp_turn_on_conection':'test'}
 		data_timestamp_turn_on_conection = {'qhawax_name':'test'}

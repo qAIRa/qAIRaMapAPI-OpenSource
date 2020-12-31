@@ -66,7 +66,7 @@ def queryDBGasInca(initial_timestamp, final_timestamp):
     return [measurement._asdict() for measurement in gas_inca]
                                   
 def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
-
+    """ Helper function to get Processed Measurement filter by qHAWAX between timestamp"""
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
         sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S,ProcessedMeasurement.NO,

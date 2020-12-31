@@ -7,10 +7,7 @@ import datetime
 import pytz
 
 class TestGetDataHelper(unittest.TestCase):
-	"""
-	Test of Get Business Functions
-
-	"""
+	""" Test of Get Data Functions """
 	def test_query_air_valid_quality_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality)
 		self.assertRaises(TypeError,get_data_helper.queryDBValidAirQuality,{"qhawax_id":5})
@@ -25,7 +22,6 @@ class TestGetDataHelper(unittest.TestCase):
 		last_timestamp = "02-09-2020 05:01:00"
 		self.assertAlmostEqual(get_data_helper.queryDBValidAirQuality(1,initial_timestamp,last_timestamp),[])
 		self.assertAlmostEqual(get_data_helper.queryDBValidAirQuality(100,initial_timestamp,last_timestamp),None)
-
 
 	def test_query_gas_average_measurement_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryDBGasAverageMeasurement)
