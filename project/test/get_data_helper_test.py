@@ -84,7 +84,7 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryLastMainInca,1)
 
 	def test_query_last_main_inca_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH004"),50.0)
+		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH004"),500.0)
 		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH100"),None)
 
 	def test_query_first_timestamp_valid_not_valid(self):
