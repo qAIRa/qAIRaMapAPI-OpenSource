@@ -20,7 +20,7 @@ class TestPostDataHelper(unittest.TestCase):
 						   "NO2": 19.78,"NO2_ug_m3": 19.78,"O3": 3.126,"O3_ug_m3": 3.126,
 						   "SO2": 4.388,"SO2_ug_m3": 4.388,"PM10": 35.349,"PM25": 11.678,
 						   "alt": 0.0,"lat": -12.0402780000002,"lon": -77.0436090000003,
-						   "timestamp_zone": "Fri, 01 Jan 2021 00:00:00 GMT", "ID":"qH057",
+						   "timestamp_zone": "Mon, 04 Jan 2021 00:00:00 GMT", "ID":"qH057",
 						   "pressure":10,"humidity":25,"I_temperature":25,"temperature":21,"SPL":1,"UV":1}
 		post_data_helper.storeAirQualityDataInDB(air_quality_json)
 
@@ -77,7 +77,6 @@ class TestPostDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_data_helper.validTimeOfValidProcessed,1,"minute","hora","json",23,"inca")
 		self.assertRaises(TypeError,post_data_helper.validTimeOfValidProcessed,1,"minute","hora",{},23,0.0)
 		self.assertRaises(TypeError,post_data_helper.validTimeOfValidProcessed,1,"minute","hora",{},"qH001","inca")
-
 
 	def test_valid_time_of_valid_processed_valid(self):
 		naive_time = datetime.time(0,0,0,410000)
