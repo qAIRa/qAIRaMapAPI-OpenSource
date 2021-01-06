@@ -48,7 +48,7 @@ class TestPostDataHelper(unittest.TestCase):
 						   "NO2": 19.78,"NO2_ug_m3": 19.78,"O3": 3.126,"O3_ug_m3": 3.126,"VOC":0,"CO2":1,
 						   "SO2": 4.388,"SO2_ug_m3": 4.388,"PM10": 35.349,"PM25": 11.678,"UVA":1,"UVB":1,
 						   "alt": 0.0,"lat": -12.0402780000002,"lon": -77.0436090000003,"PM1":1,
-						   "timestamp_zone": "Fri, 01 Jan 2021 00:00:00 GMT", "ID":"qH057",
+						   "timestamp_zone": "Mon, 04 Jan 2021 00:00:00 GMT", "ID":"qH057",
 						   "pressure":10,"humidity":25,"I_temperature":25,"temperature":21,"spl":1,"UV":1}
 		post_data_helper.storeProcessedDataInDB(processed_measurement_json)
 

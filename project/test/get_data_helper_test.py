@@ -35,19 +35,29 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(ValueError,get_data_helper.queryDBGasAverageMeasurement,"qH001","H2O")
 
 	def test_query_gas_average_measurement_valid(self):
-		naive_time = datetime.time(0,0,0)
+		naive_time1 = datetime.time(0,0,0)
+		naive_time2 = datetime.time(1,0,0)
+		naive_time3 = datetime.time(2,0,0)
+		naive_time4 = datetime.time(4,0,0)
 		date = datetime.date(2021, 1, 6)
-		naive_datetime = datetime.datetime.combine(date, naive_time)
+		naive_datetime1 = datetime.datetime.combine(date, naive_time1)
+		naive_datetime2 = datetime.datetime.combine(date, naive_time2)
+		naive_datetime3 = datetime.datetime.combine(date, naive_time3)
+		naive_datetime4 = datetime.datetime.combine(date, naive_time4)
 		timezone = pytz.timezone('UTC')
-		aware_datetime = timezone.localize(naive_datetime)
-		co = [(aware_datetime, 1986.208)]
-		h2s = [(aware_datetime, 43.404)]
-		no2 = [(aware_datetime, 19.78)]
-		o3 = [(aware_datetime, 3.126)]
-		so2 = [(aware_datetime, 4.388)]
-		pm25 = [(aware_datetime, 11.678)]
-		pm10 = [(aware_datetime, 35.349)]
-		co_format = [{'timestamp_zone': aware_datetime, 'sensor': 1986.208}]
+		aware_datetime1 = timezone.localize(naive_datetime1)
+		aware_datetime2 = timezone.localize(naive_datetime2)
+		aware_datetime3 = timezone.localize(naive_datetime3)
+		aware_datetime4 = timezone.localize(naive_datetime4)
+		co = [(aware_datetime1, 1986.208),(aware_datetime4, 1986.208)]
+		h2s = [(aware_datetime1, 43.404),(aware_datetime4, 43.404)]
+		no2 = [(aware_datetime1, 19.78),(aware_datetime4, 19.78)]
+		o3 = [(aware_datetime1, 3.126),(aware_datetime4, 3.126)]
+		so2 = [(aware_datetime1, 4.388),(aware_datetime4, 4.388)]
+		pm25 = [(aware_datetime1, 11.678),(aware_datetime4, 11.678)]
+		pm10 = [(aware_datetime1, 35.349),(aware_datetime4, 35.349)]
+		co_format = [{'timestamp_zone': aware_datetime1, 'sensor': 1986.208},{'timestamp_zone': aware_datetime2, 'sensor': ""},\
+					 {'timestamp_zone': aware_datetime3, 'sensor': ""},{'timestamp_zone': aware_datetime4, 'sensor': 1986.208}]
 		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","CO"),co)
 		self.assertAlmostEqual(util_helper.getFormatData(get_data_helper.queryDBGasAverageMeasurement("qH057","CO")),co_format)
 		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","H2S"),h2s)
@@ -94,7 +104,8 @@ class TestGetDataHelper(unittest.TestCase):
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
 		last_timestamp = timezone.localize(naive_datetime)
-		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH004",initial_timestamp,last_timestamp),[])
+		print(get_data_helper.queryDBProcessed("qH057",initial_timestamp,last_timestamp))
+		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH057",initial_timestamp,last_timestamp),[])
 		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH100",initial_timestamp,last_timestamp),None)
 
 	def test_query_last_main_inca_not_valid(self):

@@ -180,5 +180,3 @@ class ValidProcessedMeasurement(db.Model):
     alt = db.Column(db.Float)
     I_temperature = db.Column(db.Float)
     qhawax_installation_id = db.Column(db.Integer, db.ForeignKey('qhawax_installation_history.id'))
-
-import project.database.utils as utils
