@@ -37,9 +37,7 @@ def getGasAverageMeasurementsEvery24():
     gas_name = str(request.args.get('gas'))
     try:
         gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement(qhawax_name, gas_name)
-        print(gas_average_measurement)
         gas_average_measurement_list = util_helper.getFormatData(gas_average_measurement)
-        print(gas_average_measurement_list)
         if(gas_average_measurement_list is not None):
             return make_response(jsonify(gas_average_measurement_list), 200)
         return make_response(jsonify('Measurements not found'), 200)
