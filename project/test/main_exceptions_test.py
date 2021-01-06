@@ -128,12 +128,12 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_person_in_charge)
 		self.assertRaises(ValueError,exception_helper.validEndWorkFieldJson,data_end_date)
 
-	def test_query_end_work_fields_json_not_valid(self):
+	def test_query_end_work_fields_json_valid(self):
 		data = {'qhawax_name':'test','person_in_charge':'test','end_date':'test'}
 		self.assertAlmostEqual(exception_helper.validEndWorkFieldJson(data),(str(data['qhawax_name']),\
 																			data['end_date'],\
 																			str(data['person_in_charge'])))
-	def test_query_end_calibration_json_not_valid(self):
+	def test_query_qhawax_signal_json_not_valid(self):
 		data_qhawax_name= {'timestamp_turn_on_conection':'test'}
 		data_timestamp_turn_on_conection = {'qhawax_name':'test'}
 		self.assertRaises(TypeError,exception_helper.getQhawaxSignalJson)
@@ -144,10 +144,21 @@ class TestMainExceptions(unittest.TestCase):
 		self.assertRaises(ValueError,exception_helper.getQhawaxSignalJson,data_qhawax_name)
 		self.assertRaises(ValueError,exception_helper.getQhawaxSignalJson,data_timestamp_turn_on_conection)
 
-	def test_query_end_calibration_json_valid(self):
+	def test_query_qhawax_signal_json_valid(self):
 		data = {'qhawax_name':'test','timestamp_turn_on_conection':'test'}
 		self.assertAlmostEqual(exception_helper.getQhawaxSignalJson(data),(str(data['qhawax_name']).strip(),\
 																		   str(data['timestamp_turn_on_conection'])))
+
+	def test_check_float_variable_not_valid(self):
+		self.assertRaises(TypeError,exception_helper.checkFloatVariable)
+		self.assertRaises(TypeError,exception_helper.checkFloatVariable,"Json")
+		self.assertRaises(TypeError,exception_helper.checkFloatVariable,{"hola":"hola"})
+		self.assertRaises(TypeError,exception_helper.checkFloatVariable,None)
+		self.assertRaises(TypeError,exception_helper.checkFloatVariable,True)
+
+	def test_check_float_variable_valid(self):
+		variable = 4.3
+		self.assertAlmostEqual(exception_helper.checkFloatVariable(variable),variable)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

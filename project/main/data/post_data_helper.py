@@ -74,6 +74,10 @@ def validAndBeautyJsonValidProcessed(data_json,product_id,inca_value):
 
 def validTimeOfValidProcessed(time_valid,time_type, last_time_turn_on,data_json,product_id,inca_value):
     """ Helper function to valid time of Valid Processed table """
+    time_valid = exceptions.checkIntegerVariable(time_valid)
+    time_type = exceptions.checkStringVariable(time_type)
+    data_json = exceptions.checkDictionaryVariable(data_json)
+    product_id = exceptions.checkStringVariable(product_id)
     aditional_time = datetime.timedelta(hours=time_valid) if (time_type=="hour") else datetime.timedelta(minutes=time_valid)
     if(last_time_turn_on + aditional_time < datetime.datetime.now(dateutil.tz.tzutc())):
       validAndBeautyJsonValidProcessed(data_json,product_id,inca_value)

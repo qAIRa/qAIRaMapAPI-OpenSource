@@ -1,4 +1,5 @@
 import project.main.data.get_data_helper as get_data_helper
+import project.main.util_helper as util_helper
 from datetime import timedelta
 import dateutil.parser
 import unittest
@@ -34,13 +35,37 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(ValueError,get_data_helper.queryDBGasAverageMeasurement,"qH001","H2O")
 
 	def test_query_gas_average_measurement_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","CO"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","H2S"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","NO2"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","O3"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","PM25"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","PM10"),[])
-		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","SO2"),[])
+		naive_time1 = datetime.time(0,0,0)
+		naive_time2 = datetime.time(1,0,0)
+		naive_time3 = datetime.time(2,0,0)
+		naive_time4 = datetime.time(4,0,0)
+		date = datetime.date(2021, 1, 6)
+		naive_datetime1 = datetime.datetime.combine(date, naive_time1)
+		naive_datetime2 = datetime.datetime.combine(date, naive_time2)
+		naive_datetime3 = datetime.datetime.combine(date, naive_time3)
+		naive_datetime4 = datetime.datetime.combine(date, naive_time4)
+		timezone = pytz.timezone('UTC')
+		aware_datetime1 = timezone.localize(naive_datetime1)
+		aware_datetime2 = timezone.localize(naive_datetime2)
+		aware_datetime3 = timezone.localize(naive_datetime3)
+		aware_datetime4 = timezone.localize(naive_datetime4)
+		co = [(aware_datetime1, 1986.208),(aware_datetime4, 1986.208)]
+		h2s = [(aware_datetime1, 43.404),(aware_datetime4, 43.404)]
+		no2 = [(aware_datetime1, 19.78),(aware_datetime4, 19.78)]
+		o3 = [(aware_datetime1, 3.126),(aware_datetime4, 3.126)]
+		so2 = [(aware_datetime1, 4.388),(aware_datetime4, 4.388)]
+		pm25 = [(aware_datetime1, 11.678),(aware_datetime4, 11.678)]
+		pm10 = [(aware_datetime1, 35.349),(aware_datetime4, 35.349)]
+		co_format = [{'timestamp_zone': aware_datetime1, 'sensor': 1986.208},{'timestamp_zone': aware_datetime2, 'sensor': ""},\
+					 {'timestamp_zone': aware_datetime3, 'sensor': ""},{'timestamp_zone': aware_datetime4, 'sensor': 1986.208}]
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","CO"),co)
+		self.assertAlmostEqual(util_helper.getFormatData(get_data_helper.queryDBGasAverageMeasurement("qH057","CO")),co_format)
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","H2S"),h2s)
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","NO2"),no2)
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","O3"),o3)
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","PM25"),pm25)
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","PM10"),pm10)
+		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH057","SO2"),so2)
 		self.assertAlmostEqual(get_data_helper.queryDBGasAverageMeasurement("qH100","CO"),None)
 
 	def test_query_valid_air_quality_not_valid(self):
@@ -69,11 +94,19 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001",1,"02-09-2010 00:01:00",'%d-%m-%Y %H:%M:%S')
 		self.assertRaises(TypeError,get_data_helper.queryDBProcessed,"qH001","02-09-2010 00:01:00",1,'%d-%m-%Y %H:%M:%S')
 
-	#def test_query_processed_valid(self):
-	#	initial_timestamp = "20-12-2020 00:00:00+00:00"
-	#	last_timestamp = "21-12-2020 00:00:00+00:00"
-	#	self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH004",initial_timestamp,last_timestamp),[])
-	#	self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH100",initial_timestamp,last_timestamp),None)
+	def test_query_processed_valid(self):
+		naive_time = datetime.time(5,0,21)
+		date = datetime.date(2020, 12, 20)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		initial_timestamp = timezone.localize(naive_datetime)
+		date = datetime.date(2020, 12, 21)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		last_timestamp = timezone.localize(naive_datetime)
+		print(get_data_helper.queryDBProcessed("qH057",initial_timestamp,last_timestamp))
+		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH057",initial_timestamp,last_timestamp),[])
+		self.assertAlmostEqual(get_data_helper.queryDBProcessed("qH100",initial_timestamp,last_timestamp),None)
 
 	def test_query_last_main_inca_not_valid(self):
 		self.assertRaises(TypeError,get_data_helper.queryLastMainInca)
@@ -84,7 +117,7 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryLastMainInca,1)
 
 	def test_query_last_main_inca_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH004"),50.0)
+		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH004"),500.0)
 		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH100"),None)
 
 	def test_query_first_timestamp_valid_not_valid(self):
