@@ -7,8 +7,7 @@ import dateutil.tz
 import datetime
 import random
 
-# BASE_URL = 'https://qairamapnapi.qairadrones.com/'
-BASE_URL = 'http://0.0.0.0:5000/'
+BASE_URL = 'https://qairamapnapi.qairadrones.com/'
 PROCESSED_MEASUREMENT= BASE_URL + '/api/dataProcessed/'
 
 
