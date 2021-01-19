@@ -78,7 +78,7 @@ def updateIncaData():
         post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(value_inca, name)
         jsonsend['main_inca'] = value_inca
-        jsonsend['name'] = name 
+        jsonsend['name'] = name
         socketio.emit('update_inca', jsonsend)
         return make_response({'Success':' save inca value'}, 200)
     except (ValueError, TypeError) as e:
@@ -97,7 +97,7 @@ def sendQhawaxStatusOff():
         post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qH_time_off)
         post_business_helper.writeBinnacle(qH_name,description,None)
         jsonsend['main_inca'] = -1
-        jsonsend['name'] = qH_name 
+        jsonsend['name'] = qH_name
         socketio.emit('update_inca', jsonsend)
         return make_response({'Success': 'qHAWAX OFF'}, 200)
     except (ValueError, TypeError) as e:
@@ -116,7 +116,7 @@ def sendQhawaxStatusOn():
         post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,None)
         jsonsend['main_inca'] = 0
-        jsonsend['name'] = qhawax_name 
+        jsonsend['name'] = qhawax_name
         return make_response({'Success': 'qHAWAX ON physically'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

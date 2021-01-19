@@ -15,13 +15,13 @@ def qhawaxExistBasedOnID(qhawax_id):
     return True
 
 def qhawaxExistBasedOnName(qhawax_name):
-    """ Helper function to check if qHAWAX name exist """
+    """ Helper function that checks if qHAWAX name exist """
     qhawax_name = exceptions.checkStringVariable(qhawax_name)
     qhawax_list = session.query(Qhawax.name).filter_by(name=qhawax_name).all()
     if(qhawax_list == []):
         return False
     return True
-        
+
 def qhawaxInstallationExistBasedOnID(installation_id):
     """ Helper function to check if qHAWAX Installation ID exist """
     installation_id = exceptions.checkIntegerVariable(installation_id)
@@ -59,13 +59,13 @@ def companyExistBasedOnRUC(ruc):
 """ Helper functions to get one field """
 
 def getQhawaxID(qhawax_name):
-    """ Helper function to get qHAWAX ID base on qHAWAX name """
+    """ Helper function to get qHAWAX ID based on qHAWAX name """
     if(qhawaxExistBasedOnName(qhawax_name)):
         return int(session.query(Qhawax.id).filter_by(name= qhawax_name).first()[0])
     return None
 
 def getInstallationId(qhawax_id):
-    """ Helper function to get qHAWAX Installation ID base on qHAWAX ID """
+    """ Helper function that gets qHAWAX Installation ID base on qHAWAX ID """
     if(qhawaxExistBasedOnID(qhawax_id)):
         installation_id= session.query(QhawaxInstallationHistory.id).\
                                  filter_by(qhawax_id=qhawax_id).\
@@ -87,16 +87,14 @@ def getQhawaxName(qhawax_id):
     return None
 
 def getInstallationIdBaseName(qhawax_name):
-    """ Helper function to get qHAWAX Installation ID  
-        qHAWAX name could be exist in qHAWAX table, 
-        but it could not exist in qHAWAX Installation table """
+    """ Helper function that gets qHAWAX Installation ID based on qHAWAX name """
     if(qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = getQhawaxID(qhawax_name)
         return getInstallationId(qhawax_id)
     return None
 
 def getMainIncaQhawaxTable(qhawax_name):
-    """ Helper function to get qHAWAX Main Inca based on qHAWAX ID """
+    """ Helper function to get qHAWAX Main Inca based on qHAWAX name """
     if(qhawaxExistBasedOnName(qhawax_name)):
         return session.query(Qhawax.main_inca).filter_by(name=qhawax_name).first()[0]
     return None
@@ -108,7 +106,7 @@ def getQhawaxMode(qhawax_name):
     return None
 
 def getTimeQhawaxHistory(qhawax_name):
-    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
+    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,
               QhawaxInstallationHistory.last_registration_time_zone)
 
     installation_id = getInstallationIdBaseName(qhawax_name)
@@ -116,7 +114,7 @@ def getTimeQhawaxHistory(qhawax_name):
     if(installation_id is not None):
         values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
         if (values!=None):
-            return {'last_time_on': values[0], 'last_time_registration': values[1]} 
+            return {'last_time_on': values[0], 'last_time_registration': values[1]}
     return None
 
 def getQhawaxStatus(qhawax_name):
@@ -143,6 +141,6 @@ def qhawaxQueryUpdate(json, qhawax_name):
 
 def qhawaxInstallationQueryUpdate(json, qhawax_name):
     installation_id=getInstallationIdBaseName(qhawax_name)
-    if(installation_id is not None): 
+    if(installation_id is not None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
         session.commit()
