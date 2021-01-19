@@ -15,7 +15,7 @@ def handleTelemetry():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
     telemetry['ID'] = room
-    socketio.emit('telemetry_event', telemetry)
+    socketio.emit(telemetry['ID'] + '_telemetry', data_json)
     drone_telemetry = telemetry
     post_data_helper.storeLogs(telemetry, room)
     return {'success': 'Telemetry sent from drone: "%s"' % (telemetry)}

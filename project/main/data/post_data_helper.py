@@ -1,4 +1,5 @@
-from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, ValidProcessedMeasurement
+from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
+                                    GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog
 import project.main.business.post_business_helper as post_business_helper
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
@@ -157,4 +158,19 @@ def formatTelemetryForStorage(telemetry):
         'yaw': telemetry['yaw'],  # obligatorio
         'timestamp': datetime.datetime.now(dateutil.tz.tzutc())
     }
+
+
+def recordDroneTakeoff(flight_start, qhawax_name):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    gas_inca_processed = DroneFlightLog(flight_start=flight_start, qhawax_id=qhawax_id)
+    session.add(gas_inca_processed)
+    session.commit()
+
+
+def recordDroneLanding(flight_end, qhawax_name,flight_detail):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    landing_json = {"flight_end":flight_end,"flight_detail":flight_detail}
+    session.query(DroneFlightLog). \
+            filter_by(qhawax_id=qhawax_id,flight_end=None).update(values=landing_json)
+    session.commit()
 

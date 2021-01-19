@@ -66,6 +66,11 @@ def updateTimeOffWithLastTurnOff(time_turn_off_binnacle, qhawax_name):
     qhawax_json_last_turn_off = {'last_registration_time_zone':time_turn_off_binnacle}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_last_turn_off,qhawax_name)
 
+def updateLastLocation(qhawax_name, location):
+    """ Helper Drone Log function to update location of andean drone in qHAWAX Installation table """
+    location = exceptions.checkDictionaryVariable(location)
+    same_helper.qhawaxInstallationQueryUpdate(location,qhawax_name)
+
 def updateQhawaxInstallation(data):
     """ Update qHAWAX in Field """
     data = exceptions.checkDictionaryVariable(data)

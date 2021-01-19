@@ -232,3 +232,14 @@ class DroneTelemetry(db.Model):
     yaw = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime)
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    drone_flight_log_id = db.Column(db.Integer, db.ForeignKey('drone_flight_log.id'))
+
+class DroneFlightLog(db.Model):
+    __tablename__ = 'drone_flight_log'
+    id = db.Column(db.Integer, primary_key=True)
+    flight_start = db.Column(db.DateTime, nullable=False)
+    flight_end = db.Column(db.DateTime, nullable=False)
+    flight_detail = db.Column(db.String(100))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+
+
