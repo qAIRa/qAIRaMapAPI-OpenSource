@@ -25,7 +25,17 @@ def queryQhawaxInFieldInPublicMode():
                             join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
                             join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
                             group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                            filter(QhawaxInstallationHistory.end_date_zone == None). \
+                            filter(Qhawax.qhawax_type=='STATIC', QhawaxInstallationHistory.end_date_zone == None). \
+                            order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_public]
+
+def queryDronesInFieldInPublicMode():
+    """ Get list of qHAWAXs in field in public mode """
+    qhawax_public = session.query(*columns_qhawax).\
+                            join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
+                            join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
+                            group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
+                            filter(Qhawax.qhawax_type=='AEREAL', QhawaxInstallationHistory.end_date_zone == None). \
                             order_by(Qhawax.id).all()
     return [qhawax._asdict() for qhawax in qhawax_public]
 

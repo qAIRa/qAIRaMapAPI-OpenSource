@@ -1,4 +1,5 @@
-from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca, ValidProcessedMeasurement
+from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
+                                    GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog
 import project.main.business.post_business_helper as post_business_helper
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
@@ -10,6 +11,10 @@ import dateutil.tz
 import datetime
 
 session = db.session
+MAX_SECONDS_DATA_STORAGE = 20
+drone_elapsed_time = None
+drone_telemetry = None
+drone_storage = {}
 
 def storeAirQualityDataInDB(data):
     """ Helper function to record Air Quality measurement """
@@ -81,4 +86,91 @@ def validTimeOfValidProcessed(time_valid,time_type, last_time_turn_on,data_json,
     aditional_time = datetime.timedelta(hours=time_valid) if (time_type=="hour") else datetime.timedelta(minutes=time_valid)
     if(last_time_turn_on + aditional_time < datetime.datetime.now(dateutil.tz.tzutc())):
       validAndBeautyJsonValidProcessed(data_json,product_id,inca_value)
+
+def storeLogs(telemetry, drone_name):
+    global drone_elapsed_time, drone_telemetry, drone_storage
+    if drone_elapsed_time is None:
+        drone_elapsed_time = time.time()
+
+    if drone_name not in drone_storage:
+        qhawax_id = same_helper.getQhawaxID(drone_name) if same_helper.getQhawaxID(drone_name) is not None else 'qH001'
+        drone_storage[drone_name] = qhawax_id
+
+    if time.time() - drone_elapsed_time > MAX_SECONDS_DATA_STORAGE:
+        drone_telemetry = formatTelemetryForStorage(telemetry)
+        drone_telemetry['qhawax_id'] = drone_storage[drone_name]
+        drone_telemetry = DroneTelemetry(**drone_telemetry)
+        session.add(drone_telemetry)
+        session.commit()
+        drone_elapsed_time = time.time() 
+
+def formatTelemetryForStorage(telemetry):
+    rcout= telemetry['rcout'] if telemetry['rcout'] is not None else [-1,-1,-1,-1,-1,-1,-1,-1]
+    compass1= telemetry['compass1'] if telemetry['compass1'] is not None else [-1,-1,-1]
+    compass2= telemetry['compass2'] if telemetry['compass2'] is not None else [-1,-1,-1]
+    gps= telemetry['gps'] if telemetry['gps'] is not None else {"satellites":-1,"fix_type":-1}
+    vibrations= telemetry['vibrations'] if telemetry['vibrations'] is not None else [-1,-1,-1]
+
+    return {
+        'airspeed': telemetry['airspeed'], # obligatorio
+        'alt': telemetry['alt'], # obligatorio
+        'battery_perc': telemetry['level'],  # obligatorio
+        'dist_home': telemetry['dist_home'], # obligatorio
+        'compass1_x': compass1[0], # obligatorio
+        'compass1_y': compass1[1], # obligatorio
+        'compass1_z': compass1[2], # obligatorio
+        'compass2_x': compass2[0], # obligatorio
+        'compass2_y': compass2[1], # obligatorio
+        'compass2_z': compass2[2], # obligatorio
+        'compass_variance': telemetry['ekf_status']['compass_variance'] if telemetry['ekf_status'] is not None else -1, # obligatorio
+        'current': telemetry['current'], # obligatorio
+        'fix_type': telemetry['fix_type'], # obligatorio
+        'flight_mode': telemetry['flight_mode'], # obligatorio
+        'gps_sats': gps['satellites'], # obligatorio
+        'gps_fix': gps['fix_type'], # obligatorio
+        'gps2_sats': telemetry['gps2']['satellites'] if telemetry['gps2'] is not None else -1, # obligatorio
+        'gps2_fix': telemetry['gps2']['fix_type'] if telemetry['gps2'] is not None else -1, # obligatorio
+        'irlock_x': telemetry['irlock'][0] if telemetry['irlock'] is not None else -1, # obligatorio
+        'irlock_y': telemetry['irlock'][1] if telemetry['irlock'] is not None else -1, # obligatorio
+        'irlock_status': telemetry['IRLOCK_status'], # obligatorio
+        'lat': telemetry['lat'], # obligatorio
+        'lon': telemetry['lon'], # obligatorio
+        'num_gps': telemetry['num_gps'], # obligatorio
+        'pos_horiz_variance': telemetry['ekf_status']['pos_horiz_variance'] if telemetry['ekf_status'] is not None else -1, # obligatorio
+        'pos_vert_variance': telemetry['ekf_status']['pos_vert_variance'] if telemetry['ekf_status'] is not None else -1, # obligatorio
+        'rcout1': rcout[0], # obligatorio
+        'rcout2': rcout[1], # obligatorio
+        'rcout3': rcout[2], # obligatorio
+        'rcout4': rcout[3], # obligatorio
+        'rcout5': rcout[4], # obligatorio
+        'rcout6': rcout[5], # obligatorio
+        'rcout7': rcout[6], # obligatorio
+        'rcout8': rcout[7], # obligatorio
+        'sonar_dist': telemetry['sonar_dist'], # obligatorio
+        'throttle': telemetry['throttle'], # obligatorio
+        'vibrations_x': vibrations[0], # obligatorio
+        'vibrations_y': vibrations[1], # obligatorio
+        'vibrations_z': vibrations[2], # obligatorio
+        'voltage': telemetry['voltage'], # obligatorio
+        'velocity_variance': telemetry['ekf_status']['velocity_variance'] if telemetry['ekf_status'] is not None else -1, # obligatorio
+        'terrain_alt_variance': telemetry['ekf_status']['terrain_alt_variance'] if telemetry['ekf_status'] is not None else -1, # obligatorio
+        'waypoint': telemetry['waypoint'], # obligatorio
+        'yaw': telemetry['yaw'],  # obligatorio
+        'timestamp': datetime.datetime.now(dateutil.tz.tzutc())
+    }
+
+
+def recordDroneTakeoff(flight_start, qhawax_name):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    gas_inca_processed = DroneFlightLog(flight_start=flight_start, qhawax_id=qhawax_id)
+    session.add(gas_inca_processed)
+    session.commit()
+
+
+def recordDroneLanding(flight_end, qhawax_name,flight_detail):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    landing_json = {"flight_end":flight_end,"flight_detail":flight_detail}
+    session.query(DroneFlightLog). \
+            filter_by(qhawax_id=qhawax_id,flight_end=None).update(values=landing_json)
+    session.commit()
 

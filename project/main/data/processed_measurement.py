@@ -53,7 +53,7 @@ def handleProcessedData():
                 elif(minutes_difference>=5):
                     post_data_helper.validTimeOfValidProcessed(2,"hour",last_time_turn_on,data_json,product_id,inca_value)
         data_json = util_helper.setNoneStringElements(data_json)
-        socketio.emit('new_data_summary_processed', data_json)
+        socketio.emit(data_json['ID'] + '_processed', data_json)
         return make_response('OK', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
