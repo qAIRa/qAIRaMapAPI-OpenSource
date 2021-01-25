@@ -127,3 +127,19 @@ def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
                        filter(initial_timestamp <= DroneFlightLog.flight_start). \
                        filter(final_timestamp >= DroneFlightLog.flight_end).order_by(DroneFlightLog.id).all()
     return [f._asdict() for f in flight]
+
+
+def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
+    """ Helper function to get Telemetry filter by qHAWAX between timestamp"""
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+      sensors = (DroneTelemetry.airspeed, DroneTelemetry.alt, DroneTelemetry.battery_perc,DroneTelemetry.dist_home,
+                 DroneTelemetry.flight_mode, DroneTelemetry.lat, DroneTelemetry.lon,DroneTelemetry.num_gps,
+                 DroneTelemetry.voltage,DroneTelemetry.velocity_variance, DroneTelemetry.timestamp)
+
+      telemetry = session.query(*sensors).filter(DroneTelemetry.qhawax_id == qhawax_id). \
+                                          filter(DroneTelemetry.timestamp >= initial_timestamp). \
+                                          filter(DroneTelemetry.timestamp <= final_timestamp). \
+                                          order_by(DroneTelemetry.timestamp).all()
+      return [t._asdict() for t in telemetry]
+    return None
