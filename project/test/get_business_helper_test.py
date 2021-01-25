@@ -117,7 +117,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_get_andean_drone_in_field_public_mode_valid(self):
 		y = [{'name': 'qH006', 'mode': 'Customer', 'state': 'OFF', 'qhawax_type': 'AEREAL', 'main_inca': -1.0, 'id': 179,
-			  'qhawax_id': 179, 'eca_noise_id': 2, 'comercial_name': 'Wakanda Awakening', 'lat': -12.2633328, 'lon': -76.8156567, 
+			  'qhawax_id': 179, 'eca_noise_id': 2, 'comercial_name': 'Wakanda Awakening', 'lat': -18.23333, 'lon': -79.828282, 
 			  'area_name': 'Residential Zone'}, {'name': 'qH058', 'mode': 'Customer', 'state': 'OFF', 'qhawax_type': 'AEREAL',
 			  'main_inca': -1.0, 'id': 184, 'qhawax_id': 184, 'eca_noise_id': 1, 'comercial_name': 'Aereo Prueba', 'lat': -12.439766, 
 			  'lon': -76.779879, 'area_name': 'Special Protection Zone'}]
