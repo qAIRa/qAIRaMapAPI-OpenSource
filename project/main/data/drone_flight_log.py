@@ -1,4 +1,5 @@
 import project.main.business.post_business_helper as post_business_helper
+import project.main.business.get_business_helper as get_business_helper
 import project.main.data.post_data_helper as post_data_helper
 import project.main.data.get_data_helper as get_data_helper
 import project.main.exceptions as exception_helper
@@ -14,8 +15,10 @@ def recordDroneTakeoff():
     req_json = request.get_json()
     try:
         flight_start, qhawax_name = exception_helper.getJsonOfTakeOff(req_json)
-        post_data_helper.recordDroneTakeoff(flight_start, qhawax_name)
-        return make_response({'Success':'The drone takeoff has been recorded'}, 200)
+        if(get_business_helper.isAerealQhawax(qhawax_name)==True):
+            post_data_helper.recordDroneTakeoff(flight_start, qhawax_name)
+            return make_response({'Success':'The drone takeoff has been recorded'}, 200)
+        return make_response({'Warning':'This is not an andean drone'}, 400)
     except (TypeError, ValueError ) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -28,9 +31,11 @@ def recordDroneLanding():
     req_json = request.get_json()
     try:
         flight_end, qhawax_name,flight_detail,location = exception_helper.getJsonOfLanding(req_json)
-        post_data_helper.recordDroneLanding(flight_end, qhawax_name,flight_detail)
-        post_business_helper.updateLastLocation(qhawax_name,location)
-        return make_response({'Success':'The drone landing has been recorded'}, 200)
+        if(get_business_helper.isAerealQhawax(qhawax_name)==True):
+            post_data_helper.recordDroneLanding(flight_end, qhawax_name,flight_detail)
+            post_business_helper.updateLastLocation(qhawax_name,location)
+            return make_response({'Success':'The drone landing has been recorded'}, 200)
+        return make_response({'Warning':'This is not an andean drone'}, 400)
     except (TypeError, ValueError ) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

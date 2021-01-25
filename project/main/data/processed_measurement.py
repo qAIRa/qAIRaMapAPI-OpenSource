@@ -41,10 +41,10 @@ def handleProcessedData():
         data_json = util_helper.validAndBeautyJsonProcessed(data_json)
         post_data_helper.storeProcessedDataInDB(data_json)
         data_json['ID'] = product_id
-        data_json['zone'] = "Zona No Definida"
+        data_json['zone'] = "Undefined Zone"
         mode = same_helper.getQhawaxMode(product_id)
         inca_value = same_helper.getMainIncaQhawaxTable(product_id)
-        if(mode == "Cliente" and inca_value!=None):
+        if(mode == "Customer" and inca_value!=None):
             data_json['zone'] = get_business_helper.getNoiseData(product_id)
             minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
             if(minutes_difference!=None):
@@ -55,6 +55,22 @@ def handleProcessedData():
         data_json = util_helper.setNoneStringElements(data_json)
         socketio.emit(data_json['ID'] + '_processed', data_json)
         return make_response('OK', 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+
+@app.route('/api/processed_measurements_andean_drone/', methods=['GET'])
+def getProcessedDataFromAndeanDrone():
+    """ To list all measurement of processed measurement table record the last N minutes """
+    qhawax_name = request.args.get('qhawax_name')
+    initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+    try: 
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        if processed_measurements is not None:
+            return make_response(jsonify(processed_measurements), 200)
+        return make_response(jsonify('Measurements not found'), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
