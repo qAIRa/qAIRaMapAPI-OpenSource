@@ -21,7 +21,7 @@ def handleTelemetry():
         return make_response(json_message, 400)
     if(get_business_helper.isAerealQhawax(room)==True):
         telemetry['ID'] = room
-        socketio.emit(telemetry['ID'] + '_telemetry', data_json)
+        socketio.emit(room + '_telemetry', telemetry)
         drone_telemetry = telemetry
         post_data_helper.storeLogs(telemetry, room)
         return make_response({'success': 'Telemetry sent from drone: '+str(room)}, 200) 

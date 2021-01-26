@@ -1460,7 +1460,7 @@ positions = [
 
 for pos in positions:
 	response_measurement = requests.post(PROCESSED_MEASUREMENT, json=pos)
-	time.sleep(1)
+	time.sleep(5)
 
 
 

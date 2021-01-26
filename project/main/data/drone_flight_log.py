@@ -9,6 +9,7 @@ from project import app
 import dateutil.parser
 import dateutil.tz
 import datetime
+from project import app, socketio
 
 @app.route('/api/record_start_flight/', methods=['POST'])
 def recordDroneTakeoff():
@@ -17,6 +18,7 @@ def recordDroneTakeoff():
         flight_start, qhawax_name = exception_helper.getJsonOfTakeOff(req_json)
         if(get_business_helper.isAerealQhawax(qhawax_name)==True):
             post_data_helper.recordDroneTakeoff(flight_start, qhawax_name)
+            socketio.emit(qhawax_name + '_takeoff', flight_start)
             return make_response({'Success':'The drone takeoff has been recorded'}, 200)
         return make_response({'Warning':'This is not an andean drone'}, 400)
     except (TypeError, ValueError ) as e:
@@ -34,6 +36,7 @@ def recordDroneLanding():
         if(get_business_helper.isAerealQhawax(qhawax_name)==True):
             post_data_helper.recordDroneLanding(flight_end, qhawax_name,flight_detail)
             post_business_helper.updateLastLocation(qhawax_name,location)
+            socketio.emit(qhawax_name + '_landing', flight_end)
             return make_response({'Success':'The drone landing has been recorded'}, 200)
         return make_response({'Warning':'This is not an andean drone'}, 400)
     except (TypeError, ValueError ) as e:
