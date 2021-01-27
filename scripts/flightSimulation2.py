@@ -1,8 +1,8 @@
 import requests
 import time
 
-# BASE_URL = 'https://openqairamapnapi.qairadrones.com/'
-BASE_URL = 'http://0.0.0.0:5000/'
+BASE_URL = 'https://openqairamapnapi.qairadrones.com/'
+#BASE_URL = 'http://0.0.0.0:5000/'
 PROCESSED_MEASUREMENT= BASE_URL + '/api/dataProcessed/'
 
 

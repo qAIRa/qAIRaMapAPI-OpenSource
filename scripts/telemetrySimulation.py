@@ -7,8 +7,8 @@ import math
 # python scripts/telemetrySimulation.py "qH006" 20 1 7
 
 
-# BASE_URL = 'https://openqairamapnapi.qairadrones.com/'
-BASE_URL = 'http://0.0.0.0:5000/'
+BASE_URL = 'https://openqairamapnapi.qairadrones.com/'
+#BASE_URL = 'http://0.0.0.0:5000/'
 SEND_TELEMETRY= BASE_URL + '/api/send_telemetry_andean_drone/'
 COMPLETE_FLIGHT =BASE_URL +'/api/complete_flight'
 START_FLIGHT = BASE_URL + 'api/record_start_flight'
