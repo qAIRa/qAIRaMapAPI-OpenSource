@@ -30,9 +30,10 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxModeCustomer,"String_")
 
 	def test_query_qhawax_mode_customer_valid(self):
-		y = [{'name': 'qH004', 'mode': 'Customer', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0, 
-			  'id': 4, 'qhawax_id': 1, 'eca_noise_id': 2, 'comercial_name': 'FaberCastell', 'lat': -11.557571,
-			  'lon': -70.777524, 'area_name': 'Residential Zone'}]
+		#y = [{'name': 'qH004', 'mode': 'Customer', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 50.0, 
+		#	  'id': 4, 'qhawax_id': 1, 'eca_noise_id': 2, 'comercial_name': 'FaberCastell', 'lat': -11.557571,
+		#	  'lon': -70.777524, 'area_name': 'Residential Zone'}]
+		y=[]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxModeCustomer(),y)
 
 	def test_query_get_areas_not_valid(self):
@@ -102,9 +103,9 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
-		y = [{'name': 'qH004', 'mode': 'Customer', 'state': 'ON', 'qhawax_type': 'STATIC',
-		 	  'main_inca': 50.0, 'id': 4, 'qhawax_id': 1, 'eca_noise_id': 2, 'comercial_name': 'FaberCastell',
-		  	   'lat': -11.557571,'lon': -70.777524, 'area_name': 'Residential Zone'}]
+		y = [{"area_name":"Residential Zone","comercial_name":"FaberCastell","eca_noise_id":2,"id":4,
+			  "lat":-11.557571,"lon":-70.777524,"main_inca":-1.0,"mode":"Customer","name":"qH004","qhawax_id":1,
+			  "qhawax_type":"STATIC","state":"OFF"}]
 		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
 
 	def test_get_andean_drone_in_field_public_mode_not_valid(self):
@@ -116,11 +117,11 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_andean_drone_in_field_public_mode_valid(self):
-		y = [{'name': 'qH006', 'mode': 'Customer', 'state': 'OFF', 'qhawax_type': 'AEREAL', 'main_inca': -1.0, 'id': 179,
-			  'qhawax_id': 179, 'eca_noise_id': 2, 'comercial_name': 'Wakanda Awakening', 'lat': -18.23333, 'lon': -79.828282, 
-			  'area_name': 'Residential Zone'}, {'name': 'qH058', 'mode': 'Customer', 'state': 'OFF', 'qhawax_type': 'AEREAL',
-			  'main_inca': -1.0, 'id': 184, 'qhawax_id': 184, 'eca_noise_id': 1, 'comercial_name': 'Aereo Prueba', 'lat': -12.439766, 
-			  'lon': -76.779879, 'area_name': 'Special Protection Zone'}]
+		y = [{"area_name":"Residential Zone","comercial_name":"Wakanda Awakening","eca_noise_id":2,"id":179,
+			  "lat":-12.0706992694318,"lon":-77.0805159418931,"main_inca":-1.0,"mode":"Customer","name":"qH006",
+			  "qhawax_id":179,"qhawax_type":"AEREAL","state":"OFF"},{"area_name":"Special Protection Zone",
+			  "comercial_name":"Aereo Prueba","eca_noise_id":1,"id":184,"lat":-12.0700711793011,"lon":-77.0798769626038,
+			  "main_inca":-1.0,"mode":"Customer","name":"qH058","qhawax_id":184,"qhawax_type":"AEREAL","state":"OFF"}]
 		self.assertAlmostEqual(get_business_helper.queryDronesInFieldInPublicMode(),y)
 
 	def test_query_noise_data_not_valid(self):
@@ -160,7 +161,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 
 	def test_set_last_value_of_qhawax_valid(self):
 		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH057'),("Stand By","qHAWAX has changed to stand by mode",-1))
-		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH004'),("Customer","qHAWAX has changed to customer mode",0))
+		self.assertAlmostEqual(get_business_helper.getLastValuesOfQhawax('qH004'),("Customer","qHAWAX has changed to customer mode",-1))
 
 	def test_query_last_time_off_due_lack_energy_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.queryLastTimeOffDueLackEnergy)

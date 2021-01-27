@@ -10,7 +10,7 @@ import random
 BASE_URL = 'https://qairamapnapi.qairadrones.com/'
 PROCESSED_MEASUREMENT= BASE_URL + '/api/dataProcessed/'
 
-
+# python staticQhawaxSimulation.py "qH002" 20 1
 measurement_qhawax = {"ID":None,"timestamp":None,"lat":-12.132288,"lon":-77.027702,"CO":42.363,"H2S":0,"NO2":0,\
 					  "O3":0,"SO2":0,"PM1":4.775,"PM25":12.631,"PM10":25.046,"UV":0,"UVA":0,"UVB":0,"spl":0,\
 					  "temperature":23.0,"pressure":100629.10,"humidity":3}
