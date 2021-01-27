@@ -11,13 +11,14 @@ import math
 BASE_URL = 'http://0.0.0.0:5000/'
 SEND_TELEMETRY= BASE_URL + '/api/send_telemetry_andean_drone/'
 COMPLETE_FLIGHT =BASE_URL +'/api/complete_flight'
+START_FLIGHT = BASE_URL + 'api/record_start_flight'
 
 telemetry_qhawax ={
 				"token": "droneandino123",
 				"room" :"qH006",
 				"telemetry": {
-					"lat": -12.0724959,
-					"lon": -77.0823532,
+					"lat": -12.07070,
+					"lon": -77.08052,
 					"alt": -0.05,
 					"dist_home": 0.0,
 					"airspeed": 0.02,
@@ -47,7 +48,7 @@ telemetry_qhawax ={
 					}
 				}
 complete_flight = {
-    "flight_end": "2021-01-25 14:35:00",
+    "flight_end": "2021-01-27 13:05:00",
     "qhawax_name": "qH006",
     "flight_detail": "Terrible flight",
     "location": {
@@ -56,13 +57,22 @@ complete_flight = {
     }
 }
 
+start_flight = {
+    "flight_start": "2021-01-27 13:00:00",
+    "qhawax_name": "qH006"
+}
+
 R=6378137
 sleep_time_seconds=int(sys.argv[3])
 times_iterate= int(sys.argv[2])
 offset =int(sys.argv[4])
 dLat = offset/R
 
+
 if(len(sys.argv)==5):
+	start_flight['qhawax_name']=sys.argv[1]
+	response_telemetry = requests.post(START_FLIGHT, json=start_flight)
+
 	for index in range(times_iterate):
 		telemetry_qhawax["room"]=sys.argv[1]
 		telemetry_qhawax["telemetry"]["alt"]= random.randrange(times_iterate)
@@ -77,6 +87,7 @@ if(len(sys.argv)==5):
 		response_telemetry = requests.post(SEND_TELEMETRY, json=telemetry_qhawax)
 		time.sleep(sleep_time_seconds)
 
+	complete_flight['qhawax_name']=sys.argv[1]	
 	complete_flight['location']['lat']=telemetry_qhawax["telemetry"]["lat"]
 	complete_flight['location']['lon']=telemetry_qhawax["telemetry"]["lon"]
 	response_telemetry = requests.post(COMPLETE_FLIGHT, json=complete_flight)
