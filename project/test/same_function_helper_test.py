@@ -150,8 +150,8 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,1)
 
 	def test_query_time_qhawax_history_valid(self):
-		initial_timestamp = "25-01-2021 22:27:40.980430+00:00"
-		last_timestamp = "27-01-2021 15:01:47.0+00:00"
+		initial_timestamp = "02-02-2021 21:49:17.429848+00:00"
+		last_timestamp = "29-01-2021 23:18:59.0+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
 		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
@@ -182,7 +182,6 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop,{"name":"qH001"},1)
 
 	def test_get_qhawax_on_loop_valid(self):
-		print(same_helper.getQhawaxOnLoop('qH057'))
 		self.assertAlmostEqual(same_helper.getQhawaxOnLoop('qH057'),0)
 		self.assertAlmostEqual(same_helper.getQhawaxOnLoop('qH999'),None)
 

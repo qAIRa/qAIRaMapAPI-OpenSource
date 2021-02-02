@@ -117,11 +117,12 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_andean_drone_in_field_public_mode_valid(self):
-		y = [{"area_name":"Residential Zone","comercial_name":"Wakanda Awakening","eca_noise_id":2,"id":179,
-			  "lat":-12.0706992694318,"lon":-77.0805159418931,"main_inca":-1.0,"mode":"Customer","name":"qH006",
-			  "qhawax_id":179,"qhawax_type":"AEREAL","state":"OFF"},{"area_name":"Special Protection Zone",
-			  "comercial_name":"Aereo Prueba","eca_noise_id":1,"id":184,"lat":-12.0700711793011,"lon":-77.0798769626038,
-			  "main_inca":-1.0,"mode":"Customer","name":"qH058","qhawax_id":184,"qhawax_type":"AEREAL","state":"OFF"}]
+		y = [{"area_name":"Residential Zone","comercial_name":"Wakanda Awakening","eca_noise_id":2,
+			"id":179,"lat":-12.264081,"lon":-76.9144391,"main_inca":-1.0,"mode":"Customer","name":"qH006",
+			"qhawax_id":179,"qhawax_type":"AEREAL","state":"OFF"},{"area_name":"Special Protection Zone",
+			"comercial_name":"Aereo Prueba","eca_noise_id":1,"id":184,"lat":-12.0680050541477,
+			"lon":-77.0777641359314,"main_inca":-1.0,"mode":"Customer","name":"qH058","qhawax_id":184,
+			"qhawax_type":"AEREAL","state":"OFF"}]
 		self.assertAlmostEqual(get_business_helper.queryDronesInFieldInPublicMode(),y)
 
 	def test_query_noise_data_not_valid(self):
@@ -169,7 +170,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.queryLastTimeOffDueLackEnergy,None)
 
 	def test_query_last_time_off_due_lack_energy_valid(self):
-		naive_time = datetime.time(18,25,6,796572)
+		naive_time = datetime.time(18,25,6,854278)
 		date = datetime.date(2021, 1, 21)
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')

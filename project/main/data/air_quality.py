@@ -25,7 +25,9 @@ def getAverageValidProcessedMeasurementsTimePeriodByCompany():
         initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
         final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
         average_valid_processed_measurements = get_data_helper.queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp)
-        return make_response(jsonify(average_valid_processed_measurements_list), 200)
+        if(average_valid_processed_measurements not in [[],None]):
+            return make_response(jsonify(average_valid_processed_measurements), 200)
+        return make_response(jsonify('Measurements not found'), 400)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -40,7 +42,7 @@ def getGasAverageMeasurementsEvery24():
         gas_average_measurement_list = util_helper.getFormatData(gas_average_measurement)
         if(gas_average_measurement_list is not None):
             return make_response(jsonify(gas_average_measurement_list), 200)
-        return make_response(jsonify('Measurements not found'), 200)
+        return make_response(jsonify('Measurements not found'), 400)
     except (ValueError,TypeError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
