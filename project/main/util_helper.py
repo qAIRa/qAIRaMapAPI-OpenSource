@@ -126,3 +126,8 @@ def setNoneStringElements(data_json):
             data_json[key]=None
     return data_json
 
+def beautyFormatDate(date):
+    return addZero(date.day)+"-"+addZero(date.month)+"-"+addZero(date.year)+" "+addZero(date.hour)+":"+addZero(date.minute)+":"+addZero(date.second)
+
+def addZero(number):
+    return "0"+str(number) if (number<10) else str(number)
