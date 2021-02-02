@@ -134,9 +134,14 @@ def getQhawaxOnLoop(qhawax_name):
         return session.query(Qhawax.on_loop).filter_by(name=qhawax_name).one()[0]
     return None
 
-def qhawaxQueryUpdate(json, qhawax_name):
+def qhawaxQueryUpdateFilterByQhawaxName(json, qhawax_name):
     if(qhawaxExistBasedOnName(qhawax_name)):
         session.query(Qhawax).filter_by(name=qhawax_name).update(values=json)
+        session.commit()
+
+def qhawaxQueryUpdateFilterByQhawaxId(json, qhawax_id):
+    if(qhawaxExistBasedOnName(qhawax_name)):
+        session.query(Qhawax).filter_by(id=qhawax_id).update(values=json)
         session.commit()
 
 def qhawaxInstallationQueryUpdate(json, qhawax_name):

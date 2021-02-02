@@ -23,9 +23,10 @@ migrate = Migrate(app, db)
 mail = Mail(app)
 
 from project.main.business import company, eca_noise, qhawax, eca_noise, qhawax_installation_history
-from project.main.data import processed_measurement, air_quality,gas_inca
+from project.main.data import processed_measurement, air_quality,gas_inca, drone_flight_log, drone_telemetry
 import project.database.models as models
 from project.database.models import Company, Qhawax ,ProcessedMeasurement, AirQualityMeasurement, \
-									EcaNoise, GasInca, QhawaxInstallationHistory, ValidProcessedMeasurement
+									EcaNoise, GasInca, QhawaxInstallationHistory, ValidProcessedMeasurement,\
+									DroneTelemetry, DroneFlightLog
 
 db.create_all()

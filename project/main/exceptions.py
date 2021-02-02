@@ -113,3 +113,30 @@ def checkDictionaryVariable(variable):
     if(isinstance(variable, dict) is not True):
         raise TypeError("Variable "+str(variable)+" should be Json")
     return variable
+
+def checkListVariable(variable):
+    if(isinstance(variable, list) is not True):
+        raise TypeError("Variable "+str(variable)+" should be List")
+    return variable
+
+def getJsonOfTakeOff(data):
+    data = checkDictionaryVariable(data)
+    if 'flight_start' not in data:
+        raise ValueError("No target flight_start in given json")
+    if 'qhawax_name' not in data:
+        raise ValueError("No target qhawax_name in given json")
+
+    return data['flight_start'], str(data['qhawax_name'])
+
+def getJsonOfLanding(data):
+    data = checkDictionaryVariable(data)
+    if 'flight_end' not in data:
+        raise ValueError("No target flight_end in given json")
+    if 'qhawax_name' not in data:
+        raise ValueError("No target qhawax_name in given json")
+    if 'flight_detail' not in data:
+        raise ValueError("No target flight_detail in given json")
+    if 'location' not in data:
+        raise ValueError("No target location in given json")
+
+    return data['flight_end'], str(data['qhawax_name']) ,str(data['flight_detail']), data['location']

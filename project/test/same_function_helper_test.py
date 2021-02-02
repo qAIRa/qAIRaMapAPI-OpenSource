@@ -6,10 +6,7 @@ import dateutil
 import dateutil.parser
 
 class TestSameFunctionHelper(unittest.TestCase):
-	"""
-	Test of Same Function Helper
-
-	"""
+	""" Test of Same Function Helper """
 	def test_qhawax_exist_based_on_id_not_valid(self):
 		self.assertRaises(TypeError,same_helper.qhawaxExistBasedOnID)
 		self.assertRaises(TypeError,same_helper.qhawaxExistBasedOnID,{"name":"qH001"})
@@ -19,7 +16,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_qhawax_exist_based_on_id_valid(self):
 		self.assertAlmostEqual(same_helper.qhawaxExistBasedOnID(1),True)
-		self.assertAlmostEqual(same_helper.qhawaxExistBasedOnID(100),False)
+		self.assertAlmostEqual(same_helper.qhawaxExistBasedOnID(999),False)
 
 	def test_qhawax_exist_based_on_name_not_valid(self):
 		self.assertRaises(TypeError,same_helper.qhawaxExistBasedOnName)
@@ -41,7 +38,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_qhawax_installation_exist_based_on_id_valid(self):
 		self.assertAlmostEqual(same_helper.qhawaxInstallationExistBasedOnID(1),True)
-		self.assertAlmostEqual(same_helper.qhawaxInstallationExistBasedOnID(100),False)
+		self.assertAlmostEqual(same_helper.qhawaxInstallationExistBasedOnID(999),False)
 
 	def test_area_exist_based_on_id_not_valid(self):
 		self.assertRaises(TypeError,same_helper.areaExistBasedOnID)
@@ -108,7 +105,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_get_qhawax_name_valid(self):
 		self.assertAlmostEqual(same_helper.getQhawaxName(1),"qH004")
-		self.assertAlmostEqual(same_helper.getQhawaxName(100),None)
+		self.assertAlmostEqual(same_helper.getQhawaxName(999),None)
 
 	def test_get_installation_id_based_name_not_valid(self):
 		self.assertRaises(TypeError,same_helper.getInstallationIdBaseName)
@@ -143,7 +140,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_get_qhawax_mode_valid(self):
 		self.assertAlmostEqual(same_helper.getQhawaxMode('qH057'),'Stand By')
-		self.assertAlmostEqual(same_helper.getQhawaxMode('qH004'),'Cliente')
+		self.assertAlmostEqual(same_helper.getQhawaxMode('qH004'),'Customer')
 		self.assertAlmostEqual(same_helper.getQhawaxMode('qH999'),None)
 
 	def test_query_time_qhawax_history_not_valid(self):
@@ -153,8 +150,8 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getTimeQhawaxHistory,1)
 
 	def test_query_time_qhawax_history_valid(self):
-		initial_timestamp = "30-12-2020 14:35:03.630017+00:00"
-		last_timestamp = "30-12-2020 01:26:04.0+00:00"
+		initial_timestamp = "25-01-2021 22:27:40.980430+00:00"
+		last_timestamp = "27-01-2021 15:01:47.0+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
 		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
@@ -162,6 +159,45 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory('qH004'),values)
 		self.assertAlmostEqual(same_helper.getTimeQhawaxHistory('qH100'),None)
 
+	def test_get_qhawax_comercial_name_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getComercialName)
+		self.assertRaises(TypeError,same_helper.getComercialName,40)
+		self.assertRaises(TypeError,same_helper.getComercialName,True)
+		self.assertRaises(TypeError,same_helper.getComercialName,4.5)
+		self.assertRaises(TypeError,same_helper.getComercialName,None)
+		self.assertRaises(TypeError,same_helper.getComercialName,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getComercialName,{"name":"qH001"},1)
+
+	def test_get_qhawax_comercial_name_valid(self):
+		self.assertAlmostEqual(same_helper.getComercialName('qH057'),'qH057')
+		self.assertAlmostEqual(same_helper.getComercialName('qH004'),'FaberCastell')
+
+	def test_get_qhawax_on_loop_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop)
+		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop,40)
+		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop,True)
+		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop,4.5)
+		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop,None)
+		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getQhawaxOnLoop,{"name":"qH001"},1)
+
+	def test_get_qhawax_on_loop_valid(self):
+		print(same_helper.getQhawaxOnLoop('qH057'))
+		self.assertAlmostEqual(same_helper.getQhawaxOnLoop('qH057'),0)
+		self.assertAlmostEqual(same_helper.getQhawaxOnLoop('qH999'),None)
+
+	def test_get_qhawax_status_not_valid(self):
+		self.assertRaises(TypeError,same_helper.getQhawaxStatus)
+		self.assertRaises(TypeError,same_helper.getQhawaxStatus,40)
+		self.assertRaises(TypeError,same_helper.getQhawaxStatus,True)
+		self.assertRaises(TypeError,same_helper.getQhawaxStatus,4.5)
+		self.assertRaises(TypeError,same_helper.getQhawaxStatus,None)
+		self.assertRaises(TypeError,same_helper.getQhawaxStatus,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.getQhawaxStatus,{"name":"qH001"},1)
+
+	def test_get_qhawax_status_valid(self):
+		self.assertAlmostEqual(same_helper.getQhawaxStatus('qH004'),'OFF')
+		self.assertAlmostEqual(same_helper.getQhawaxStatus('qH999'),None)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

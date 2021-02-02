@@ -4,21 +4,13 @@ from datetime import timedelta
 import dateutil
 import dateutil.parser
 import project.main.util_helper as util_helper
+import pytz
 
 class TestUtilHelper(unittest.TestCase):
 	"""
-	Test of Get Business Functions
+	Test of Util Helper Functions
 
 	"""
-	def test_check_date_not_valid(self):
-		date_format = '%d-%m-%Y %H:%M:%S'
-		self.assertRaises(TypeError,util_helper.check_valid_date,{"name":"qH001"})
-		self.assertRaises(TypeError,util_helper.check_valid_date,4.33,date_format)
-		self.assertRaises(TypeError,util_helper.check_valid_date,5,date_format)
-		self.assertRaises(TypeError,util_helper.check_valid_date,None,date_format)
-		self.assertRaises(TypeError,util_helper.check_valid_date,True,date_format)
-		self.assertRaises(ValueError,util_helper.check_valid_date,'2020-09-09 00:00:00',date_format)
-
 	def test_valid_time_json_processed_not_valid(self):
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed)
 		self.assertRaises(TypeError,util_helper.validTimeJsonProcessed,"resultado")
@@ -121,14 +113,14 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.getFormatData,True)
 
 	#def test_get_format_data_valid(self):
-	#	y = [{'CO': 1.15,'timestamp_zone':"2020-01-01 23:00:00"},
-	#		 {'CO': 2.30,'timestamp_zone':"2020-01-02 03:00:00"}]
-	#	y_result = [{'CO': 1.15,'timestamp_zone':"2020-01-01 23:00:00"},
-	#				{'CO': "",  'timestamp_zone':"2020-01-02 00:00:00"},
-	#				{'CO': "",  'timestamp_zone':"2020-01-02 01:00:00"},
-	#				{'CO': "",  'timestamp_zone':"2020-01-02 02:00:00"},
-	#				{'CO': 2.30,'timestamp_zone':"2020-01-02 03:00:00"}]
-	#	self.assertAlmostEqual(util_helper.getFormatData(y),y_result)
+	#	naive_time = datetime.time(0,0,0)
+	#	date = datetime.date(2021, 1, 6)
+	#	naive_datetime = datetime.datetime.combine(date, naive_time)
+	#	timezone = pytz.timezone('UTC')
+	#	aware_datetime = timezone.localize(naive_datetime)
+	#	a = [(aware_datetime, 1986.208)]
+	#	b = [{'timestamp_zone': aware_datetime, 'sensor': 1986.208}]
+	#	self.assertAlmostEqual(util_helper.getFormatData(a),b)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

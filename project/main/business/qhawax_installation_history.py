@@ -18,6 +18,18 @@ def getQhawaxInMap():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+@app.route('/api/AllDronesInMap/', methods=['GET'])
+def getDronesInMap():
+    """ Get list of qHAWAXs filter by company ID """
+    try:
+        drones_in_field = get_business_helper.queryDronesInFieldInPublicMode()
+        if (drones_in_field!=[]):
+            return make_response(jsonify(drones_in_field), 200)
+        return make_response(jsonify({'Warning':'Drones in field not found'}), 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
 @app.route('/api/GetInstallationDate/', methods=['GET'])
 def getInstallationDate():
     """ Get installation date of qHAWAX in field """
@@ -29,14 +41,14 @@ def getInstallationDate():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
     else:
-        if(installation_date != None):
-            if(first_timestamp!=None):
-                if(first_timestamp>installation_date):
-                    return str(first_timestamp)
-                return str(installation_date)
+        if(installation_date == None):
+            return make_response({'Warning ':'qHAWAX ID '+str(qhawax_id)+' has not been found in field'}, 400)
+        if(first_timestamp == None):
             return str(installation_date)
-        return make_response({'Success ':'qHAWAX ID '+str(qhawax_id)+' has not been found in field'}, 200)
-
+        if(first_timestamp > installation_date):
+            return str(first_timestamp)
+        return str(installation_date)
+        
 @app.route('/api/newQhawaxInstallation/', methods=['POST'])
 def newQhawaxInstallation():
     """ To create a qHAWAX in Field """
@@ -45,28 +57,26 @@ def newQhawaxInstallation():
     try:
         qH_name, in_charge = exception_helper.getInstallationFields(data_json)
         post_business_helper.storeNewQhawaxInstallation(data_json)
-        post_business_helper.util_qhawax_installation_set_up(qH_name,'Occupied','Cliente',description,in_charge)
+        post_business_helper.util_qhawax_installation_set_up(qH_name,'Occupied','Customer',description,in_charge)
+        return make_response({'Success': 'Save new qHAWAX in field'}, 200)
     except Exception as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-    else:
-        return make_response({'Success': 'Save new qHAWAX in field'}, 200)
-
+        
 @app.route('/api/saveEndWorkField/', methods=['POST'])
 def saveEndWorkField():
     """Save last date of qHAWAX in field """
     data_json = request.get_json()
-    description="qHAWAX finished work in field"
+    description="qHAWAX has finished work in field"
     try:
         qH_name, end_date, person_in_charge = exception_helper.validEndWorkFieldJson(data_json)
         post_business_helper.saveEndWorkFieldDate(qH_name, end_date)
-        mode = 'Stand By' if (same_helper.getQhawaxMode(qH_name) == 'Cliente') else same_helper.getQhawaxMode(qH_name)
+        mode = 'Stand By' if (same_helper.getQhawaxMode(qH_name) == 'Customer') else same_helper.getQhawaxMode(qH_name)
         post_business_helper.util_qhawax_installation_set_up(qH_name,'Available',mode,description,person_in_charge)
+        return make_response('Success: Save last day in field', 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-    else:
-        return make_response('Success: Save qHAWAX last day in field', 200)
 
 @app.route('/api/updateQhawaxInstallation/', methods=['POST'])
 def updateQhawaxInstallation():
@@ -77,8 +87,7 @@ def updateQhawaxInstallation():
         qH_name, in_charge = exception_helper.getInstallationFields(data_json)
         post_business_helper.updateQhawaxInstallation(data_json)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
+        return make_response({'Sucess': 'qHAWAX field information have been updated'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-    else:
-        return make_response({'Sucess': 'Update data of qHAWAX in field'}, 200)

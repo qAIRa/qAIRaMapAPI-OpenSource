@@ -1,4 +1,6 @@
-from project.database.models import AirQualityMeasurement, ProcessedMeasurement, GasInca,ValidProcessedMeasurement, Qhawax
+from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
+                                    GasInca,ValidProcessedMeasurement, Qhawax, \
+                                    DroneTelemetry, DroneFlightLog,QhawaxInstallationHistory
 import project.main.business.post_business_helper as post_business_helper
 import project.main.same_function_helper as same_helper
 import project.main.exceptions as exceptions
@@ -66,7 +68,7 @@ def queryDBGasInca(initial_timestamp, final_timestamp):
     return [measurement._asdict() for measurement in gas_inca]
                                   
 def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
-
+    """ Helper function to get Processed Measurement filter by qHAWAX between timestamp"""
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
         sensors = (ProcessedMeasurement.CO, ProcessedMeasurement.CO2, ProcessedMeasurement.H2S,ProcessedMeasurement.NO,
@@ -109,4 +111,35 @@ def getFirstTimestampValidProcessed(qhawax_id):
                                  filter(ValidProcessedMeasurement.qhawax_installation_id == int(installation_id)). \
                                  order_by(ValidProcessedMeasurement.timestamp_zone.asc()).first()
         return None if (first_timestamp==None) else first_timestamp[0]
+    return None
+
+
+def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
+    """ Helper function to get GAS INCA measurement"""
+    flight_columns = (DroneFlightLog.flight_start, DroneFlightLog.flight_end, \
+                      DroneFlightLog.flight_detail,Qhawax.name.label('qhawax_name'),\
+                      QhawaxInstallationHistory.lat.label('last_latitude_position'), QhawaxInstallationHistory.lon.label('last_longitude_position'))
+
+    flight = session.query(*flight_columns).\
+                       join(Qhawax, DroneFlightLog.qhawax_id == Qhawax.id). \
+                       join(QhawaxInstallationHistory, DroneFlightLog.qhawax_id == QhawaxInstallationHistory.qhawax_id). \
+                       group_by(Qhawax.id, DroneFlightLog.id, QhawaxInstallationHistory.id). \
+                       filter(initial_timestamp <= DroneFlightLog.flight_start). \
+                       filter(final_timestamp >= DroneFlightLog.flight_end).order_by(DroneFlightLog.id).all()
+    return [f._asdict() for f in flight]
+
+
+def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
+    """ Helper function to get Telemetry filter by qHAWAX between timestamp"""
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+      sensors = (DroneTelemetry.airspeed, DroneTelemetry.alt, DroneTelemetry.battery_perc,DroneTelemetry.dist_home,
+                 DroneTelemetry.flight_mode, DroneTelemetry.lat, DroneTelemetry.lon,DroneTelemetry.num_gps,
+                 DroneTelemetry.voltage,DroneTelemetry.velocity_variance, DroneTelemetry.timestamp)
+
+      telemetry = session.query(*sensors).filter(DroneTelemetry.qhawax_id == qhawax_id). \
+                                          filter(DroneTelemetry.timestamp >= initial_timestamp). \
+                                          filter(DroneTelemetry.timestamp <= final_timestamp). \
+                                          order_by(DroneTelemetry.timestamp).all()
+      return [t._asdict() for t in telemetry]
     return None

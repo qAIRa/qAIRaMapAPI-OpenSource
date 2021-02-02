@@ -143,15 +143,15 @@ def qhawaxChangeToCalibration():
     """ qHAWAX update to Calibration mode, set main inca -2 value """
     req_json = request.get_json()
     qhawax_time_off = datetime.datetime.now(dateutil.tz.tzutc())
-    description = "qHAWAX have changed to calibration mode"
+    description = "qHAWAX has been changed to calibration mode"
     try:
         qH_name, in_charge = exception_helper.getChangeCalibrationFields(req_json)
         post_business_helper.updateMainIncaQhawaxTable(-2,qH_name)
         post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off)
         post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qH_name)
-        post_business_helper.changeMode(qH_name,"Calibracion")
+        post_business_helper.changeMode(qH_name,"Calibration")
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
-        return make_response({'Success': 'qHAWAX have changed to calibration mode - open'}, 200)
+        return make_response({'Success': 'qHAWAX has been changed to calibration mode - open'}, 200)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -170,7 +170,7 @@ def qhawaxEndCalibration():
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qH_name)
         post_business_helper.changeMode(qH_name,mode)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
-        return make_response({'Success': 'qHAWAX have changed to original mode - open'}, 200)
+        return make_response({'Success': 'qHAWAX has been changed to original mode - open'}, 200)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
@@ -185,7 +185,8 @@ def sendQhawaxStatusOnBaseOnLossSignal():
     try:
         qH_name, timestamp = exception_helper.getQhawaxSignalJson(req_json)
         qhawax_state = same_helper.getQhawaxStatus(qH_name)
-        json_email = {'description':'Se prendió el qHAWAX luego de una pérdida de señal','person_in_charge':'Firmware'}
+        description='qHAWAX turned on after a loss of signal'
+        json_email = {'description':description,'person_in_charge':'Firmware'}
         if(qhawax_state is not None):
             mode = same_helper.getQhawaxMode(qH_name)
             on_loop = int(same_helper.getQhawaxOnLoop(qH_name)) +1
@@ -194,15 +195,11 @@ def sendQhawaxStatusOnBaseOnLossSignal():
                 post_business_helper.setLastMeasurementOfQhawax(mode,qH_name)
                 post_business_helper.writeBinnacle(qH_name,json_email['description'],json_email['person_in_charge'])
                 post_business_helper.reset_on_loop(qH_name,0)
-                return make_response({'Success': 'qHAWAX ON based on loss signal'}, 200)
+                return make_response({'Success': description}, 200)
             else:
-                if(on_loop==20):
-                    first_time = str(get_business_helper.getFirstTimeLoop(qH_name) - datetime.timedelta(hours=5))
-                    post_business_helper.reset_on_loop(qH_name,0)
-                else:
-                    post_business_helper.reset_on_loop(qH_name,on_loop)
-                    if(on_loop==1):
-                        post_business_helper.record_first_time_loop(qH_name,timestamp)
+                post_business_helper.reset_on_loop(qH_name,0) if(on_loop==20) else post_business_helper.reset_on_loop(qH_name,on_loop)
+                if(on_loop==1):
+                    post_business_helper.record_first_time_loop(qH_name,timestamp)
                 return make_response({'Success': 'qHAWAX is already ON'}, 200)
         return make_response({'Warning': 'qHAWAX name has not been found'}, 400)
     except TypeError as e:
