@@ -12,7 +12,7 @@ import datetime
 
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
-    """ To list all measurement of processed measurement table record the last N minutes """
+    """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
     qhawax_name = request.args.get('name')
     try:
         interval_minutes = int(request.args.get('interval_minutes')) \
@@ -30,7 +30,7 @@ def getProcessedData():
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
     """
-    To record processed measurement and valid processed measurement every five seconds
+    Records processed and valid processed measurements every five seconds
     qHAWAX: Record new measurement
     """
     flag_email = False
@@ -62,14 +62,14 @@ def handleProcessedData():
 
 @app.route('/api/processed_measurements_andean_drone/', methods=['GET'])
 def getProcessedDataFromAndeanDrone():
-    """ To list all measurement of processed measurement table record the last N minutes """
+    """ Lists all measurements of processed measurement of the target drone within the initial and final date """
     qhawax_name = request.args.get('qhawax_name')
     initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
 <<<<<<< HEAD
     try:
 =======
-    try: 
+    try:
 >>>>>>> 734858d6f1dba7eb81f5229b2cdc517e1a770e16
         processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
         if processed_measurements is not None:

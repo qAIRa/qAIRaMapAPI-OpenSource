@@ -24,12 +24,12 @@ def handleTelemetry():
         socketio.emit(room + '_telemetry', telemetry)
         drone_telemetry = telemetry
         post_data_helper.storeLogs(telemetry, room)
-        return make_response({'success': 'Telemetry sent from drone: '+str(room)}, 200) 
-    return make_response({'warning': 'qHAWAX '+str(room)+' is not aereal '}, 400) 
+        return make_response({'success': 'Telemetry sent from drone: '+str(room)}, 200)
+    return make_response({'warning': 'qHAWAX '+str(room)+' is not aereal '}, 400)
 
 @app.route('/api/telemetry_andean_drone/', methods=['GET'])
 def getTelemetryDataFromAndeanDrone():
-    """ To list all measurement of processed measurement table record the last N minutes """
+    """ Lists all measurements of processed measurement table within the initial and final date """
     qhawax_name = request.args.get('qhawax_name')
     initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
