@@ -12,13 +12,13 @@ import datetime
 
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
-    """ To list all measurement of processed measurement table record the last N minutes """
+    """ Lists all measurements of processed measurement table record the last N minutes """
     qhawax_name = request.args.get('name')
     try:
         interval_minutes = int(request.args.get('interval_minutes')) \
-            if request.args.get('interval_minutes') is not None else 60 
+            if request.args.get('interval_minutes') is not None else 60
         final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
-        initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes) 
+        initial_timestamp = final_timestamp - datetime.timedelta(minutes=interval_minutes)
         processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
         if processed_measurements is not None:
             return make_response(jsonify(processed_measurements), 200)
@@ -30,7 +30,7 @@ def getProcessedData():
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedData():
     """
-    To record processed measurement and valid processed measurement every five seconds
+    Records processed measurements and valid processed measurements every five seconds
     qHAWAX: Record new measurement
     """
     flag_email = False
@@ -62,11 +62,11 @@ def handleProcessedData():
 
 @app.route('/api/processed_measurements_andean_drone/', methods=['GET'])
 def getProcessedDataFromAndeanDrone():
-    """ To list all measurement of processed measurement table record the last N minutes """
+    """ Lists all measurements of processed measurement table record the last N minutes """
     qhawax_name = request.args.get('qhawax_name')
     initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
-    try: 
+    try:
         processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
         if processed_measurements is not None:
             return make_response(jsonify(processed_measurements), 200)
@@ -74,4 +74,3 @@ def getProcessedDataFromAndeanDrone():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-
