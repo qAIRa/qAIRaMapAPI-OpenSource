@@ -8,7 +8,7 @@ from project import app
 
 @app.route('/api/AllQhawaxInMap/', methods=['GET'])
 def getQhawaxInMap():
-    """ Get list of qHAWAXs filter by company ID """
+    """ Gets a list of qHAWAXs filter by company ID """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
         if (qhawax_in_field!=[]):
@@ -20,7 +20,7 @@ def getQhawaxInMap():
 
 @app.route('/api/AllDronesInMap/', methods=['GET'])
 def getDronesInMap():
-    """ Get list of qHAWAXs filter by company ID """
+    """ Gets a list of qHAWAXs filter by company ID """
     try:
         drones_in_field = get_business_helper.queryDronesInFieldInPublicMode()
         if (drones_in_field!=[]):
@@ -32,7 +32,7 @@ def getDronesInMap():
 
 @app.route('/api/GetInstallationDate/', methods=['GET'])
 def getInstallationDate():
-    """ Get installation date of qHAWAX in field """
+    """ Gets the installation date of qHAWAX in field """
     qhawax_id = int(request.args.get('qhawax_id'))
     try:
         installation_date = get_business_helper.getInstallationDate(qhawax_id)
@@ -48,10 +48,10 @@ def getInstallationDate():
         if(first_timestamp > installation_date):
             return str(first_timestamp)
         return str(installation_date)
-        
+
 @app.route('/api/newQhawaxInstallation/', methods=['POST'])
 def newQhawaxInstallation():
-    """ To create a qHAWAX in Field """
+    """ Creates a qHAWAX in Field """
     data_json = request.get_json()
     description="qHAWAX was recorded in field"
     try:
@@ -62,10 +62,10 @@ def newQhawaxInstallation():
     except Exception as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-        
+
 @app.route('/api/saveEndWorkField/', methods=['POST'])
 def saveEndWorkField():
-    """Save last date of qHAWAX in field """
+    """Saves the last date of qHAWAX in field """
     data_json = request.get_json()
     description="qHAWAX has finished work in field"
     try:
@@ -80,7 +80,7 @@ def saveEndWorkField():
 
 @app.route('/api/updateQhawaxInstallation/', methods=['POST'])
 def updateQhawaxInstallation():
-    """ To update qHAWAX in Field """
+    """ Updates qHAWAX in Field """
     data_json = request.get_json()
     description="Some fields of qHAWAX installation were updated"
     try:
