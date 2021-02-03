@@ -18,7 +18,7 @@ def storeAirQualityData():
         return make_response(json_message, 400)
 
 @app.route('/api/average_valid_processed_period/', methods=['GET'])
-def getAverageValidProcessedMeasurementsTimePeriodByCompany():
+def getAverageValidProcessedMeasurementsTimePeriod():
     """ Lists all average measurements of valid processed measurement table in a defined period of time and company """
     try:
         qhawax_id = int(request.args.get('qhawax_id'))
