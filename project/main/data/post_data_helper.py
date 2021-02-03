@@ -9,6 +9,7 @@ from datetime import timedelta
 import dateutil.parser
 import dateutil.tz
 import datetime
+import time
 
 session = db.session
 MAX_SECONDS_DATA_STORAGE = 20

@@ -15,7 +15,7 @@ def queryQhawaxModeCustomer():
                           join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
                           join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
                           group_by(Qhawax.id, QhawaxInstallationHistory.id,EcaNoise.id). \
-                          filter(Qhawax.mode =="Cliente",Qhawax.state =="ON", \
+                          filter(Qhawax.mode =="Customer",Qhawax.state =="ON", \
                                  QhawaxInstallationHistory.end_date_zone == None).order_by(Qhawax.id).all()
     return [qhawax._asdict() for qhawax in qhawax_list]
 
@@ -101,7 +101,7 @@ def getLastValuesOfQhawax(qH_name):
     mode = "Stand By"
     description="qHAWAX has changed to stand by mode"
     if(isItFieldQhawax(qH_name) == True):
-        mode = "Cliente"
+        mode = "Customer"
         description="qHAWAX has changed to customer mode"
     main_inca = 0 if(queryQhawaxStatus(qH_name)=='ON') else -1
     return mode, description, main_inca
@@ -123,4 +123,14 @@ def queryLastTimeOffDueLackEnergy(qhawax_name):
                                     filter_by(end_date_zone=None). \
                                     limit(1).all()
             return list_last_turn_on[0]
+    return None
+
+
+def isAerealQhawax(qhawax_name):
+    """Helper Drone Flight function to check if qhawax is aereal"""
+    if(same_helper.qhawaxExistBasedOnName(qhawax_name)):
+        aereal_qhawax = session.query(Qhawax.id).filter_by(name=qhawax_name,qhawax_type='AEREAL').all()
+        if(aereal_qhawax==[]):
+            return False
+        return True
     return None

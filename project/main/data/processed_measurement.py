@@ -66,7 +66,11 @@ def getProcessedDataFromAndeanDrone():
     qhawax_name = request.args.get('qhawax_name')
     initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
     final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+<<<<<<< HEAD
     try:
+=======
+    try: 
+>>>>>>> 734858d6f1dba7eb81f5229b2cdc517e1a770e16
         processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
         if processed_measurements is not None:
             return make_response(jsonify(processed_measurements), 200)
@@ -74,3 +78,7 @@ def getProcessedDataFromAndeanDrone():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 734858d6f1dba7eb81f5229b2cdc517e1a770e16
