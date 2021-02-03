@@ -47,7 +47,7 @@ def getTimeAllActiveQhawax():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-
+#
 @app.route('/api/qhawax_exist/', methods=['GET'])
 def verifyIfQhawaxExist():
     """ Verify if qHAWAX exist """

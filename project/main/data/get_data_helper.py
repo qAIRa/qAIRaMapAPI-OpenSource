@@ -3,6 +3,7 @@ from project.database.models import AirQualityMeasurement, ProcessedMeasurement,
                                     DroneTelemetry, DroneFlightLog,QhawaxInstallationHistory
 import project.main.business.post_business_helper as post_business_helper
 import project.main.same_function_helper as same_helper
+import project.main.util_helper as util_helper
 import project.main.exceptions as exceptions
 from project import app, db
 import datetime
@@ -116,7 +117,7 @@ def getFirstTimestampValidProcessed(qhawax_id):
 
 def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
     """ Helper function to get GAS INCA measurement"""
-    flight_columns = (DroneFlightLog.flight_start, DroneFlightLog.flight_end, \
+    flight_columns = (DroneFlightLog.flight_start, DroneFlightLog.flight_end,\
                       DroneFlightLog.flight_detail,Qhawax.name.label('qhawax_name'),\
                       QhawaxInstallationHistory.lat.label('last_latitude_position'), QhawaxInstallationHistory.lon.label('last_longitude_position'))
 
@@ -126,8 +127,13 @@ def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
                        group_by(Qhawax.id, DroneFlightLog.id, QhawaxInstallationHistory.id). \
                        filter(initial_timestamp <= DroneFlightLog.flight_start). \
                        filter(final_timestamp >= DroneFlightLog.flight_end).order_by(DroneFlightLog.id).all()
-    return [f._asdict() for f in flight]
-
+    new_flight = []
+    for f in flight:
+      f = f._asdict()
+      f["flight_start"] = util_helper.beautyFormatDate(f["flight_start"])
+      f["flight_end"] = util_helper.beautyFormatDate(f["flight_end"])
+      new_flight.append(f)   
+    return new_flight
 
 def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
     """ Helper function to get Telemetry filter by qHAWAX between timestamp"""
