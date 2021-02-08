@@ -74,3 +74,21 @@ def getProcessedDataFromAndeanDrone():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+
+
+@app.route('/api/measurements_by_pollutant_during_flight/', methods=['GET'])
+def getProcessedByPollutantDuringFlight():
+    """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
+    qhawax_name = str(request.args.get('name'))
+    pollutant = str(request.args.get('pollutant'))
+    try:
+        start_flight = get_data_helper.qHAWAXIsInFlight(qhawax_name)
+        if(start_flight is not None):
+            final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+            processed_measurements = get_data_helper.queryDBProcessedByPollutant(qhawax_name, start_flight, final_timestamp,pollutant)
+            if processed_measurements is not None:
+                return make_response(jsonify(processed_measurements), 200)
+        return make_response(jsonify('Measurements not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)

@@ -10,7 +10,7 @@ import datetime
 import math
 
 session = db.session
-
+sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #validar con sabri
     """ Helper function to get Air Quality measurement """
     sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3, 
@@ -30,7 +30,6 @@ def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #vali
 
 def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     """ Helper function to get gas average measurement based on qHAWAX name and sensor name"""
-    sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
     gas_name = exceptions.checkStringVariable(gas_name)
 
     if(gas_name not in sensor_array):
@@ -149,3 +148,40 @@ def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
                                           order_by(DroneTelemetry.timestamp).all()
       return [t._asdict() for t in telemetry]
     return None
+
+def queryDBProcessedByPollutant(qhawax_name, initial_timestamp, final_timestamp,pollutant):
+    """ Helper function to get Processed Measurement filter by qHAWAX between timestamp"""
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        column_array = [ProcessedMeasurement.CO.label('pollutant'), ProcessedMeasurement.H2S.label('pollutant'), 
+                        ProcessedMeasurement.NO2.label('pollutant'), ProcessedMeasurement.O3.label('pollutant'),
+                        ProcessedMeasurement.PM25.label('pollutant'), ProcessedMeasurement.PM10.label('pollutant'),
+                        ProcessedMeasurement.SO2.label('pollutant')]
+
+        for i in range(len(sensor_array)):
+            if(pollutant==sensor_array[i]):
+                sensors = (ProcessedMeasurement.timestamp_zone, column_array[i])
+
+        measurements = session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
+                               filter(ProcessedMeasurement.timestamp_zone >= initial_timestamp). \
+                               filter(ProcessedMeasurement.timestamp_zone <= final_timestamp). \
+                               order_by(ProcessedMeasurement.timestamp_zone.asc()).all()
+        return [t._asdict() for t in measurements]
+    return None
+
+def qHAWAXIsInFlight(qhawax_name):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        flight = session.query(DroneFlightLog.flight_start).\
+                         filter(DroneFlightLog.qhawax_id==qhawax_id,DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
+        if(flight!=[]):
+          return flight[0][0]
+    return None
+
+def AllqHAWAXIsInFlight():
+    flight = session.query(DroneFlightLog.flight_start, Qhawax.name).\
+                     join(Qhawax, DroneFlightLog.qhawax_id == Qhawax.id). \
+                     group_by(Qhawax.id, DroneFlightLog.id). \
+                     filter(DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
+    return [t._asdict() for t in flight]
+
