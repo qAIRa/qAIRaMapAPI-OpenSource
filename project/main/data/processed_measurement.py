@@ -10,6 +10,8 @@ import dateutil.parser
 import dateutil.tz
 import datetime
 
+pollutants = ['CO','CO2','NO2','O3','H2S','SO2','PM25','PM10','VOC']
+
 @app.route('/api/processed_measurements/', methods=['GET'])
 def getProcessedData():
     """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
@@ -28,7 +30,7 @@ def getProcessedData():
         return make_response(json_message, 400)
 
 @app.route('/api/dataProcessed/', methods=['POST'])
-def handleProcessedData():
+def handleProcessedDataByQhawax():
     """
     Records processed and valid processed measurements every five seconds
     qHAWAX: Record new measurement
@@ -59,6 +61,28 @@ def handleProcessedData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+@app.route('/api/dataProcessedDrone/', methods=['POST'])
+def handleProcessedDataByDrone():
+    """
+    Records processed and valid processed measurements every second by drone
+    qHAWAX: Record new measurement
+    """
+    flag_email = False
+    data_json = request.get_json()
+    try:
+        product_id = data_json['ID']
+        data_json = util_helper.validTimeJsonProcessed(data_json)
+        data_json = util_helper.validAndBeautyJsonProcessed(data_json)
+        post_data_helper.storeProcessedDataInDB(data_json)
+        data_json['ID'] = product_id
+        data_json = util_helper.setNoneStringElements(data_json)
+        for i in range(len(pollutants)):
+            socket_name = data_json['ID'] +'_'+ str(pollutants[i])+'_processed'
+            socketio.emit(socket_name, data_json) #qH006_CO_proccessed
+        return make_response('OK', 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
 
 @app.route('/api/processed_measurements_andean_drone/', methods=['GET'])
 def getProcessedDataFromAndeanDrone():
