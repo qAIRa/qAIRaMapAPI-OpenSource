@@ -160,7 +160,7 @@ def queryDBProcessedByPollutant(qhawax_name, initial_timestamp, final_timestamp,
 
         for i in range(len(sensor_array)):
             if(pollutant==sensor_array[i]):
-                sensors = (ProcessedMeasurement.timestamp_zone, column_array[i])
+                sensors = (ProcessedMeasurement.timestamp_zone, column_array[i], ProcessedMeasurement.lat,ProcessedMeasurement.lon)
 
         measurements = session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
                                filter(ProcessedMeasurement.timestamp_zone >= initial_timestamp). \
@@ -179,9 +179,10 @@ def qHAWAXIsInFlight(qhawax_name):
     return None
 
 def AllqHAWAXIsInFlight():
-    flight = session.query(DroneFlightLog.flight_start, Qhawax.name).\
+    flight = session.query(DroneFlightLog.flight_start, Qhawax.name, QhawaxInstallationHistory.comercial_name).\
                      join(Qhawax, DroneFlightLog.qhawax_id == Qhawax.id). \
-                     group_by(Qhawax.id, DroneFlightLog.id). \
+                     join(QhawaxInstallationHistory, Qhawax.id == QhawaxInstallationHistory.qhawax_id). \
+                     group_by(Qhawax.id, DroneFlightLog.id, QhawaxInstallationHistory.id). \
                      filter(DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
     return [t._asdict() for t in flight]
 
