@@ -8,7 +8,7 @@ import datetime
 import random
 
 BASE_URL = 'https://qairamapnapi.qairadrones.com/'
-PROCESSED_MEASUREMENT= BASE_URL + '/api/dataProcessed/'
+PROCESSED_MEASUREMENT= BASE_URL + '/api/dataProcessedDrone/'
 
 # python scripts/staticQhawaxSimulation.py "qH002" 20 1
 measurement_qhawax = {
