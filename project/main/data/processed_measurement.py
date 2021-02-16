@@ -79,8 +79,8 @@ def handleProcessedDataByDrone():
         for i in range(len(pollutants)):
             socket_name = data_json['ID'] +'_'+ str(pollutants[i])+'_processed'
             pollutant = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
-            new_data_json = {"sensor": pollutant,"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
-            new_data_json[pollutant]= data_json[pollutant]
+            new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
+            new_data_json[pollutants[i]]= data_json[pollutant]
             print(new_data_json)
             socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
         return make_response('OK', 200)
