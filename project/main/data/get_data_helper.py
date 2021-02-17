@@ -140,7 +140,8 @@ def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
     if(qhawax_id is not None):
       sensors = (DroneTelemetry.airspeed, DroneTelemetry.alt, DroneTelemetry.battery_perc,DroneTelemetry.dist_home,
                  DroneTelemetry.flight_mode, DroneTelemetry.lat, DroneTelemetry.lon,DroneTelemetry.num_gps,
-                 DroneTelemetry.voltage,DroneTelemetry.velocity_variance, DroneTelemetry.timestamp)
+                 DroneTelemetry.voltage,DroneTelemetry.velocity_variance, DroneTelemetry.timestamp,DroneTelemetry.current,
+                 DroneTelemetry.fix_type)
 
       telemetry = session.query(*sensors).filter(DroneTelemetry.qhawax_id == qhawax_id). \
                                           filter(DroneTelemetry.timestamp >= initial_timestamp). \
