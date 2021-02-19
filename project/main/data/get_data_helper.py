@@ -117,6 +117,7 @@ def getFirstTimestampValidProcessed(qhawax_id):
 def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
     """ Helper function to get GAS INCA measurement"""
     flight_columns = (DroneFlightLog.flight_start, DroneFlightLog.flight_end,\
+											QhawaxInstallationHistory.comercial_name,\
                       DroneFlightLog.flight_detail,Qhawax.name.label('qhawax_name'),\
                       QhawaxInstallationHistory.lat.label('last_latitude_position'), QhawaxInstallationHistory.lon.label('last_longitude_position'))
 

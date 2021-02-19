@@ -6,6 +6,7 @@ import math
 import dateutil.parser
 import dateutil.tz
 import datetime
+from datetime import timedelta
 
 # python scripts/droneSimulation.py "qH006" 20 1 7
 
@@ -23,7 +24,7 @@ measurement_qhawax = {
 	"lat": -12.07070,
 	"lon": -77.08052,
 	"CO":42.363,
-	"H2S":0,
+	"H2S":-10,
 	"NO2":150.1,
 	"O3":101,
 	"SO2":0,
@@ -75,9 +76,9 @@ telemetry_qhawax ={
 				}
 
 complete_flight = {
-    "flight_end": str(datetime.datetime.now(dateutil.tz.tzutc())),
+    "flight_end": str(datetime.datetime.now(dateutil.tz.tzutc())+ datetime.timedelta(hours=0.5)),
     "qhawax_name": "qH006",
-    "flight_detail": "Terrible flight",
+    "flight_detail": "Good flight",
     "location": {
         "lat": -12.2222,
         "lon": -77.3333
@@ -99,9 +100,9 @@ dLat = offset/R
 
 if(len(sys.argv)==5):
 	start_flight['qhawax_name']=sys.argv[1]
+	start_flight['flight_start']=str(datetime.datetime.now(dateutil.tz.tzutc()))
 	print(start_flight)
 	response_telemetry = requests.post(START_FLIGHT, json=start_flight)
-
 	for index in range(times_iterate):
 		measurement_qhawax["ID"]=sys.argv[1]
 		measurement_qhawax["timestamp"]= str(datetime.datetime.now(dateutil.tz.tzutc()))
@@ -129,5 +130,6 @@ if(len(sys.argv)==5):
 	complete_flight['qhawax_name']=sys.argv[1]	
 	complete_flight['location']['lat']=telemetry_qhawax["telemetry"]["lat"]
 	complete_flight['location']['lon']=telemetry_qhawax["telemetry"]["lon"]
+	complete_flight['flight_end']=str(datetime.datetime.now(dateutil.tz.tzutc()))
 	print(complete_flight)
 	response_telemetry = requests.post(COMPLETE_FLIGHT, json=complete_flight)
