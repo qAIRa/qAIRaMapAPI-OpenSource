@@ -42,9 +42,9 @@ def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
     qhawax_json_main_inca_installation = {'main_inca': new_main_inca}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_main_inca_installation,qhawax_name)
 
-def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
+def saveStatusOffQhawaxInstallationTable(qhawax_name,time):
     """ Set qHAWAX OFF in qHAWAX Installation table """
-    qhawax_json_status_off = {'main_inca': -1,'last_registration_time_zone':qhawax_lost_timestamp}
+    qhawax_json_status_off = {'main_inca': -1,'last_registration_time_zone':time}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_status_off,qhawax_name)
 
 def saveTurnOnLastTime(qhawax_name):
@@ -165,3 +165,9 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
         bitacora_update = Bitacora(**bitacora)
         session.add(bitacora_update)
         session.commit()
+
+def saveTimeQhawaxOff(qhawax_name):
+    """ Save time qHAWAX off with timestamp in UTC 0 """
+    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+    session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_registration_time_zone':datetime.datetime.now(dateutil.tz.tzutc())})
+    session.commit()

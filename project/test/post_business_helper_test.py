@@ -161,7 +161,7 @@ class TestPostBusinessHelper(unittest.TestCase):
 		installation_date = "2020-12-29 00:44:00.0-05:00"
 		end_date_string = "2020-12-29 01:00:00.255258"
 		person_in_charge = 'l.montalvo'
-		qhawax_name = 'qH134'
+		qhawax_name = 'qH102'
 		post_business_helper.createQhawax(qhawax_name,'STATIC')
 		installation_json = {'lat':'-7.0000499','lon':'-70.9000000',
 							 'comercial_name':'Unit Test '+str(randint(0, 30))+' Coveralls',

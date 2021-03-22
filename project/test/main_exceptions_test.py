@@ -53,19 +53,16 @@ class TestMainExceptions(unittest.TestCase):
 
 	def test_query_off_target_json_not_valid(self):
 		data_qhawax_name= {'qhawax_lost_timestamp':'test'}
-		data_qhawax_lost_time= {'qhawax_name':'test'}
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson)
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson,"Json")
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson,4.33)
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson,None)
 		self.assertRaises(TypeError,exception_helper.getStatusOffTargetofJson,True)
 		self.assertRaises(ValueError,exception_helper.getStatusOffTargetofJson,data_qhawax_name)
-		self.assertRaises(ValueError,exception_helper.getStatusOffTargetofJson,data_qhawax_lost_time)
 
 	def test_query_off_target_json_valid(self):
-		data = {'qhawax_name':'test','qhawax_lost_timestamp':'test'}
-		self.assertAlmostEqual(exception_helper.getStatusOffTargetofJson(data),(str(data['qhawax_name']).strip(),\
-																		   	   data['qhawax_lost_timestamp']))
+		data = {'qhawax_name':'test'}
+		self.assertAlmostEqual(exception_helper.getStatusOffTargetofJson(data),(str(data['qhawax_name']).strip()))
 
 	def test_query_change_to_calibration_json_not_valid(self):
 		data_qhawax_name= {'person_in_charge':'test'}

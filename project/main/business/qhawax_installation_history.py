@@ -11,6 +11,7 @@ def getQhawaxInMap():
     """ Gets a list of qHAWAXs filter by company ID """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
+        print(qhawax_in_field)
         if (qhawax_in_field!=[]):
             return make_response(jsonify(qhawax_in_field), 200)
         return make_response(jsonify({'Warning':'qHAWAXs in field not found'}), 400)
@@ -23,6 +24,7 @@ def getDronesInMap():
     """ Gets a list of qHAWAXs filter by company ID """
     try:
         drones_in_field = get_business_helper.queryDronesInFieldInPublicMode()
+        print(drones_in_field)
         if (drones_in_field!=[]):
             return make_response(jsonify(drones_in_field), 200)
         return make_response(jsonify({'Warning':'Drones in field not found'}), 400)

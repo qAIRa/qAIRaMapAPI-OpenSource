@@ -28,6 +28,7 @@ def getActiveQhawaxModeCustomer():
     """ To get all active qHAWAXs that are in field in mode costumer - No parameters required """
     try:
         customer_qhawaxs = get_business_helper.queryQhawaxModeCustomer()
+        print(customer_qhawaxs)
         if(customer_qhawaxs!=[]):
             return make_response(jsonify(customer_qhawaxs), 200)
         return make_response(jsonify({'Warning':'qHAWAXs not found'}), 400)
@@ -92,9 +93,10 @@ def sendQhawaxStatusOff():
     req_json = request.get_json()
     description = "qHAWAX off"
     try:
-        qH_name, qH_time_off = exception_helper.getStatusOffTargetofJson(req_json)
+        qH_name = exception_helper.getStatusOffTargetofJson(req_json)
         post_business_helper.saveStatusQhawaxTable(qH_name,'OFF',-1)
-        post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qH_time_off)
+        lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name)
+        post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,lessfive)
         post_business_helper.writeBinnacle(qH_name,description,None)
         jsonsend['main_inca'] = -1
         jsonsend['name'] = qH_name
