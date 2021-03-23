@@ -157,5 +157,39 @@ class TestMainExceptions(unittest.TestCase):
 		variable = 4.3
 		self.assertAlmostEqual(exception_helper.checkFloatVariable(variable),variable)
 
+	def test_query_take_off_json_not_valid(self):
+		data_flight_start= {'flight_start':'test'}
+		data_qhawax_name = {'qhawax_name':'test'}
+		self.assertRaises(TypeError,exception_helper.getJsonOfTakeOff)
+		self.assertRaises(TypeError,exception_helper.getJsonOfTakeOff,"Json")
+		self.assertRaises(TypeError,exception_helper.getJsonOfTakeOff,4.33)
+		self.assertRaises(TypeError,exception_helper.getJsonOfTakeOff,None)
+		self.assertRaises(TypeError,exception_helper.getJsonOfTakeOff,True)
+		self.assertRaises(ValueError,exception_helper.getJsonOfTakeOff,data_flight_start)
+		self.assertRaises(ValueError,exception_helper.getJsonOfTakeOff,data_qhawax_name)
+
+	def test_query_take_off_json_valid(self):
+		data = {'flight_start':'2021-01-01 00:00:00','qhawax_name':'qH006'}
+		self.assertAlmostEqual(exception_helper.getJsonOfTakeOff(data),(data['flight_start'],str(data['qhawax_name'])))
+
+	def test_query_take_off_json_not_valid(self):
+		data_location= {'flight_end':'test','qhawax_name':'test','flight_detail':'test'}
+		data_flight_detail = {'flight_end':'test','qhawax_name':'test','location':'test'}
+		data_flight_end = {'location':'test','qhawax_name':'test','flight_detail':'test'}
+		data_qhawax_name= {'flight_end':'test','location':'test','flight_detail':'test'}
+		self.assertRaises(TypeError,exception_helper.getJsonOfLanding)
+		self.assertRaises(TypeError,exception_helper.getJsonOfLanding,"Json")
+		self.assertRaises(TypeError,exception_helper.getJsonOfLanding,4.33)
+		self.assertRaises(TypeError,exception_helper.getJsonOfLanding,None)
+		self.assertRaises(TypeError,exception_helper.getJsonOfLanding,True)
+		self.assertRaises(ValueError,exception_helper.getJsonOfLanding,data_location)
+		self.assertRaises(ValueError,exception_helper.getJsonOfLanding,data_qhawax_name)
+		self.assertRaises(ValueError,exception_helper.getJsonOfLanding,data_flight_detail)
+		self.assertRaises(ValueError,exception_helper.getJsonOfLanding,data_flight_end)
+
+	def test_query_take_off_json_valid(self):
+		data = {'flight_end':'2021-01-02 00:00:00','qhawax_name':'qH006','flight_detail':'test','location':'test'}
+		self.assertAlmostEqual(exception_helper.getJsonOfLanding(data),(data['flight_end'], str(data['qhawax_name']) ,str(data['flight_detail']), data['location']))
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
