@@ -94,26 +94,26 @@ class TestGetBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_business_helper.isItFieldQhawax,{"name":"qH001"})
 
 	def test_get_qhawax_in_field_public_mode_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,40)
-		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,True)
-		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,4.5)
-		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,None)
-		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.queryQhawaxInFieldInPublicMode,{"name":"qH001"},1)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,40)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,True)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,4.5)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,None)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,{"name":"qH001"})
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_qhawax_in_field_public_mode_valid(self):
 		y = [{'name': 'qH021', 'mode': 'Customer', 'state': 'ON', 'qhawax_type': 'STATIC', 'main_inca': 100.0,
 			  'id': 327, 'qhawax_id': 307, 'eca_noise_id': 3, 'comercial_name': 'Universidad Nacional de San Antonio Abad del Cusco',
 			  'lat': -12.598634, 'lon': -69.187518, 'area_name': 'Comercial Zone'}]
-		self.assertAlmostEqual(get_business_helper.queryQhawaxInFieldInPublicMode(),y)
+		self.assertAlmostEqual(get_business_helper.queryQhawaxTypeInFieldInPublicMode("STATIC"),y)
 
 	def test_get_andean_drone_in_field_public_mode_not_valid(self):
-		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,40)
-		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,True)
-		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,4.5)
-		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,None)
-		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,{"name":"qH001"})
-		self.assertRaises(TypeError,get_business_helper.queryDronesInFieldInPublicMode,{"name":"qH001"},1)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,40)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,True)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,4.5)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,None)
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,{"name":"qH001"})
+		self.assertRaises(TypeError,get_business_helper.queryQhawaxTypeInFieldInPublicMode,{"name":"qH001"},1)
 
 	def test_get_andean_drone_in_field_public_mode_valid(self):
 		y = [{'name': 'qH006', 'mode': 'Customer', 'state': 'OFF', 'qhawax_type': 'AEREAL', 'main_inca': -1.0,
@@ -122,7 +122,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 			  'qhawax_type': 'AEREAL', 'main_inca': -1.0, 'id': 184, 'qhawax_id': 184, 'eca_noise_id': 1, 
 			  'comercial_name': 'Aereo Prueba', 'lat': -11.998472864017, 'lon': -76.9984387510529, 
 			  'area_name': 'Special Protection Zone'}]
-		self.assertAlmostEqual(get_business_helper.queryDronesInFieldInPublicMode(),y)
+		self.assertAlmostEqual(get_business_helper.queryQhawaxTypeInFieldInPublicMode("AEREAL"),y)
 
 	def test_query_noise_data_not_valid(self):
 		self.assertRaises(TypeError,get_business_helper.getNoiseData)
