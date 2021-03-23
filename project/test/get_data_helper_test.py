@@ -127,7 +127,7 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryLastMainInca,1)
 
 	def test_query_last_main_inca_valid(self):
-		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH004"),1.0)
+		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH004"),50.0)
 		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH100"),None)
 
 	def test_query_first_timestamp_valid_not_valid(self):
@@ -138,13 +138,13 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.getFirstTimestampValidProcessed,None)
 
 	def test_query_first_timestamp_valid_valid(self):
-		naive_time = datetime.time(0,30,46)
-		date = datetime.date(2020, 1, 16)
+		naive_time = datetime.time(21,14,2)
+		date = datetime.date(2021, 3, 22)
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
-		print(get_data_helper.getFirstTimestampValidProcessed(1))
-		self.assertAlmostEqual(get_data_helper.getFirstTimestampValidProcessed(1),aware_datetime)
+		print(get_data_helper.getFirstTimestampValidProcessed(307))
+		self.assertAlmostEqual(get_data_helper.getFirstTimestampValidProcessed(307),aware_datetime)
 		self.assertAlmostEqual(get_data_helper.getFirstTimestampValidProcessed(100),None)
 
 

@@ -7,7 +7,7 @@ import datetime
 
 @app.route('/api/air_quality_measurements/', methods=['POST'])
 def storeAirQualityData():
-    """ POST: To record processed measurement and valid processed measurement every five seconds """
+    """ POST: Records processed and valid processed measurements every five seconds """
     data_json = request.get_json()
     try:
         #revisar el json con un exception
@@ -18,8 +18,8 @@ def storeAirQualityData():
         return make_response(json_message, 400)
 
 @app.route('/api/average_valid_processed_period/', methods=['GET'])
-def getAverageValidProcessedMeasurementsTimePeriodByCompany():
-    """ To list all average measurement of valid processed measurement table in a define period of time and company """
+def getAverageValidProcessedMeasurementsTimePeriod():
+    """ Lists all average measurements of valid processed measurement table in a defined period of time and company """
     try:
         qhawax_id = int(request.args.get('qhawax_id'))
         initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
@@ -34,12 +34,15 @@ def getAverageValidProcessedMeasurementsTimePeriodByCompany():
 
 @app.route('/api/gas_average_measurement/', methods=['GET'])
 def getGasAverageMeasurementsEvery24():
-    """ To list all values by a define gas or dust in ug/m3 of air quality measurement table of the last 24 hours """
+    """ Lists all values by a defined gas or dust in ug/m3 of air quality measurement table of the last 24 hours """
     qhawax_name = str(request.args.get('qhawax'))
     gas_name = str(request.args.get('gas'))
     try:
         gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement(qhawax_name, gas_name)
+        print(gas_average_measurement)
+        print(type(gas_average_measurement[0]))
         gas_average_measurement_list = util_helper.getFormatData(gas_average_measurement)
+        print(gas_average_measurement_list)
         if(gas_average_measurement_list is not None):
             return make_response(jsonify(gas_average_measurement_list), 200)
         return make_response(jsonify('Measurements not found'), 400)

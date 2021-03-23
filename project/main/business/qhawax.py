@@ -28,6 +28,7 @@ def getActiveQhawaxModeCustomer():
     """ To get all active qHAWAXs that are in field in mode costumer - No parameters required """
     try:
         customer_qhawaxs = get_business_helper.queryQhawaxModeCustomer()
+        print(customer_qhawaxs)
         if(customer_qhawaxs!=[]):
             return make_response(jsonify(customer_qhawaxs), 200)
         return make_response(jsonify({'Warning':'qHAWAXs not found'}), 400)
@@ -78,7 +79,7 @@ def updateIncaData():
         post_business_helper.updateMainIncaQhawaxTable(value_inca,name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(value_inca, name)
         jsonsend['main_inca'] = value_inca
-        jsonsend['name'] = name 
+        jsonsend['name'] = name
         socketio.emit('update_inca', jsonsend)
         return make_response({'Success':' save inca value'}, 200)
     except (ValueError, TypeError) as e:
@@ -92,12 +93,13 @@ def sendQhawaxStatusOff():
     req_json = request.get_json()
     description = "qHAWAX off"
     try:
-        qH_name, qH_time_off = exception_helper.getStatusOffTargetofJson(req_json)
+        qH_name = exception_helper.getStatusOffTargetofJson(req_json)
         post_business_helper.saveStatusQhawaxTable(qH_name,'OFF',-1)
-        post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qH_time_off)
+        lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name)
+        post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,lessfive)
         post_business_helper.writeBinnacle(qH_name,description,None)
         jsonsend['main_inca'] = -1
-        jsonsend['name'] = qH_name 
+        jsonsend['name'] = qH_name
         socketio.emit('update_inca', jsonsend)
         return make_response({'Success': 'qHAWAX OFF'}, 200)
     except (ValueError, TypeError) as e:
@@ -116,7 +118,7 @@ def sendQhawaxStatusOn():
         post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,None)
         jsonsend['main_inca'] = 0
-        jsonsend['name'] = qhawax_name 
+        jsonsend['name'] = qhawax_name
         return make_response({'Success': 'qHAWAX ON physically'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

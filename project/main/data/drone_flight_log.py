@@ -57,3 +57,30 @@ def getDroneFlightDuringPeriodTime():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+
+
+@app.route('/api/flight_log_info_by_qhawax_name/', methods=['GET'])
+def getFlightLogInfoByQhawaxName():
+    """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
+    qhawax_name = str(request.args.get('name'))
+    try:
+        start_flight = get_data_helper.qHAWAXIsInFlight(qhawax_name)
+        if(start_flight is not None):
+            json = {"start_flight":start_flight,"qhawax_name":qhawax_name}
+            return make_response(jsonify(json), 200)
+        return make_response(jsonify('qHAWAX '+str(qhawax_name)+' is not in flight'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/flight_log_info_during_flight/', methods=['GET'])
+def getFlightLogDuringFlight():
+    """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
+    try:
+        allQhawaxsInFlight = get_data_helper.AllqHAWAXIsInFlight()
+        if(allQhawaxsInFlight!=[]):
+            return make_response(jsonify(allQhawaxsInFlight), 200)
+        return make_response(jsonify('There are no qHAWAXs in flight'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
