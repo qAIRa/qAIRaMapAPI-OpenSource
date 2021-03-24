@@ -126,7 +126,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,True)
 
 	def test_get_main_inca_valid(self):
-		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH004"),-1.0)
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH004"),0.0)
 		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH100"),None)
 
 	def test_get_qhawax_mode_not_valid(self):
@@ -151,7 +151,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 
 	def test_query_time_qhawax_history_valid(self):
 		initial_timestamp = "20-01-2021 19:07:07.0+00:00"
-		last_timestamp = "20-01-2021 19:07:07.0+00:00"
+		last_timestamp = "24-03-2021 05:10:04.994731+00:00"
 		date_format = '%d-%m-%Y %H:%M:%S.%f%z'
 		last_time_turn_on = datetime.datetime.strptime(initial_timestamp,date_format)
 		last_registration_time = datetime.datetime.strptime(last_timestamp,date_format)
@@ -196,7 +196,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getQhawaxStatus,{"name":"qH001"},1)
 
 	def test_get_qhawax_status_valid(self):
-		self.assertAlmostEqual(same_helper.getQhawaxStatus('qH004'),'OFF')
+		self.assertAlmostEqual(same_helper.getQhawaxStatus('qH004'),'ON')
 		self.assertAlmostEqual(same_helper.getQhawaxStatus('qH999'),None)
 
 if __name__ == '__main__':

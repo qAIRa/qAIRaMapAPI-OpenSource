@@ -1,5 +1,6 @@
 from project.database.models import Qhawax, EcaNoise, QhawaxInstallationHistory, Company, Bitacora
 import project.main.same_function_helper as same_helper
+import project.main.exceptions as exception_helper
 import project.main.util_helper as util_helper
 from project import app, db
 session = db.session
@@ -21,6 +22,7 @@ def queryQhawaxModeCustomer():
 
 def queryQhawaxTypeInFieldInPublicMode(qhawax_type):
     """ Get list of qHAWAXs in field in public mode based on qhawax type """
+    qhawax_type = exception_helper.checkStringVariable(qhawax_type)
     qhawax_public = session.query(*columns_qhawax).\
                             join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id). \
                             join(Qhawax, QhawaxInstallationHistory.qhawax_id == Qhawax.id). \
@@ -58,9 +60,11 @@ def getInstallationDate(qhawax_id):
 
 def isItFieldQhawax(qhawax_name):
     """Check qhawax in field """
+    qhawax_type = exception_helper.checkStringVariable(qhawax_name)
     return True if (same_helper.getInstallationIdBaseName(qhawax_name)is not None) else False
 
 def queryQhawaxStatus(name):
+    qhawax_type = exception_helper.checkStringVariable(name)
     return session.query(Qhawax.state).filter_by(name=name).one()[0]
 
 def getHoursDifference(qhawax_name):

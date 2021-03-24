@@ -39,8 +39,8 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,50)
 		self.assertRaises(TypeError,post_business_helper.turnOnAfterCalibration,True)
 
-	#def test_save_turn_on_after_calibration_valid(self):
-	#	post_business_helper.turnOnAfterCalibration('qH004')
+	def test_save_turn_on_after_calibration_valid(self):
+		post_business_helper.turnOnAfterCalibration('qH004')
 
 	def test_save_turn_on_qhawax_installation_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime)
@@ -48,8 +48,8 @@ class TestPostBusinessHelper(unittest.TestCase):
 		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,50)
 		self.assertRaises(TypeError,post_business_helper.saveTurnOnLastTime,True)
 
-	#def test_save_turn_on_qhawax_installation_valid(self):
-	#	post_business_helper.saveTurnOnLastTime('qH057')
+	def test_save_turn_on_qhawax_installation_valid(self):
+		post_business_helper.saveTurnOnLastTime('qH057')
 
 	def test_save_status_qhawax_not_valid(self):
 		self.assertRaises(TypeError,post_business_helper.saveStatusQhawaxTable)
