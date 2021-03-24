@@ -28,7 +28,6 @@ def getActiveQhawaxModeCustomer():
     """ To get all active qHAWAXs that are in field in mode costumer - No parameters required """
     try:
         customer_qhawaxs = get_business_helper.queryQhawaxModeCustomer()
-        print(customer_qhawaxs)
         if(customer_qhawaxs!=[]):
             return make_response(jsonify(customer_qhawaxs), 200)
         return make_response(jsonify({'Warning':'qHAWAXs not found'}), 400)
