@@ -184,6 +184,27 @@ class TestPostBusinessHelper(unittest.TestCase):
 		json= {"company_name": "Unit Test "+str(randint(0, 20))+"_"+str(randint(0, 20)), "email_group": "unitest"+str(randint(0, 20))+"-"+str(randint(0, 20))+".gob",
 			   "ruc":"12345678"+str(randint(200, 900)),"phone":"998123123","contact_person":"Test","address":"Prueba"}
 		post_business_helper.createCompany(json)
+
+
+	def test_update_time_off_with_last_turn_off_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff)
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff,None)
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff,50)
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff,100,None)
+
+	def test_update_time_off_with_last_turn_off_valid(self):
+		time_turn_off = datetime.datetime.now(dateutil.tz.tzutc())
+		post_business_helper.updateTimeOffWithLastTurnOff(time_turn_off,'qH004')
+
+	def test_update_last_location_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation)
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation,None)
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation,50)
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation,100,None)
+
+	def test_update_last_location_valid(self):
+		json = {"lat":-12,"lon":-77}
+		post_business_helper.updateLastLocation('qH004',json)
 	
 if __name__ == '__main__':
     unittest.main(verbosity=2)
