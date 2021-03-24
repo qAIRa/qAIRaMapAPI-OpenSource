@@ -73,6 +73,7 @@ def storeValidProcessedDataInDB(data, product_id):
 def validAndBeautyJsonValidProcessed(data_json,product_id,inca_value):
     """ Helper function to valid json Valid Processed table """
     data_json = exceptions.checkDictionaryVariable(data_json)
+    product_id = exceptions.checkStringVariable(product_id)
     storeValidProcessedDataInDB(data_json,product_id)
     if(inca_value==0.0):
       post_business_helper.updateMainIncaQhawaxTable(1,product_id)
@@ -90,6 +91,8 @@ def validTimeOfValidProcessed(time_valid,time_type, last_time_turn_on,data_json,
 
 def storeLogs(telemetry, drone_name):
     global drone_elapsed_time, drone_telemetry, drone_storage
+    telemetry = exceptions.checkDictionaryVariable(telemetry)
+    drone_name = exceptions.checkStringVariable(drone_name)
     if drone_elapsed_time is None:
         drone_elapsed_time = time.time()
 
@@ -99,6 +102,7 @@ def storeLogs(telemetry, drone_name):
 
     if time.time() - drone_elapsed_time > MAX_SECONDS_DATA_STORAGE:
         drone_telemetry = formatTelemetryForStorage(telemetry)
+        drone_telemetry['timestamp'] = datetime.datetime.now(dateutil.tz.tzutc())
         drone_telemetry['qhawax_id'] = drone_storage[drone_name]
         drone_telemetry = DroneTelemetry(**drone_telemetry)
         session.add(drone_telemetry)
@@ -106,6 +110,7 @@ def storeLogs(telemetry, drone_name):
         drone_elapsed_time = time.time() 
 
 def formatTelemetryForStorage(telemetry):
+    telemetry = exceptions.checkDictionaryVariable(telemetry)
     rcout= telemetry['rcout'] if telemetry['rcout'] is not None else [-1,-1,-1,-1,-1,-1,-1,-1]
     compass1= telemetry['compass1'] if telemetry['compass1'] is not None else [-1,-1,-1]
     compass2= telemetry['compass2'] if telemetry['compass2'] is not None else [-1,-1,-1]
@@ -156,8 +161,7 @@ def formatTelemetryForStorage(telemetry):
         'velocity_variance': telemetry['ekf_status']['velocity_variance'] if telemetry['ekf_status'] is not None else -1, # obligatorio
         'terrain_alt_variance': telemetry['ekf_status']['terrain_alt_variance'] if telemetry['ekf_status'] is not None else -1, # obligatorio
         'waypoint': telemetry['waypoint'], # obligatorio
-        'yaw': telemetry['yaw'],  # obligatorio
-        'timestamp': datetime.datetime.now(dateutil.tz.tzutc())
+        'yaw': telemetry['yaw'] # obligatorio
     }
 
 

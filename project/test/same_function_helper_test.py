@@ -126,7 +126,7 @@ class TestSameFunctionHelper(unittest.TestCase):
 		self.assertRaises(TypeError,same_helper.getMainIncaQhawaxTable,True)
 
 	def test_get_main_inca_valid(self):
-		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH004"),0.0)
+		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH004"),50.0)
 		self.assertAlmostEqual(same_helper.getMainIncaQhawaxTable("qH100"),None)
 
 	def test_get_qhawax_mode_not_valid(self):
@@ -198,6 +198,20 @@ class TestSameFunctionHelper(unittest.TestCase):
 	def test_get_qhawax_status_valid(self):
 		self.assertAlmostEqual(same_helper.getQhawaxStatus('qH004'),'ON')
 		self.assertAlmostEqual(same_helper.getQhawaxStatus('qH999'),None)
+
+	def test_qhawax_query_update_filter_qhawax_id_not_valid(self):
+		self.assertRaises(TypeError,same_helper.qhawaxQueryUpdateFilterByQhawaxId)
+		self.assertRaises(TypeError,same_helper.qhawaxQueryUpdateFilterByQhawaxId,40)
+		self.assertRaises(TypeError,same_helper.qhawaxQueryUpdateFilterByQhawaxId,True)
+		self.assertRaises(TypeError,same_helper.qhawaxQueryUpdateFilterByQhawaxId,4.5)
+		self.assertRaises(TypeError,same_helper.qhawaxQueryUpdateFilterByQhawaxId,None)
+		self.assertRaises(TypeError,same_helper.qhawaxQueryUpdateFilterByQhawaxId,{"name":"qH001"})
+		self.assertRaises(TypeError,same_helper.qhawaxQueryUpdateFilterByQhawaxId,1,{"name":"qH001"})
+
+	def test_qhawax_query_update_filter_qhawax_id_valid(self):
+		json_loop = {'on_loop':0}
+		qhawax_id=1
+		same_helper.qhawaxQueryUpdateFilterByQhawaxId(json_loop, qhawax_id)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

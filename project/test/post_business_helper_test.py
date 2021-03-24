@@ -184,6 +184,65 @@ class TestPostBusinessHelper(unittest.TestCase):
 		json= {"company_name": "Unit Test "+str(randint(0, 20))+"_"+str(randint(0, 20)), "email_group": "unitest"+str(randint(0, 20))+"-"+str(randint(0, 20))+".gob",
 			   "ruc":"12345678"+str(randint(200, 900)),"phone":"998123123","contact_person":"Test","address":"Prueba"}
 		post_business_helper.createCompany(json)
+
+
+	def test_update_time_off_with_last_turn_off_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff)
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff,None)
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff,50)
+		self.assertRaises(TypeError,post_business_helper.updateTimeOffWithLastTurnOff,100,None)
+
+	def test_update_time_off_with_last_turn_off_valid(self):
+		time_turn_off = datetime.datetime.now(dateutil.tz.tzutc())
+		post_business_helper.updateTimeOffWithLastTurnOff(time_turn_off,'qH004')
+
+	def test_update_last_location_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation)
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation,None)
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation,50)
+		self.assertRaises(TypeError,post_business_helper.updateLastLocation,100,None)
+
+	def test_update_last_location_valid(self):
+		json = {"lat":-12,"lon":-77}
+		post_business_helper.updateLastLocation('qH004',json)
+
+	def test_reset_on_loop_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.resetOnLoop)
+		self.assertRaises(TypeError,post_business_helper.resetOnLoop,None)
+		self.assertRaises(TypeError,post_business_helper.resetOnLoop,50)
+		self.assertRaises(TypeError,post_business_helper.resetOnLoop,100,None)
+
+	def test_reset_on_loop_valid(self):
+		loop = 0
+		post_business_helper.resetOnLoop('qH004',loop)
+
+	def test_record_first_time_loop_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.recordFirstTimeLoop)
+		self.assertRaises(TypeError,post_business_helper.recordFirstTimeLoop,None)
+		self.assertRaises(TypeError,post_business_helper.recordFirstTimeLoop,50)
+		self.assertRaises(TypeError,post_business_helper.recordFirstTimeLoop,100,None)
+
+	def test_record_first_time_loop_valid(self):
+		timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+		post_business_helper.recordFirstTimeLoop('qH004',timestamp)
+
+	def test_save_time_qhawax_off_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.saveTimeQhawaxOff)
+		self.assertRaises(TypeError,post_business_helper.saveTimeQhawaxOff,None)
+		self.assertRaises(TypeError,post_business_helper.saveTimeQhawaxOff,50)
+		self.assertRaises(TypeError,post_business_helper.saveTimeQhawaxOff,100,None)
+
+	def test_save_time_qhawax_off_valid(self):
+		post_business_helper.saveTimeQhawaxOff('qH006')
+
+	def test_set_last_measurement_of_qhawax_not_valid(self):
+		self.assertRaises(TypeError,post_business_helper.setLastMeasurementOfQhawax)
+		self.assertRaises(TypeError,post_business_helper.setLastMeasurementOfQhawax,None)
+		self.assertRaises(TypeError,post_business_helper.setLastMeasurementOfQhawax,50)
+		self.assertRaises(TypeError,post_business_helper.setLastMeasurementOfQhawax,100,None)
+
+	def test_set_last_measurement_of_qhawax_valid(self):
+		post_business_helper.setLastMeasurementOfQhawax("qH004")
 	
 if __name__ == '__main__':
     unittest.main(verbosity=2)

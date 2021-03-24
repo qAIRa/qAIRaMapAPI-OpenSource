@@ -78,7 +78,7 @@ class TestGetBusinessHelper(unittest.TestCase):
 		naive_datetime = datetime.datetime.combine(date, naive_time)
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
-		#self.assertAlmostEqual(get_business_helper.getInstallationDate(2),None)
+		self.assertAlmostEqual(get_business_helper.getInstallationDate(1),None)
 		self.assertAlmostEqual(get_business_helper.getInstallationDate(307),aware_datetime)
 
 	def test_qhawax_in_field_valid(self):
@@ -165,6 +165,19 @@ class TestGetBusinessHelper(unittest.TestCase):
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
 		self.assertAlmostEqual(get_business_helper.queryLastTimeOffDueLackEnergy('qH021'),(aware_datetime,))
+		self.assertAlmostEqual(get_business_helper.queryLastTimeOffDueLackEnergy('qH761'),None)
+
+
+	def test_is_aereal_qhawax_not_valid(self):
+		self.assertRaises(TypeError,get_business_helper.isAerealQhawax)
+		self.assertRaises(TypeError,get_business_helper.isAerealQhawax,21)
+		self.assertRaises(TypeError,get_business_helper.isAerealQhawax,None)
+		self.assertRaises(TypeError,get_business_helper.isAerealQhawax,True)
+
+	def test_is_aereal_qhawax_valid(self):
+		self.assertAlmostEqual(get_business_helper.isAerealQhawax('qH006'),True)
+		self.assertAlmostEqual(get_business_helper.isAerealQhawax('qH004'),False)
+		self.assertAlmostEqual(get_business_helper.isAerealQhawax('qH244'),None)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

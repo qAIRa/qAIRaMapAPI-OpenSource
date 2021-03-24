@@ -110,16 +110,13 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.getFormatData,5)
 		self.assertRaises(TypeError,util_helper.getFormatData,"year")
 		self.assertRaises(TypeError,util_helper.getFormatData,-1,1)
-		self.assertRaises(TypeError,util_helper.getFormatData,None)
 		self.assertRaises(TypeError,util_helper.getFormatData,True)
 
-	#def test_get_format_data_valid(self):
-	#	gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement("qH021", "NO2")
-	#	gas_average_measurement = gas_average_measurement[0:2]
-	#	result = [{'timestamp_zone': datetime.datetime(2021, 3, 22, 9, 0, tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0, name=None)), 'sensor': 25.333},
-	#			  {'timestamp_zone': datetime.datetime(2021, 3, 22, 10, 0, tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0, name=None)), 'sensor': 26.568},
-	#			   {'timestamp_zone': datetime.datetime(2021, 3, 22, 11, 0, tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0, name=None)), 'sensor': 35.615}]
-	#	self.assertAlmostEqual(util_helper.getFormatData(gas_average_measurement),result)
+	def test_get_format_data_valid(self):
+		gas_average_measurement = None
+		self.assertAlmostEqual(util_helper.getFormatData(gas_average_measurement),None)
+		gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement("qH021", "NO2")
+		gas_average_measurement = util_helper.getFormatData(gas_average_measurement)
 
 	def test_add_zero_not_valid(self):
 		self.assertRaises(TypeError,util_helper.addZero,{"test":"test"},5)

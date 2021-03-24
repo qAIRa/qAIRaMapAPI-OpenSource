@@ -81,7 +81,6 @@ def handleProcessedDataByDrone():
             pollutant = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
             new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
             new_data_json[pollutants[i]]= data_json[pollutant]
-            print(new_data_json)
             socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
         return make_response('OK', 200)
     except TypeError as e:
@@ -102,7 +101,6 @@ def getProcessedDataFromAndeanDrone():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
-
 
 @app.route('/api/measurements_by_pollutant_during_flight/', methods=['GET'])
 def getProcessedByPollutantDuringFlight():
