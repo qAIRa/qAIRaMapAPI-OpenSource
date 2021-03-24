@@ -90,9 +90,9 @@ def areFieldsValid(data):
     return True
 
 def getFormatData(gas_average_measurement):
-    data = exceptions.checkListVariable(gas_average_measurement)
     gas_average_measurement_list = []
     if gas_average_measurement is not None:
+        data = exceptions.checkListVariable(gas_average_measurement)
         next_hour = -1
         for measurement in gas_average_measurement:
             gas_measurement = measurement._asdict() 

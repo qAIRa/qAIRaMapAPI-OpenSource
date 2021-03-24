@@ -147,6 +147,7 @@ class TestGetDataHelper(unittest.TestCase):
 		self.assertRaises(TypeError,get_data_helper.queryLastMainInca,1)
 
 	def test_query_last_main_inca_valid(self):
+		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH058"),None)
 		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH004"),50.0)
 		self.assertAlmostEqual(get_data_helper.queryLastMainInca("qH100"),None)
 
@@ -180,6 +181,7 @@ class TestGetDataHelper(unittest.TestCase):
 		timezone = pytz.timezone('UTC')
 		aware_datetime = timezone.localize(naive_datetime)
 		self.assertAlmostEqual(get_data_helper.getQhawaxLatestTimestampProcessedMeasurement("qH057"),aware_datetime)
+		self.assertAlmostEqual(get_data_helper.getQhawaxLatestTimestampProcessedMeasurement("qH001"),None)
 
 	def test_all_qhawax_is_in_flight_valid(self):
 		self.assertAlmostEqual(get_data_helper.AllqHAWAXIsInFlight(),[])
@@ -201,6 +203,45 @@ class TestGetDataHelper(unittest.TestCase):
 
 		self.assertAlmostEqual(get_data_helper.queryDBProcessedByPollutant("qH057", initial_timestamp, last_timestamp,"NO2"),[])
 		self.assertAlmostEqual(get_data_helper.queryDBProcessedByPollutant("qH756", initial_timestamp, last_timestamp,"NO2"),None)
+
+	def test_query_flights_filter_by_time_not_valid(self):
+		self.assertRaises(TypeError,get_data_helper.queryFlightsFilterByTime)
+		self.assertRaises(TypeError,get_data_helper.queryFlightsFilterByTime,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_data_helper.queryFlightsFilterByTime,True)
+		self.assertRaises(TypeError,get_data_helper.queryFlightsFilterByTime,-5.0)
+
+	def test_query_flights_filter_by_time_valid(self):
+		naive_time = datetime.time(5,0,0)
+		date = datetime.date(2021, 3, 22)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		initial_timestamp = timezone.localize(naive_datetime)
+
+		date = datetime.date(2021, 3, 23)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		last_timestamp = timezone.localize(naive_datetime)
+		self.assertAlmostEqual(get_data_helper.queryFlightsFilterByTime(initial_timestamp,last_timestamp),[])
+
+	def test_query_telemetry_not_valid(self):
+		self.assertRaises(TypeError,get_data_helper.queryDBTelemetry)
+		self.assertRaises(TypeError,get_data_helper.queryDBTelemetry,{"qhawax_id":5})
+		self.assertRaises(TypeError,get_data_helper.queryDBTelemetry,True)
+		self.assertRaises(TypeError,get_data_helper.queryDBTelemetry,-5.0)
+
+	def test_query_telemetry_valid(self):
+		naive_time = datetime.time(5,0,0)
+		date = datetime.date(2021, 3, 22)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		initial_timestamp = timezone.localize(naive_datetime)
+
+		date = datetime.date(2021, 3, 23)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		last_timestamp = timezone.localize(naive_datetime)
+		self.assertAlmostEqual(get_data_helper.queryDBTelemetry("qH006",initial_timestamp,last_timestamp),[])
+		self.assertAlmostEqual(get_data_helper.queryDBTelemetry("qH001",initial_timestamp,last_timestamp),None)
 
 
 if __name__ == '__main__':

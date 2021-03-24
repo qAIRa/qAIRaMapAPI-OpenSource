@@ -193,14 +193,14 @@ def sendQhawaxStatusOnBaseOnLossSignal():
             on_loop = int(same_helper.getQhawaxOnLoop(qH_name)) +1
             if(qhawax_state=='OFF'):
                 post_business_helper.saveStatusQhawaxTable(qH_name, "ON",0)
-                post_business_helper.setLastMeasurementOfQhawax(mode,qH_name)
+                post_business_helper.setLastMeasurementOfQhawax(qH_name)
                 post_business_helper.writeBinnacle(qH_name,json_email['description'],json_email['person_in_charge'])
-                post_business_helper.reset_on_loop(qH_name,0)
+                post_business_helper.resetOnLoop(qH_name,0)
                 return make_response({'Success': description}, 200)
             else:
                 post_business_helper.reset_on_loop(qH_name,0) if(on_loop==20) else post_business_helper.reset_on_loop(qH_name,on_loop)
                 if(on_loop==1):
-                    post_business_helper.record_first_time_loop(qH_name,timestamp)
+                    post_business_helper.recordFirstTimeLoop(qH_name,timestamp)
                 return make_response({'Success': 'qHAWAX is already ON'}, 200)
         return make_response({'Warning': 'qHAWAX name has not been found'}, 400)
     except TypeError as e:
