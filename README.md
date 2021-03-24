@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource)  [![Coverage Status](https://coveralls.io/repos/github/qAIRa/qAIRaMapAPI-OpenSource/badge.svg?branch=master)](https://coveralls.io/github/qAIRa/qAIRaMapAPI-OpenSource?branch=master)  [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability) [![Documentation Status](https://readthedocs.org/projects/qairamapapi-opensource/badge/?version=latest)](https://qairamapapi-opensource.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource.svg?branch=master)](https://travis-ci.org/qAIRa/qairamapAPI-OpenSource)  
+[![Coverage Status](https://coveralls.io/repos/github/qAIRa/qAIRaMapAPI-OpenSource/badge.svg?branch=master)](https://coveralls.io/github/qAIRa/qAIRaMapAPI-OpenSource?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/2e414a349dfeaa89f538/maintainability)](https://codeclimate.com/github/qAIRa/qairamapAPI-OpenSource/maintainability) [![Documentation Status](https://readthedocs.org/projects/qairamapapi-opensource/badge/?version=latest)](https://qairamapapi-opensource.readthedocs.io/en/latest/?badge=latest)
 
 
 #  qAIRa Map API
@@ -86,7 +87,8 @@ Dont hesitate to contact us in [qAIRa Public Slack Channel](https://join.slack.c
 If you're encountering some oddities in the API, here's a list of resolutions to some of the problems you may be experiencing.
 
 Why am I getting a 404?
-The request could not be understood by the server due to malformed syntax. The client should not repeat the request without modifications
+The request could not be understood by the server due to malformed syntax. The client should not repeat the request without modifications.
+I recommend you to see the response message it could be something like this: {"error":"No target qhawax_name in given json"}
 
 Why am I getting a 405?
 
