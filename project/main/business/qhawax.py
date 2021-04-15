@@ -94,7 +94,7 @@ def sendQhawaxStatusOff():
     try:
         qH_name = exception_helper.getStatusOffTargetofJson(req_json)
         post_business_helper.saveStatusQhawaxTable(qH_name,'OFF',-1)
-        lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name)
+        lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qH_name)
         post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,lessfive)
         post_business_helper.writeBinnacle(qH_name,description,None)
         jsonsend['main_inca'] = -1
