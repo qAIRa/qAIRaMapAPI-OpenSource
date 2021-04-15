@@ -1,12 +1,7 @@
 from flask import Flask
-from flask_jsglue import JSGlue
-from flask_mail import Mail
-from flask_login import LoginManager
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from flask_cors import CORS, cross_origin
-
 
 # Config
 app = Flask(__name__)
@@ -16,11 +11,6 @@ CORS(app)
 
 # Extensions
 db = SQLAlchemy(app)
-jsglue = JSGlue(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
-migrate = Migrate(app, db)
-mail = Mail(app)
 
 from project.main.business import company, eca_noise, qhawax, eca_noise, qhawax_installation_history
 from project.main.data import processed_measurement, air_quality,gas_inca, drone_flight_log, drone_telemetry

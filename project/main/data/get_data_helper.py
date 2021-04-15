@@ -187,3 +187,15 @@ def AllqHAWAXIsInFlight():
                      group_by(Qhawax.id, DroneFlightLog.id, QhawaxInstallationHistory.id). \
                      filter(DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
     return [t._asdict() for t in flight]
+
+def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
+    """ Helper qHAWAX function to get latest timestamp in UTC 00 from Processed Measurement """
+    qhawax_id =same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        qhawax_time = session.query(ProcessedMeasurement.timestamp_zone).filter_by(qhawax_id=qhawax_id).first()
+        processed_measurement_timestamp=""
+        if(qhawax_time!=None):
+            processed_measurement_timestamp = session.query(ProcessedMeasurement.timestamp_zone).filter_by(qhawax_id=qhawax_id) \
+                .order_by(ProcessedMeasurement.id.desc()).first().timestamp_zone
+            return processed_measurement_timestamp
+    return None

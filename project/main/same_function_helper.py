@@ -142,7 +142,7 @@ def qhawaxQueryUpdateFilterByQhawaxName(json, qhawax_name):
         session.commit()
 
 def qhawaxQueryUpdateFilterByQhawaxId(json, qhawax_id):
-    if(qhawaxExistBasedOnName(qhawax_name)):
+    if(qhawaxExistBasedOnID(qhawax_id)):
         session.query(Qhawax).filter_by(id=qhawax_id).update(values=json)
         session.commit()
 

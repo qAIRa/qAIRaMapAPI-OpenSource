@@ -10,7 +10,7 @@ from project import app
 def getQhawaxInMap():
     """ Gets a list of qHAWAXs filter by company ID """
     try:
-        qhawax_in_field = get_business_helper.queryQhawaxInFieldInPublicMode()
+        qhawax_in_field = get_business_helper.queryQhawaxTypeInFieldInPublicMode('STATIC')
         if (qhawax_in_field!=[]):
             return make_response(jsonify(qhawax_in_field), 200)
         return make_response(jsonify({'Warning':'qHAWAXs in field not found'}), 400)
@@ -22,7 +22,7 @@ def getQhawaxInMap():
 def getDronesInMap():
     """ Gets a list of qHAWAXs filter by company ID """
     try:
-        drones_in_field = get_business_helper.queryDronesInFieldInPublicMode()
+        drones_in_field = get_business_helper.queryQhawaxTypeInFieldInPublicMode('AEREAL')
         if (drones_in_field!=[]):
             return make_response(jsonify(drones_in_field), 200)
         return make_response(jsonify({'Warning':'Drones in field not found'}), 400)
@@ -43,8 +43,6 @@ def getInstallationDate():
     else:
         if(installation_date == None):
             return make_response({'Warning ':'qHAWAX ID '+str(qhawax_id)+' has not been found in field'}, 400)
-        if(first_timestamp == None):
-            return str(installation_date)
         if(first_timestamp > installation_date):
             return str(first_timestamp)
         return str(installation_date)

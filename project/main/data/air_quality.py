@@ -10,7 +10,6 @@ def storeAirQualityData():
     """ POST: Records processed and valid processed measurements every five seconds """
     data_json = request.get_json()
     try:
-        #revisar el json con un exception
         post_data_helper.storeAirQualityDataInDB(data_json)
         return make_response('OK', 200)
     except TypeError as e:

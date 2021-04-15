@@ -19,3 +19,5 @@ notifications:
   email:
     recipients:
     - l.montalvo@qairadrones.com
+    - g.montesinos@qairadrones.com
+    - s.campos@qairadrones.com
