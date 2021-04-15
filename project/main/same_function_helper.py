@@ -21,7 +21,7 @@ def qhawaxExistBasedOnName(qhawax_name):
     if(qhawax_list == []):
         return False
     return True
-        
+
 def qhawaxInstallationExistBasedOnID(installation_id):
     """ Helper function to check if qHAWAX Installation ID exist """
     installation_id = exceptions.checkIntegerVariable(installation_id)
@@ -87,9 +87,9 @@ def getQhawaxName(qhawax_id):
     return None
 
 def getInstallationIdBaseName(qhawax_name):
-    """ Helper function to get qHAWAX Installation ID  
-        qHAWAX name could be exist in qHAWAX table, 
-        but it could not exist in qHAWAX Installation table """
+    """ Helper function to get qHAWAX Installation ID
+        qHAWAX name could be exist in qHAWAX table,
+        but it might not exist in qHAWAX Installation table """
     if(qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = getQhawaxID(qhawax_name)
         return getInstallationId(qhawax_id)
@@ -108,7 +108,7 @@ def getQhawaxMode(qhawax_name):
     return None
 
 def getTimeQhawaxHistory(qhawax_name):
-    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
+    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,
               QhawaxInstallationHistory.last_registration_time_zone)
 
     installation_id = getInstallationIdBaseName(qhawax_name)
@@ -116,7 +116,7 @@ def getTimeQhawaxHistory(qhawax_name):
     if(installation_id is not None):
         values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
         if (values!=None):
-            return {'last_time_on': values[0], 'last_time_registration': values[1]} 
+            return {'last_time_on': values[0], 'last_time_registration': values[1]}
     return None
 
 def getQhawaxStatus(qhawax_name):
@@ -148,6 +148,6 @@ def qhawaxQueryUpdateFilterByQhawaxId(json, qhawax_id):
 
 def qhawaxInstallationQueryUpdate(json, qhawax_name):
     installation_id=getInstallationIdBaseName(qhawax_name)
-    if(installation_id is not None): 
+    if(installation_id is not None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
         session.commit()

@@ -120,3 +120,31 @@ def getProcessedByPollutantDuringFlight():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+
+@app.route('/api/processed_measurements_before_48_hours/', methods=['POST'])
+def deleteProcessedMeasurementsBefore48Hours():
+    #qhawax_name = str(request.args.get('qhawax_name'))
+    try:
+        before = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=48)
+        #qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        data = post_data_helper.deleteValuesBetweenTimestampsProcessedMeasurement(before)
+        if data is not None:
+            return make_response(jsonify(data), 200)
+        return make_response(jsonify("Measurements not found"), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/valid_processed_measurements_before_48_hours/', methods=['POST'])
+def deleteValidProcessedMeasurementsBefore48Hours():
+    #qhawax_name = str(request.args.get('qhawax_name'))
+    try:
+        before = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(hours=48)
+        #qhawax_id = same_helper.getQhawaxID(qhawax_name)
+        data = post_data_helper.deleteValuesBetweenTimestampsValidProcessedMeasurement(before)
+        if data is not None:
+            return make_response(jsonify(data), 200)
+        return make_response(jsonify("Measurements not found"), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)

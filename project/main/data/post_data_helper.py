@@ -1,6 +1,7 @@
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
                                     GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog
 import project.main.business.post_business_helper as post_business_helper
+import project.main.business.get_business_helper as get_business_helper
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
 import project.main.exceptions as exceptions
@@ -175,3 +176,45 @@ def recordDroneLanding(flight_end, qhawax_name,flight_detail):
             filter_by(qhawax_id=qhawax_id,flight_end=None).update(values=landing_json)
     session.commit()
 
+def deleteValuesBetweenTimestampsProcessedMeasurement(timestamp_before):
+    """ Helper qHAWAX Installation function that gets values of Processed between timestamps of STATIC qHAWAX  """
+    qhawax_static_id_list = get_business_helper.getAllStaticQhawaxID()
+    #qhawax_id_list = get_business_helper.queryAllQhawaxID()
+    # print("List of all static qhawax")
+    # print(qhawax_static_id_list)
+    #x = len(qhawax_static_id_list) - 1
+    for qhawax_id in qhawax_static_id_list:
+        # if(qhawax_static_id_list[x]==qhawax_id):
+        #     print("Entre al id del qhawax" + str(qhawax_id["id"]))
+        if(qhawax_id["id"] is not None):
+            processed_measurement_ids = session.query(ProcessedMeasurement.id, ProcessedMeasurement.qhawax_id). \
+                            join(Qhawax, ProcessedMeasurement.qhawax_id == Qhawax.id). \
+                            filter(ProcessedMeasurement.timestamp_zone < timestamp_before). \
+                            filter(ProcessedMeasurement.qhawax_id == qhawax_id["id"]).all()
+            #return processed_measurement_ids
+            if(processed_measurement_ids!=[]):
+                for each in processed_measurement_ids:
+                    deleteThis = session.query(ProcessedMeasurement).filter(ProcessedMeasurement.id == int(each[0])).first()
+                    session.delete(deleteThis)
+                    session.commit()
+    return "OK"
+
+def deleteValuesBetweenTimestampsValidProcessedMeasurement(timestamp_before):
+    """ Helper qHAWAX Installation function that gets values of Processed between timestamps of STATIC qHAWAX  """
+    qhawax_static_install_id_list = get_business_helper.getAllStaticQhawaxInstallationID()
+    # print(qhawax_static_install_id_list)
+    # x = len(qhawax_static_install_id_list) - 5
+    for qhawax_install_id in qhawax_static_install_id_list:
+        # if(qhawax_static_install_id_list[x]==qhawax_install_id):
+        #     print("Entre al id del qhawax" + str(qhawax_install_id["id"]))
+        if(qhawax_install_id["id"] is not None):
+            valid_processed_measurement_ids = session.query(ValidProcessedMeasurement.id, ValidProcessedMeasurement.qhawax_installation_id). \
+                            join(QhawaxInstallationHistory, ValidProcessedMeasurement.qhawax_installation_id == QhawaxInstallationHistory.id). \
+                            filter(ValidProcessedMeasurement.timestamp_zone < timestamp_before). \
+                            filter(ValidProcessedMeasurement.qhawax_installation_id == qhawax_install_id["id"]).all()
+            if(valid_processed_measurement_ids!=[]):
+                for each in valid_processed_measurement_ids:
+                    deleteThis = session.query(ValidProcessedMeasurement).filter(ValidProcessedMeasurement.id == int(each[0])).first()
+                    session.delete(deleteThis)
+                    session.commit()
+    return "OK"

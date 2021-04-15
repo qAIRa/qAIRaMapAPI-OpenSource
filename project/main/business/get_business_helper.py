@@ -4,9 +4,9 @@ import project.main.util_helper as util_helper
 from project import app, db
 session = db.session
 
-columns_qhawax = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, 
+columns_qhawax = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca,
                   QhawaxInstallationHistory.id, QhawaxInstallationHistory.qhawax_id,
-                  QhawaxInstallationHistory.eca_noise_id, QhawaxInstallationHistory.comercial_name, 
+                  QhawaxInstallationHistory.eca_noise_id, QhawaxInstallationHistory.comercial_name,
                   QhawaxInstallationHistory.lat, QhawaxInstallationHistory.lon, EcaNoise.area_name)
 
 def queryQhawaxModeCustomer():
@@ -43,6 +43,11 @@ def queryAllQhawax():
     """ Get all qHAWAXs - No parameters required """
     columns = (Qhawax.name, Qhawax.mode,Qhawax.state,Qhawax.qhawax_type,Qhawax.main_inca, Qhawax.id)
     qhawax_list =  session.query(*columns).order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]
+
+def queryAllQhawaxID():
+    """ Get all qHAWAXs - No parameters required """
+    qhawax_list =  session.query(Qhawax.id).order_by(Qhawax.id).all()
     return [qhawax._asdict() for qhawax in qhawax_list]
 
 def queryGetAreas():
@@ -134,3 +139,21 @@ def isAerealQhawax(qhawax_name):
             return False
         return True
     return None
+
+def getAllStaticQhawaxID():
+    """ Get all qHAWAXs STATIC (int or ext) ID - No parameters required """
+    base_string = "STATIC"
+    search = "%{}%".format(base_string)
+    qhawax_list =  session.query(Qhawax.id).filter(Qhawax.qhawax_type.like(search)). \
+                        order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]
+
+def getAllStaticQhawaxInstallationID():
+    """ Get all qHAWAXs STATIC (int or ext) Installation ID - No parameters required """
+    base_string = "STATIC"
+    search = "%{}%".format(base_string)
+    qhawax_list =  session.query(QhawaxInstallationHistory.id). \
+                        join(Qhawax,Qhawax.id == QhawaxInstallationHistory.qhawax_id). \
+                        filter(Qhawax.qhawax_type.like(search)). \
+                        order_by(QhawaxInstallationHistory.id.desc()).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]

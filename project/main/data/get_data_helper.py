@@ -13,13 +13,13 @@ session = db.session
 sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #validar con sabri
     """ Helper function to get Air Quality measurement """
-    sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3, 
-               AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, AirQualityMeasurement.SO2_ug_m3, 
+    sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3,
+               AirQualityMeasurement.PM25, AirQualityMeasurement.PM10, AirQualityMeasurement.SO2_ug_m3,
                AirQualityMeasurement.uv.label('UV'), AirQualityMeasurement.spl.label('SPL') ,
-               AirQualityMeasurement.humidity, AirQualityMeasurement.pressure, AirQualityMeasurement.O3_ug_m3, 
-               AirQualityMeasurement.temperature, AirQualityMeasurement.lat,AirQualityMeasurement.lon, 
+               AirQualityMeasurement.humidity, AirQualityMeasurement.pressure, AirQualityMeasurement.O3_ug_m3,
+               AirQualityMeasurement.temperature, AirQualityMeasurement.lat,AirQualityMeasurement.lon,
                AirQualityMeasurement.timestamp_zone)
-    
+
     if(same_helper.qhawaxExistBasedOnID(qhawax_id)):
       valid_processed_measurements = session.query(*sensors).filter(AirQualityMeasurement.qhawax_id == qhawax_id). \
                                              filter(AirQualityMeasurement.timestamp_zone >= initial_timestamp). \
@@ -39,8 +39,8 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     if(qhawax_id!= None):
         initial_timestamp = datetime.datetime.now()
         last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
-        
-        column_array = [AirQualityMeasurement.CO.label('sensor'), AirQualityMeasurement.H2S.label('sensor'), 
+
+        column_array = [AirQualityMeasurement.CO.label('sensor'), AirQualityMeasurement.H2S.label('sensor'),
                         AirQualityMeasurement.NO2.label('sensor'), AirQualityMeasurement.O3.label('sensor'),
                         AirQualityMeasurement.PM25.label('sensor'), AirQualityMeasurement.PM10.label('sensor'),
                         AirQualityMeasurement.SO2.label('sensor')]
@@ -57,7 +57,7 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
 
 def queryDBGasInca(initial_timestamp, final_timestamp):
     """ Helper function to get GAS INCA measurement"""
-    inca_columns = (GasInca.CO, GasInca.H2S, GasInca.SO2, GasInca.NO2,GasInca.O3, GasInca.PM25, GasInca.PM10, 
+    inca_columns = (GasInca.CO, GasInca.H2S, GasInca.SO2, GasInca.NO2,GasInca.O3, GasInca.PM25, GasInca.PM10,
                     GasInca.SO2,GasInca.timestamp_zone, GasInca.qhawax_id, GasInca.main_inca, Qhawax.name.label('qhawax_name'))
 
     gas_inca = session.query(*inca_columns).\
@@ -66,7 +66,7 @@ def queryDBGasInca(initial_timestamp, final_timestamp):
                        filter(GasInca.timestamp_zone >= initial_timestamp). \
                        filter(GasInca.timestamp_zone <= final_timestamp).all()
     return [measurement._asdict() for measurement in gas_inca]
-                                  
+
 def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
     """ Helper function to get Processed Measurement filter by qHAWAX between timestamp"""
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
@@ -132,7 +132,7 @@ def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
       f = f._asdict()
       f["flight_start"] = util_helper.beautyFormatDate(f["flight_start"])
       f["flight_end"] = util_helper.beautyFormatDate(f["flight_end"])
-      new_flight.append(f)   
+      new_flight.append(f)
     return new_flight
 
 def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
@@ -155,7 +155,7 @@ def queryDBProcessedByPollutant(qhawax_name, initial_timestamp, final_timestamp,
     """ Helper function to get Processed Measurement filter by qHAWAX between timestamp"""
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
-        column_array = [ProcessedMeasurement.CO.label('pollutant'), ProcessedMeasurement.H2S.label('pollutant'), 
+        column_array = [ProcessedMeasurement.CO.label('pollutant'), ProcessedMeasurement.H2S.label('pollutant'),
                         ProcessedMeasurement.NO2.label('pollutant'), ProcessedMeasurement.O3.label('pollutant'),
                         ProcessedMeasurement.PM25.label('pollutant'), ProcessedMeasurement.PM10.label('pollutant'),
                         ProcessedMeasurement.SO2.label('pollutant')]
@@ -187,4 +187,3 @@ def AllqHAWAXIsInFlight():
                      group_by(Qhawax.id, DroneFlightLog.id, QhawaxInstallationHistory.id). \
                      filter(DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
     return [t._asdict() for t in flight]
-
