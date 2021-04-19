@@ -3,8 +3,8 @@ import os
 
 PROCESSED_MEASUREMENT_EVERY_48_HOURS = '/api/processed_measurements_before_48_hours/'
 VALID_PROCESSED_MEASUREMENT_EVERY_48_HOURS = '/api/valid_processed_measurements_before_48_hours/'
-BASE_URL = str(os.environ.get('BASE_URL'))
-#BASE_URL = 'https://openqairamapnapi.qairadrones.com/'
+BASE_URL = str(os.environ.get('API_OPEN'))
+#BASE_URL = 'https://openqairamapnapi.qairadrones.com'
 
 
 # Frequency: daily, every 24 hours
