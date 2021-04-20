@@ -198,7 +198,7 @@ def sendQhawaxStatusOnBaseOnLossSignal():
                 post_business_helper.resetOnLoop(qH_name,0)
                 return make_response({'Success': description}, 200)
             else:
-                post_business_helper.reset_on_loop(qH_name,0) if(on_loop==20) else post_business_helper.reset_on_loop(qH_name,on_loop)
+                post_business_helper.resetOnLoop(qH_name,0) if(on_loop==20) else post_business_helper.resetOnLoop(qH_name,on_loop)
                 if(on_loop==1):
                     post_business_helper.recordFirstTimeLoop(qH_name,timestamp)
                 return make_response({'Success': 'qHAWAX is already ON'}, 200)
