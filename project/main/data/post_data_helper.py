@@ -1,5 +1,5 @@
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
-                                    GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog
+                                    GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog, Qhawax
 import project.main.business.post_business_helper as post_business_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.same_function_helper as same_helper
@@ -186,16 +186,17 @@ def deleteValuesBetweenTimestampsProcessedMeasurement(timestamp_before):
     #qhawax_id_list = get_business_helper.queryAllQhawaxID()
     # print("List of all static qhawax")
     # print(qhawax_static_id_list)
-    #x = len(qhawax_static_id_list) - 1
+    # x = 1
     for qhawax_id in qhawax_static_id_list:
         # if(qhawax_static_id_list[x]==qhawax_id):
-        #     print("Entre al id del qhawax" + str(qhawax_id["id"]))
+        #     print("Entre al id del qhawax " + str(qhawax_id["id"]))
         if(qhawax_id["id"] is not None):
             processed_measurement_ids = session.query(ProcessedMeasurement.id, ProcessedMeasurement.qhawax_id). \
                             join(Qhawax, ProcessedMeasurement.qhawax_id == Qhawax.id). \
                             filter(ProcessedMeasurement.timestamp_zone < timestamp_before). \
                             filter(ProcessedMeasurement.qhawax_id == qhawax_id["id"]).all()
             #return processed_measurement_ids
+            #print(len(processed_measurement_ids))
             if(processed_measurement_ids!=[]):
                 for each in processed_measurement_ids:
                     deleteThis = session.query(ProcessedMeasurement).filter(ProcessedMeasurement.id == int(each[0])).first()
