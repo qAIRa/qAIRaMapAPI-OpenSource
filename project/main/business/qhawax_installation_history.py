@@ -30,6 +30,18 @@ def getDronesInMap():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+@app.route('/api/AllMobileQhawaxsInMap/', methods=['GET'])
+def getMobileQhawaxsInMap():
+    """ Gets a list of qHAWAXs filter by company ID """
+    try:
+        mobile_qH_in_map = get_business_helper.queryQhawaxTypeInFieldInPublicMode('MOBILE_EXT')
+        if (mobile_qH_in_map!=[]):
+            return make_response(jsonify(mobile_qH_in_map), 200)
+        return make_response(jsonify({'Warning':'Mobiles in field not found'}), 400)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
 @app.route('/api/GetInstallationDate/', methods=['GET'])
 def getInstallationDate():
     """ Gets the installation date of qHAWAX in field """

@@ -1,5 +1,6 @@
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
-                                    GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog, Qhawax
+                                    GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog, Qhawax, \
+                                    QhawaxInstallationHistory
 import project.main.business.post_business_helper as post_business_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.same_function_helper as same_helper

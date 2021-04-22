@@ -58,7 +58,6 @@ def getDroneFlightDuringPeriodTime():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-
 @app.route('/api/flight_log_info_by_qhawax_name/', methods=['GET'])
 def getFlightLogInfoByQhawaxName():
     """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
