@@ -55,6 +55,24 @@ def storeProcessedDataInDB(data):
     session.add(processed_measurement)
     session.commit()
 
+def storeValidProcessedDataMobileInDB(data, qhawax_id, product_id):
+    """ Helper Processed Measurement function to insert Valid Processed Data """
+    installation_id = same_helper.getInstallationId(qhawax_id)
+    if(installation_id!=None):
+      valid_data = {'timestamp': data['timestamp'],'CO': data['CO'],'CO_ug_m3': data['CO_ug_m3'],
+                    'H2S': data['H2S'],'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],
+                    'SO2_ug_m3': data['SO2_ug_m3'],'NO2': data['NO2'],'NO2_ug_m3': data['NO2_ug_m3'],
+                    'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'],'PM25': data['PM25'],
+                    'lat':data['lat'],'lon':data['lon'],'PM1': data['PM1'],'PM10': data['PM10'],
+                    'UV': data['UV'],'UVA': data['UVA'],'UVB': data['UVB'],'SPL': data['spl'],
+                    'humidity': data['humidity'],'pressure': data['pressure'],
+                    'temperature': data['temperature'],'timestamp_zone': data['timestamp_zone'],
+                    'I_temperature':data['I_temperature'],'VOC':data['VOC'], 'CO2':data['CO2']}
+      valid_processed_measurement = ValidProcessedMeasurement(**valid_data, qhawax_installation_id=installation_id)
+      session.add(valid_processed_measurement)
+      session.commit()
+
+
 def storeValidProcessedDataInDB(data, product_id):
     """ Helper Processed Measurement function to insert Valid Processed Data """
     installation_id = same_helper.getInstallationIdBaseName(product_id)
@@ -71,6 +89,32 @@ def storeValidProcessedDataInDB(data, product_id):
       session.commit()
       data = util_helper.setNoneStringElements(data)
       socketio.emit(data['ID'], data)
+
+def storeValidProcessedDataInDBMobile(data, product_id):
+    """ Helper Processed Measurement function to insert Valid Processed Data """
+    installation_id = same_helper.getInstallationIdBaseName(product_id)
+    if(installation_id!=None):
+      valid_data = {'timestamp': data['timestamp'],'CO': data['CO'],'CO_ug_m3': data['CO_ug_m3'], 'H2S': data['H2S'],
+                    'H2S_ug_m3': data['H2S_ug_m3'],'SO2': data['SO2'],'SO2_ug_m3': data['SO2_ug_m3'],'NO2': data['NO2'],
+                    'NO2_ug_m3': data['NO2_ug_m3'],'O3': data['O3'],'O3_ug_m3': data['O3_ug_m3'],'PM25': data['PM25'],
+                    'lat':data['lat'],'lon':data['lon'],'PM1': data['PM1'],'PM10': data['PM10'], 'UV': data['UV'],
+                    'UVA': data['UVA'],'UVB': data['UVB'],'SPL': data['spl'],'humidity': data['humidity'], 'CO2':data['CO2'],
+                    'pressure': data['pressure'],'temperature': data['temperature'],'timestamp_zone': data['timestamp_zone'],
+                    'I_temperature':data['I_temperature'],'VOC':data['VOC']}
+      valid_processed_measurement = ValidProcessedMeasurement(**valid_data, qhawax_installation_id=installation_id)
+      session.add(valid_processed_measurement)
+      session.commit()
+      data = util_helper.setNoneStringElements(data)
+      socketio.emit(data['ID'] + '_mobile', data)
+
+def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
+    data_json = exceptions.checkDictionaryVariable(data_json)
+    product_id = exceptions.checkStringVariable(product_id)
+    storeValidProcessedDataInDBMobile(data_json, product_id)
+    # if(inca_value==0.0):
+    #   post_business_helper.updateMainIncaInDB(1,product_id)
+    #   post_business_helper.updateMainIncaQhawaxInstallationTable(1,product_id)
+
 
 def validAndBeautyJsonValidProcessed(data_json,product_id,inca_value):
     """ Helper function to valid json Valid Processed table """
@@ -89,7 +133,7 @@ def validTimeOfValidProcessed(time_valid,time_type, last_time_turn_on,data_json,
     product_id = exceptions.checkStringVariable(product_id)
     aditional_time = datetime.timedelta(hours=time_valid) if (time_type=="hour") else datetime.timedelta(minutes=time_valid)
     if(last_time_turn_on + aditional_time < datetime.datetime.now(dateutil.tz.tzutc())):
-      validAndBeautyJsonValidProcessed(data_json,product_id,inca_value)
+        validAndBeautyJsonValidProcessed(data_json,product_id,inca_value)
 
 def storeLogs(telemetry, drone_name):
     global drone_elapsed_time, drone_telemetry, drone_storage

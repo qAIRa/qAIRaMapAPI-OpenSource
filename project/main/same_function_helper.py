@@ -151,3 +151,8 @@ def qhawaxInstallationQueryUpdate(json, qhawax_name):
     if(installation_id is not None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
         session.commit()
+
+def queryQhawaxType(name):
+    if(verifyIfQhawaxExistBaseOnName(name)):
+        return session.query(Qhawax.qhawax_type).filter_by(name=name).one()[0]
+    return None

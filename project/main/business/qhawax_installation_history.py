@@ -37,7 +37,7 @@ def getMobileQhawaxsInMap():
         mobile_qH_in_map = get_business_helper.queryQhawaxTypeInFieldInPublicMode('MOBILE_EXT')
         if (mobile_qH_in_map!=[]):
             return make_response(jsonify(mobile_qH_in_map), 200)
-        return make_response(jsonify({'Warning':'Mobiles in field not found'}), 400)
+        return make_response(jsonify({'Warning':'Mobiles in field not found'}), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

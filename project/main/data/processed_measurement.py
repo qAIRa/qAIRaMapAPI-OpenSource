@@ -9,6 +9,7 @@ from datetime import timedelta
 import dateutil.parser
 import dateutil.tz
 import datetime
+import pytz
 
 pollutants = ['CO','CO2','NO2','O3','H2S','SO2','PM25','PM10','VOC']
 
@@ -57,6 +58,33 @@ def handleProcessedDataByQhawax():
         data_json = util_helper.setNoneStringElements(data_json)
         socketio.emit(data_json['ID'] + '_processed', data_json)
         return make_response('OK', 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/dataProcessedMobile/', methods=['POST'])
+def handleProcessedDataByMobileQhawax():
+    data_json = request.get_json()
+    try:
+        product_id = data_json['ID']
+        time_zone = float(-5)
+        location_time_zone = pytz.timezone("America/Lima")
+        data_json = util_helper.validTimeJsonProcessedTest(data_json,time_zone,location_time_zone)
+        if (data_json is not None):
+            data_json = util_helper.validAndBeautyJsonProcessedLatest(data_json)
+            post_data_helper.storeProcessedDataInDB(data_json)
+            data_json['ID'] = product_id
+            minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
+            minutes_difference = 10
+            if(minutes_difference!=None):
+                if(minutes_difference<5):
+                    if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
+                        post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
+                elif(minutes_difference>=5):
+                    if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
+                        post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
+            return make_response('OK', 200) 
+        return make_response('Time is not correct', 400)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

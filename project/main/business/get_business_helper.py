@@ -151,3 +151,11 @@ def getAllStaticQhawaxInstallationID():
                         filter(Qhawax.qhawax_type.like(search)). \
                         order_by(QhawaxInstallationHistory.id.desc()).all()
     return [qhawax._asdict() for qhawax in qhawax_list]
+
+def getAllMobileQhawaxID():
+    """ Gets all mobile qHAWAXs - No parameters required """
+    base_string = "MOBILE_EXT"
+    search = "%{}%".format(base_string)
+    qhawax_list =  session.query(Qhawax.id).filter(Qhawax.qhawax_type.like(search)). \
+                        order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]

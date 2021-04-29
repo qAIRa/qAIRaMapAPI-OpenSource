@@ -25,6 +25,16 @@ def validTimeJsonProcessed(data_json):
         data_json['timestamp_zone'] = (datetime.datetime.now(dateutil.tz.tzutc())).strftime("%Y-%m-%d %H:%M:%S")
     return data_json
 
+def validTimeJsonProcessedTest(data_json,time_zone,location_time_zone):
+    datetime_timestamp= datetime.datetime.strptime(data_json['timestamp'], '%Y-%m-%d %H:%M:%S%z') #lo pasamos a utc 00
+    local_time = (datetime.datetime.now() + datetime.timedelta(hours=time_zone)).replace(microsecond=0)
+    loc_dt = location_time_zone.localize(local_time)
+    now_datetime = (loc_dt +datetime.timedelta(minutes=2))
+    now_datetime_past = (loc_dt -datetime.timedelta(minutes=2))
+    if (datetime_timestamp>=now_datetime or datetime_timestamp<=now_datetime_past):
+        return None
+    return data_json
+
 def validAndBeautyJsonProcessed(data_json):
     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C
     data_json = exceptions.checkDictionaryVariable(data_json)
@@ -34,6 +44,19 @@ def validAndBeautyJsonProcessed(data_json):
     data_json = gasConversionPPBtoMG(data_json, arr_season)
     #Convertir los pascales a hectopascales
     data_json['pressure']= float(data_json['pressure'])*0.01 if (data_json['pressure']!="Nan") else "Nan"
+    data_json = roundUpThree(data_json)
+    return data_json
+
+def validAndBeautyJsonProcessedLatest(data_json):
+    arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
+    data_json = exceptions.checkDictionaryVariable(data_json)
+    
+    if  'timestamp_zone' not in data_json:
+        data_json["timestamp_zone"] = data_json["timestamp"]
+    data_json = gasConversionPPBtoMG(data_json, arr_season)
+    #Convertir los pascales a hectopascales
+    data_json['pressure']= float(data_json['pressure'])*0.01 if (data_json['pressure']!="Nan") else "Nan"
+    data_json['spl'] = None if (data_json['spl']<=0) else data_json['spl']
     data_json = roundUpThree(data_json)
     return data_json
 
