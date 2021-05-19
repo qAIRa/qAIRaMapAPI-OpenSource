@@ -241,4 +241,11 @@ class DroneFlightLog(db.Model):
     flight_detail = db.Column(db.String(100))
     qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 
+class TripLog(db.Model):
+    __tablename__ = 'trip_log'
+    id = db.Column(db.Integer, primary_key=True)
+    trip_start = db.Column(db.DateTime, nullable=False)
+    trip_end = db.Column(db.DateTime)
+    details = db.Column(db.String(100))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
 

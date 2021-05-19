@@ -1,5 +1,5 @@
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
-                                    GasInca, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog, Qhawax, \
+                                    GasInca, TripLog, ValidProcessedMeasurement, DroneTelemetry, DroneFlightLog, Qhawax, \
                                     QhawaxInstallationHistory
 import project.main.business.post_business_helper as post_business_helper
 import project.main.business.get_business_helper as get_business_helper
@@ -268,3 +268,23 @@ def deleteValuesBetweenTimestampsValidProcessedMeasurement(timestamp_before):
                     session.delete(deleteThis)
                     session.commit()
     return "OK"
+
+def recordStartTrip(qhawax_name):
+    qhawax_id=same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id!=None):
+        start_trip = datetime.datetime.now(dateutil.tz.tzutc())
+        start = TripLog(trip_start=datetime.datetime.now(dateutil.tz.tzutc()), qhawax_id=qhawax_id)
+        session.add(start)
+        session.commit()
+        socketio.emit(qhawax_name + '_startTrip', start_trip)
+
+def recordEndTrip(qhawax_name, details):
+    qhawax_id=same_helper.getQhawaxID(qhawax_name)
+    print(qhawax_id)
+    if(qhawax_id!=None):
+        finish_trip = datetime.datetime.now(dateutil.tz.tzutc())
+        finish_json = {"trip_end":finish_trip,"details":details}
+        print(finish_json)
+        session.query(TripLog). \
+            filter_by(qhawax_id=qhawax_id, trip_end=None).update(values=finish_json)
+        session.commit()

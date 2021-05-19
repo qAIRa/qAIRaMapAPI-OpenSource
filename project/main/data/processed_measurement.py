@@ -67,22 +67,39 @@ def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
     try:
         product_id = data_json['ID']
-        time_zone = float(-5)
+        time_zone = float(0)
         location_time_zone = pytz.timezone("America/Lima")
         data_json = util_helper.validTimeJsonProcessedTest(data_json,time_zone,location_time_zone)
         if (data_json is not None):
             data_json = util_helper.validAndBeautyJsonProcessedLatest(data_json)
             post_data_helper.storeProcessedDataInDB(data_json)
             data_json['ID'] = product_id
+            # if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
+            #     post_data_helper.recordStartTrip(product_id)
+
             minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
             minutes_difference = 10
             if(minutes_difference!=None):
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
+                        if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
+                            # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
+                            # aqui escribo flight start pero solo 1 vez por qhawax
+                            post_data_helper.recordStartTrip(product_id)
+                        
+                        # actualice el trip_end: script de checkQhawaxActive
+                        
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
                         post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
+                        # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
+                        # aqui escribo flight start pero solo 1 vez por qhawax
+                        if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
+                            post_data_helper.recordStartTrip(product_id)
+                        
+                        # actualice el trip_end: script de checkQhawaxActive
+
             return make_response('OK', 200) 
         return make_response('Time is not correct', 400)
     except TypeError as e:
@@ -174,3 +191,48 @@ def deleteValidProcessedMeasurementsBefore48Hours():
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
+
+@app.route('/api/processed_measurements_mobile_qhawax/', methods=['GET'])
+def getProcessedDataFromMobileQhawax():
+    """ Lists all measurements of processed measurement of the target drone within the initial and final date """
+    qhawax_name = request.args.get('qhawax_name')
+    initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+    try:
+        processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        if processed_measurements is not None:
+            return make_response(jsonify(processed_measurements), 200)
+        return make_response(jsonify('Measurements not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/measurements_by_pollutant_during_trip/', methods=['GET'])
+def getProcessedByPollutantDuringTrip():
+    """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
+    qhawax_name = str(request.args.get('name'))
+    pollutant = str(request.args.get('pollutant'))
+    try:
+        start_trip = get_data_helper.qHAWAXIsInTrip(qhawax_name)
+        if(start_trip is not None):
+            final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
+            # verify which sensors
+            processed_measurements = get_data_helper.queryDBProcessedByPollutant(qhawax_name, start_trip, final_timestamp,pollutant)
+            if processed_measurements is not None:
+                return make_response(jsonify(processed_measurements), 200)
+        return make_response(jsonify('Measurements not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+
+# @app.route('/api/function_testers/', methods=['GET'])
+# def getPreviousTurnOn():
+#     qhawax_name = request.args.get('name')
+#     try:
+#         #secret_key_hashed = str(req_json['secret_key']).strip()
+#         print(get_data_helper.qHAWAXIsInTrip(qhawax_name))
+#         return make_response(jsonify('Success'), 200)
+#     except Exception as e:
+#         json_message = jsonify({'error': ' \'%s\' ' % (e)})
+#         return make_response(json_message, 400)

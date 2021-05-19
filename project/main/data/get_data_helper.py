@@ -1,5 +1,5 @@
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
-                                    GasInca,ValidProcessedMeasurement, Qhawax, \
+                                    GasInca, TripLog,ValidProcessedMeasurement, Qhawax, \
                                     DroneTelemetry, DroneFlightLog,QhawaxInstallationHistory
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
@@ -112,9 +112,7 @@ def getFirstTimestampValidProcessed(qhawax_id):
         return None if (first_timestamp==None) else first_timestamp[0]
     return None
 
-
 def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
-    """ Helper function to get GAS INCA measurement"""
     flight_columns = (DroneFlightLog.flight_start, DroneFlightLog.flight_end,\
 											QhawaxInstallationHistory.comercial_name,\
                       DroneFlightLog.flight_detail,Qhawax.name.label('qhawax_name'),\
@@ -133,6 +131,26 @@ def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
       f["flight_end"] = util_helper.beautyFormatDate(f["flight_end"])
       new_flight.append(f)
     return new_flight
+
+def queryMobileTripsByTimestamp(initial_timestamp, final_timestamp):
+    trip_columns = (TripLog.trip_start, TripLog.trip_end, QhawaxInstallationHistory.comercial_name,\
+                    TripLog.details,Qhawax.name.label('qhawax_name'),\
+                    QhawaxInstallationHistory.lat.label('last_latitude_position'), QhawaxInstallationHistory.lon.label('last_longitude_position'))
+    
+    trip = session.query(*trip_columns).\
+                    join(Qhawax, TripLog.qhawax_id == Qhawax.id). \
+                    join(QhawaxInstallationHistory, TripLog.qhawax_id == QhawaxInstallationHistory.qhawax_id). \
+                    group_by(Qhawax.id, TripLog.qhawax_id, QhawaxInstallationHistory.qhawax_id). \
+                    filter(initial_timestamp <= TripLog.trip_start). \
+                    filter(final_timestamp >= TripLog.trip_end).order_by(TripLog.id).all()
+
+    new_trip = []
+    for t in trip:
+        t = t._asdict()
+        t["trip_start"] = util_helper.beautyFormatDate(t["trip_start"])
+        t["trip_end"] = util_helper.beautyFormatDate(t["trip_end"])
+        new_trip.append(t)
+    return new_trip
 
 def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
     """ Helper function to get Telemetry filter by qHAWAX between timestamp"""
@@ -177,6 +195,17 @@ def qHAWAXIsInFlight(qhawax_name):
                          filter(DroneFlightLog.qhawax_id==qhawax_id,DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
         if(flight!=[]):
           return flight[0][0]
+    return None
+
+def qHAWAXIsInTrip(qhawax_name):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        trip = session.query(TripLog.trip_start).\
+            filter(TripLog.qhawax_id==qhawax_id, TripLog.trip_end == None).order_by(TripLog.id).all()
+        #print(flight[0][0])
+                        #filter(DroneFlightLog.qhawax_id==qhawax_id,DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
+        if(trip!=[]):
+          return trip[0][0]
     return None
 
 def AllqHAWAXIsInFlight():

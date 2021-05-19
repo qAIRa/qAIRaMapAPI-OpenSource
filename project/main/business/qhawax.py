@@ -4,6 +4,7 @@ import project.main.exceptions as exception_helper
 import project.main.business.get_business_helper as get_business_helper
 import project.main.business.post_business_helper as post_business_helper
 import project.main.data.get_data_helper as get_data_helper
+import project.main.data.post_data_helper as post_data_helper
 from project import app, socketio
 from datetime import timedelta
 import dateutil.parser
@@ -96,10 +97,18 @@ def sendQhawaxStatusOff():
         post_business_helper.saveStatusQhawaxTable(qH_name,'OFF',-1)
         lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qH_name)
         post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,lessfive)
-        post_business_helper.writeBinnacle(qH_name,description,None)
+        post_business_helper.writeBinnacle(qH_name,description,'API')
         jsonsend['main_inca'] = -1
         jsonsend['name'] = qH_name
         socketio.emit('update_inca', jsonsend)
+        type = same_helper.queryQhawaxType(qH_name)
+        if (type == 'MOBILE_EXT'):
+            #print("I am a Mobile qHAWAX!")
+            finish_trip = datetime.datetime.now(dateutil.tz.tzutc())
+            # record end trip
+            post_data_helper.recordEndTrip(qH_name, "Turned off by API")
+            socketio.emit(qH_name + '_finishTrip', finish_trip)
+
         return make_response({'Success': 'qHAWAX OFF'}, 200)
     except (ValueError, TypeError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})

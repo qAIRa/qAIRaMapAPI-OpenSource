@@ -58,6 +58,18 @@ def getDroneFlightDuringPeriodTime():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+@app.route('/api/get_mobile_trips_period_time/', methods=['GET'])
+def getMobileTripPeriodTime():
+    """ To list all flights during the certain period of time """
+    initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+    try:
+        trips = get_data_helper.queryMobileTripsByTimestamp(initial_timestamp, final_timestamp)
+        return make_response(jsonify(trips), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
 @app.route('/api/flight_log_info_by_qhawax_name/', methods=['GET'])
 def getFlightLogInfoByQhawaxName():
     """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
