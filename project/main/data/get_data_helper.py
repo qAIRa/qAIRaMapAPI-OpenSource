@@ -140,17 +140,18 @@ def queryMobileTripsByTimestamp(initial_timestamp, final_timestamp):
     trip = session.query(*trip_columns).\
                     join(Qhawax, TripLog.qhawax_id == Qhawax.id). \
                     join(QhawaxInstallationHistory, TripLog.qhawax_id == QhawaxInstallationHistory.qhawax_id). \
-                    group_by(Qhawax.id, TripLog.qhawax_id, QhawaxInstallationHistory.qhawax_id). \
+                    group_by(Qhawax.id, TripLog.id, QhawaxInstallationHistory.id). \
                     filter(initial_timestamp <= TripLog.trip_start). \
                     filter(final_timestamp >= TripLog.trip_end).order_by(TripLog.id).all()
-
-    new_trip = []
-    for t in trip:
-        t = t._asdict()
-        t["trip_start"] = util_helper.beautyFormatDate(t["trip_start"])
-        t["trip_end"] = util_helper.beautyFormatDate(t["trip_end"])
-        new_trip.append(t)
-    return new_trip
+    if(trip!=None):
+        new_trip = []
+        for t in trip:
+            t = t._asdict()
+            t["trip_start"] = util_helper.beautyFormatDate(t["trip_start"])
+            t["trip_end"] = util_helper.beautyFormatDate(t["trip_end"])
+            new_trip.append(t)
+        return new_trip
+    return None
 
 def queryDBTelemetry(qhawax_name, initial_timestamp, final_timestamp):
     """ Helper function to get Telemetry filter by qHAWAX between timestamp"""
