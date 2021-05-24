@@ -67,9 +67,9 @@ def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
     try:
         product_id = data_json['ID']
-        time_zone = float(-5)
-        location_time_zone = pytz.timezone('America/Lima')
-        data_json = util_helper.validTimeJsonProcessedTest(data_json,time_zone,location_time_zone)
+        #time_zone = float(-5)
+        #location_time_zone = pytz.timezone('America/Lima')
+        #data_json = util_helper.validTimeJsonProcessedTest(data_json,time_zone,location_time_zone)
         if (data_json is not None):
             data_json = util_helper.validAndBeautyJsonProcessedLatest(data_json)
             post_data_helper.storeProcessedDataInDB(data_json)

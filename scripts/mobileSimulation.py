@@ -48,8 +48,8 @@ if(len(sys.argv)==4):
       time_zone = float(0)
       location_timezone = pytz.timezone("America/Lima")
       horaLocal = timestampLocal(time_zone, location_timezone)
-      data_json['timestamp'] = str(horaLocal)
-      data_json['timestamp_zone'] = str(horaLocal + datetime.timedelta(hours=5))
+      data_json['timestamp'] = str(datetime.datetime.now())
+      data_json['timestamp_zone'] = str(datetime.datetime.now() + datetime.timedelta(hours=5))
 
       lat = data_json["lat"]
       lon = data_json["lon"]
