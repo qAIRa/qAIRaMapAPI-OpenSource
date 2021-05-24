@@ -36,7 +36,7 @@ def recordDroneLanding():
         if(get_business_helper.isAerealQhawax(qhawax_name)==True):
             post_data_helper.recordDroneLanding(flight_end, qhawax_name,flight_detail)
             post_business_helper.updateLastLocation(qhawax_name,location)
-            socketio.emit(qhawax_name + '_landing', flight_end)
+            socketio.emit(qhawax_name + '_landing', flight_end)#insert qhawax_name
             return make_response({'Success':'The drone landing has been recorded'}, 200)
         return make_response({'Warning':'This is not an andean drone'}, 400)
     except (TypeError, ValueError ) as e:
