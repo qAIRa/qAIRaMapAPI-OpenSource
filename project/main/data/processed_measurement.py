@@ -82,22 +82,21 @@ def handleProcessedDataByMobileQhawax():
             if(minutes_difference!=None):
                 if(minutes_difference<5):
                     if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
                         if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
-                            # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
-                            # aqui escribo flight start pero solo 1 vez por qhawax
+                        # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
+                        # aqui escribo flight start pero solo 1 vez por qhawax
                             post_data_helper.recordStartTrip(product_id)
+                        post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
                         
                         # actualice el trip_end: script de checkQhawaxActive
                         
                 elif(minutes_difference>=5):
                     if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
+                        if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
+                            post_data_helper.recordStartTrip(product_id)
                         post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
                         # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
                         # aqui escribo flight start pero solo 1 vez por qhawax
-                        if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
-                            post_data_helper.recordStartTrip(product_id)
-                        
                         # actualice el trip_end: script de checkQhawaxActive
 
             return make_response('OK', 200) 
