@@ -7,7 +7,7 @@ import dateutil.tz
 import datetime
 import pytz
 import random
-from datetime import timedelta, tzinfo
+from datetime import date, timedelta, tzinfo
 
 
 # DATA_PROCESSED_ENDPOINT = 'api/dataProcessedMobile/'
@@ -53,8 +53,14 @@ dLat = offset/R
 
 if(len(sys.argv)==4):
    for index in range(times_iterate):
-      now = datetime.datetime.now(dateutil.tz.tzutc())
-      data_json['timestamp'] = str(now.replace(tzinfo=pytz.utc,microsecond=0))
+      #now = datetime.datetime.now(dateutil.tz.tzutc())
+      # data_json['timestamp'] = str(now.replace(tzinfo=pytz.utc,microsecond=0))
+      time_zone = float(0)
+      local_time = (datetime.datetime.now() + datetime.timedelta(hours=time_zone)).replace(microsecond=0)
+      loc_dt = pytz.timezone("America/Lima").localize(local_time)
+      #time_server = loc_dt + datetime.timedelta(hours=5)
+      #print(str(loc_dt))
+      data_json['timestamp'] = str(loc_dt)
       #data_json['timestamp_zone'] = str(datetime.datetime.now() + datetime.timedelta(hours=5))
 
       lat = data_json["lat"]
@@ -68,9 +74,19 @@ if(len(sys.argv)==4):
       data_json["humidity"]= random.randrange(times_iterate-index)
       data_json["UV"]= random.randrange(15)
 
+
+      # PUNTO A: verificar que el 'timestamp' tenga como valor el formato
+      # de la hora local en peru con -05:00 al final, visualizado en el terminal.
+      # Ejem: 2021-05-26 14:26:31-05:00
+      # Si no sale así, modificar la línea 58, que contiene la variable timezone
+      # hasta que obtengas la hora local.
+      
       print(" ")
       print(data_json)
       print(" ")
-      response = requests.post(PROCESSED_MEASUREMENT, json=data_json)
-      print(response.text)
+
+
+      # SOLO DESCOMENTAR EL POST CUANDO SE VERIFICO EL PUNTO A
+      # response = requests.post(PROCESSED_MEASUREMENT, json=data_json)
+      # print(response.text)
    
