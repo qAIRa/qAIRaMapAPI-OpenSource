@@ -1,4 +1,5 @@
 import project.main.data.post_data_helper as post_data_helper
+import project.main.business.post_business_helper as post_business_helper
 import project.main.data.get_data_helper as get_data_helper
 import project.main.util_helper as util_helper
 import project.main.same_function_helper as same_helper
@@ -67,37 +68,36 @@ def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
     try:
         product_id = data_json['ID']
-        #time_zone = float(-5)
-        #location_time_zone = pytz.timezone('America/Lima')
-        #data_json = util_helper.validTimeJsonProcessedTest(data_json,time_zone,location_time_zone)
         if (data_json is not None):
             data_json = util_helper.validAndBeautyJsonProcessedLatest(data_json)
             post_data_helper.storeProcessedDataInDB(data_json)
             data_json['ID'] = product_id
-            # if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
-            #     post_data_helper.recordStartTrip(product_id)
-
-            minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
-            minutes_difference = 10
-            if(minutes_difference!=None):
-                if(minutes_difference<5):
-                    if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
-                        # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
-                        # aqui escribo flight start pero solo 1 vez por qhawax
-                            post_data_helper.recordStartTrip(product_id)
-                        post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
-                        
-                        # actualice el trip_end: script de checkQhawaxActive
-                        
-                elif(minutes_difference>=5):
-                    if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
-                        if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
-                            post_data_helper.recordStartTrip(product_id)
-                        post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
-                        # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
-                        # aqui escribo flight start pero solo 1 vez por qhawax
-                        # actualice el trip_end: script de checkQhawaxActive
+            state = get_business_helper.queryQhawaxStatus(product_id)
+            mode = same_helper.getQhawaxMode(product_id)
+            if(state=='OFF'):
+                post_business_helper.saveTurnOnLastTime(product_id)
+                #update last_turn_on
+            if(mode == "Cliente"):
+                minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
+                minutes_difference = 10
+                if(minutes_difference!=None):
+                    if(minutes_difference<5):
+                        if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
+                            if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
+                            # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
+                            # aqui escribo flight start pero solo 1 vez por qhawax
+                                post_data_helper.recordStartTrip(product_id)
+                            post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
+                            
+                            # actualice el trip_end: script de checkQhawaxActive
+                    elif(minutes_difference>=5):
+                        if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
+                            if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
+                                post_data_helper.recordStartTrip(product_id)
+                            post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
+                            # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
+                            # aqui escribo flight start pero solo 1 vez por qhawax
+                            # actualice el trip_end: script de checkQhawaxActive
 
             return make_response('OK', 200) 
         return make_response('Time is not correct', 400)
