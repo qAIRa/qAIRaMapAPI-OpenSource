@@ -284,7 +284,6 @@ def recordEndTrip(qhawax_name, details):
     if(qhawax_id!=None):
         finish_trip = datetime.datetime.now(dateutil.tz.tzutc())
         finish_json = {"trip_end":finish_trip,"details":details}
-        print(finish_json)
         session.query(TripLog). \
             filter_by(qhawax_id=qhawax_id, trip_end=None).update(values=finish_json)
         session.commit()

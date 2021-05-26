@@ -76,6 +76,7 @@ def handleProcessedDataByMobileQhawax():
             mode = same_helper.getQhawaxMode(product_id)
             if(state=='OFF'):
                 post_business_helper.saveTurnOnLastTime(product_id)
+                post_business_helper.saveStatusQhawaxTable(product_id,'ON',1)
                 #update last_turn_on
             if(mode == "Cliente"):
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
