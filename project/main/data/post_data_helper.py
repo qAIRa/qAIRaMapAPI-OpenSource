@@ -271,12 +271,14 @@ def deleteValuesBetweenTimestampsValidProcessedMeasurement(timestamp_before):
 
 def recordStartTrip(qhawax_name):
     qhawax_id=same_helper.getQhawaxID(qhawax_name)
+    name = qhawax_name.strip()
     if(qhawax_id!=None):
         start_trip = datetime.datetime.now(dateutil.tz.tzutc())
+        socketio.emit(name + '_startTrip', start_trip)
         start = TripLog(trip_start=datetime.datetime.now(dateutil.tz.tzutc()), qhawax_id=qhawax_id)
         session.add(start)
         session.commit()
-        socketio.emit(qhawax_name + '_startTrip', start_trip)
+        print("Start trip: ", start_trip, "qHAWAX name: ", name + '_startTrip')
 
 def recordEndTrip(qhawax_name, details):
     qhawax_id=same_helper.getQhawaxID(qhawax_name)

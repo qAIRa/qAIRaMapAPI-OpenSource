@@ -226,8 +226,15 @@ def getProcessedByPollutantDuringTrip():
         return make_response(json_message, 400)
 
 
-# @app.route('/api/function_testers/', methods=['GET'])
-# def getPreviousTurnOn():
+@app.route('/api/function_testers/', methods=['POST'])
+def testerFunction():
+    qhawax_name = 'qH022'
+    #start_trip = datetime.datetime.now()
+    post_data_helper.recordStartTrip(qhawax_name)
+    return make_response(qhawax_name, 200)
+
+
+    
 #     qhawax_name = request.args.get('name')
 #     try:
 #         #secret_key_hashed = str(req_json['secret_key']).strip()
