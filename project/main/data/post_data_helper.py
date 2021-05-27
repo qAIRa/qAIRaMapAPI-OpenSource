@@ -18,6 +18,7 @@ MAX_SECONDS_DATA_STORAGE = 20
 drone_elapsed_time = None
 drone_telemetry = None
 drone_storage = {}
+pollutants = ['CO','CO2','NO2','O3','H2S','SO2','PM25','PM10','VOC']
 
 def storeAirQualityDataInDB(data):
     """ Helper function to record Air Quality measurement """
@@ -111,6 +112,12 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
     data_json = exceptions.checkDictionaryVariable(data_json)
     product_id = exceptions.checkStringVariable(product_id)
     storeValidProcessedDataInDBMobile(data_json, product_id)
+    for i in range(len(pollutants)):
+        socket_name = data_json['ID'] +'_'+ str(pollutants[i])+'_valid'
+        pollutant = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
+        new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
+        new_data_json[pollutants[i]]= data_json[pollutant]
+        socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
     # if(inca_value==0.0):
     #   post_business_helper.updateMainIncaInDB(1,product_id)
     #   post_business_helper.updateMainIncaQhawaxInstallationTable(1,product_id)

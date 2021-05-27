@@ -234,7 +234,7 @@ def testerFunction():
     return make_response(qhawax_name, 200)
 
 
-    
+
 #     qhawax_name = request.args.get('name')
 #     try:
 #         #secret_key_hashed = str(req_json['secret_key']).strip()
