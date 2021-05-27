@@ -274,7 +274,7 @@ def recordStartTrip(qhawax_name):
     name = qhawax_name.strip()
     if(qhawax_id!=None):
         start_trip = datetime.datetime.now(dateutil.tz.tzutc())
-        socketio.emit(name + '_startTrip', start_trip)
+        socketio.emit(name + '_startTrip', str(start_trip))
         start = TripLog(trip_start=datetime.datetime.now(dateutil.tz.tzutc()), qhawax_id=qhawax_id)
         session.add(start)
         session.commit()
