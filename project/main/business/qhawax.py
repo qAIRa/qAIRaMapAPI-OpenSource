@@ -107,7 +107,7 @@ def sendQhawaxStatusOff():
             finish_trip = datetime.datetime.now(dateutil.tz.tzutc())
             # record end trip
             post_data_helper.recordEndTrip(qH_name, "Turned off by API")
-            socketio.emit(qH_name + '_finishTrip', finish_trip)
+            socketio.emit(qH_name + '_finishTrip', str(finish_trip))
 
         return make_response({'Success': 'qHAWAX OFF'}, 200)
     except (ValueError, TypeError) as e:
