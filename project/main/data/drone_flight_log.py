@@ -96,6 +96,17 @@ def getFlightLogDuringFlight():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+@app.route('/api/mobile_log_info_during_trip/', methods=['GET'])
+def getMobileLogDuringTrip():
+    """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
+    try:
+        allQhawaxsInFlight = get_data_helper.AllqHAWAXIsInTrip()
+        if(allQhawaxsInFlight!=[]):
+            return make_response(jsonify(allQhawaxsInFlight), 200)
+        return make_response(jsonify('There are no qHAWAXs in a trip'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
         
 @app.route('/api/mobile_log_info_by_qhawax_name/', methods=['GET'])
 def getMobileLogInfoByQhawaxName():
