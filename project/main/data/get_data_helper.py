@@ -236,3 +236,11 @@ def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
                 .order_by(ProcessedMeasurement.id.desc()).first().timestamp_zone
             return processed_measurement_timestamp
     return None
+
+def getMobileLatestLatLonValidProcessedMeasurement(qhawax_name):
+    installation_id =same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        values=session.query(ValidProcessedMeasurement.lat,ValidProcessedMeasurement.lon).filter_by(qhawax_installation_id=installation_id) \
+            .order_by(ValidProcessedMeasurement.id.desc()).first()
+        return values._asdict()
+    return None

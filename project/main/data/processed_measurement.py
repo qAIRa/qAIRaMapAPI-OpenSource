@@ -226,12 +226,18 @@ def getProcessedByPollutantDuringTrip():
         return make_response(json_message, 400)
 
 
-@app.route('/api/function_testers/', methods=['POST'])
+@app.route('/api/function_testers/', methods=['GET'])
 def testerFunction():
-    qhawax_name = 'qH022'
-    #start_trip = datetime.datetime.now()
-    post_data_helper.recordStartTrip(qhawax_name)
-    return make_response(qhawax_name, 200)
+    try:
+        qhawax_name = 'qH022'
+        #start_trip = datetime.datetime.now()
+        #post_data_helper.recordStartTrip(qhawax_name)
+        jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
+        post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
+        return make_response(jsonify(jsonLatLon), 200)
+    except Exception as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)  
 
 
 

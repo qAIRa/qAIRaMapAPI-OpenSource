@@ -106,6 +106,8 @@ def sendQhawaxStatusOff():
             #print("I am a Mobile qHAWAX!")
             # record end trip
             post_data_helper.recordEndTrip(qH_name, "Turned off by API")
+            jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
+            post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
 
         return make_response({'Success': 'qHAWAX OFF'}, 200)
     except (ValueError, TypeError) as e:

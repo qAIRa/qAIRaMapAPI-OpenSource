@@ -298,3 +298,10 @@ def recordEndTrip(qhawax_name, details):
         session.query(TripLog). \
             filter_by(qhawax_id=qhawax_id, trip_end=None).update(values=finish_json)
         session.commit()
+
+def updateLastestLatLonMobile(qhawax_name, json_val):
+    qhawax_id=same_helper.getQhawaxID(qhawax_name)
+    session.query(QhawaxInstallationHistory). \
+        filter_by(qhawax_id=qhawax_id, end_date_zone=None).update(values=json_val)
+        # json_val should have {"lat": 12.123, "lon": 12.123}
+    session.commit()
