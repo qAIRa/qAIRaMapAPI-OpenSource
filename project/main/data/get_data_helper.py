@@ -176,7 +176,8 @@ def queryDBProcessedByPollutant(qhawax_name, initial_timestamp, final_timestamp,
         column_array = [ProcessedMeasurement.CO.label('pollutant'), ProcessedMeasurement.H2S.label('pollutant'),
                         ProcessedMeasurement.NO2.label('pollutant'), ProcessedMeasurement.O3.label('pollutant'),
                         ProcessedMeasurement.PM25.label('pollutant'), ProcessedMeasurement.PM10.label('pollutant'),
-                        ProcessedMeasurement.SO2.label('pollutant')]
+                        ProcessedMeasurement.SO2.label('pollutant'),ProcessedMeasurement.CO2.label('pollutant'),
+                        ProcessedMeasurement.VOC.label('pollutant')]
 
         for i in range(len(sensor_array)):
             if(pollutant==sensor_array[i]):
