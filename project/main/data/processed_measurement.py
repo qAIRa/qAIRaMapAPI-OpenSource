@@ -68,6 +68,8 @@ def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
     try:
         product_id = data_json['ID']
+        print(data_json['ID'])
+        print(data_json)
         if (data_json is not None):
             data_json = util_helper.validAndBeautyJsonProcessedLatest(data_json)
             post_data_helper.storeProcessedDataInDB(data_json)
@@ -229,7 +231,8 @@ def testerFunction():
     try:
         qhawax_name = 'qH004'
         #start_trip = datetime.datetime.now()
-        post_data_helper.recordStartTrip(qhawax_name)
+        get_business_helper.getHoursDifference(qhawax_name)
+        #post_data_helper.recordStartTrip(qhawax_name)
         # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
         # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
         # return make_response(jsonify(jsonLatLon), 200)

@@ -79,7 +79,7 @@ def getHoursDifference(qhawax_name):
     if(qhawax_id is not None):
         values = session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone, \
                                QhawaxInstallationHistory.last_registration_time_zone).\
-                         filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
+                         filter(QhawaxInstallationHistory.qhawax_id == qhawax_id, QhawaxInstallationHistory.end_date_zone==None).first()
         if(values!=None):
             if (values[0]!=None and values[1]!=None):
                 minutes_difference = int((values[0] - values[1]).total_seconds() / 60)
