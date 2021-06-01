@@ -71,8 +71,12 @@ def handleProcessedDataByMobileQhawax():
         print(data_json)
         if (data_json is not None):
             data_json = util_helper.validAndBeautyJsonProcessedLatest(data_json)
+            print("entre a validAndBeautyJsonProcessedLatest: ", data_json)
             post_data_helper.storeProcessedDataInDB(data_json)
+            print("hice post a storeProcessedDataInDB: ", data_json)
             data_json['ID'] = product_id
+            print("saque el ID:",product_id)
+            print("obtengo el state: ")
             state = get_business_helper.queryQhawaxStatus(product_id)
             mode = same_helper.getQhawaxMode(product_id)
             print("Verifico que si el state esta en OFF")
