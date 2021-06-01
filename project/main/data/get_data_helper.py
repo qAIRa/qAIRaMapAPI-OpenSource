@@ -10,6 +10,7 @@ import math
 
 session = db.session
 sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
+mobile_sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2','CO2','VOC']
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #validar con sabri
     """ Helper function to get Air Quality measurement """
     sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3,
@@ -178,9 +179,9 @@ def queryDBProcessedByPollutant(qhawax_name, initial_timestamp, final_timestamp,
                         ProcessedMeasurement.PM25.label('pollutant'), ProcessedMeasurement.PM10.label('pollutant'),
                         ProcessedMeasurement.SO2.label('pollutant'),ProcessedMeasurement.CO2.label('pollutant'),
                         ProcessedMeasurement.VOC.label('pollutant')]
-
-        for i in range(len(sensor_array)):
-            if(pollutant==sensor_array[i]):
+#sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
+        for i in range(len(mobile_sensor_array)):
+            if(pollutant==mobile_sensor_array[i]):
                 sensors = (ProcessedMeasurement.timestamp_zone, column_array[i], ProcessedMeasurement.lat,ProcessedMeasurement.lon)
 
         measurements = session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
@@ -223,7 +224,7 @@ def AllqHAWAXIsInTrip():
                     join(Qhawax, TripLog.qhawax_id == Qhawax.id). \
                     join(QhawaxInstallationHistory, Qhawax.id == QhawaxInstallationHistory.qhawax_id). \
                     group_by(Qhawax.id, TripLog.id, QhawaxInstallationHistory.id). \
-                    filter(TripLog.trip_end == None).order_by(TripLog.id).all()
+                    filter(TripLog.trip_end == None, QhawaxInstallationHistory.end_date_zone==None).order_by(TripLog.id).all()
     return [t._asdict() for t in trip]
 
 def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):

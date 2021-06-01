@@ -224,16 +224,16 @@ def getProcessedByPollutantDuringTrip():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-
 @app.route('/api/function_testers/', methods=['GET'])
 def testerFunction():
     try:
-        qhawax_name = 'qH022'
+        qhawax_name = 'qH004'
         #start_trip = datetime.datetime.now()
-        #post_data_helper.recordStartTrip(qhawax_name)
-        jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
-        post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
-        return make_response(jsonify(jsonLatLon), 200)
+        post_data_helper.recordStartTrip(qhawax_name)
+        # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
+        # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
+        # return make_response(jsonify(jsonLatLon), 200)
+        return make_response(jsonify("OK"), 200)
     except Exception as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)  

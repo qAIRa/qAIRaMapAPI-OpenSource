@@ -285,7 +285,7 @@ def recordStartTrip(qhawax_name):
         start = TripLog(trip_start=datetime.datetime.now(dateutil.tz.tzutc()), qhawax_id=qhawax_id)
         session.add(start)
         session.commit()
-        print("Start trip: ", start_trip, "qHAWAX name: ", name + '_startTrip')
+        print("Start trip: ", str(start_trip), "qHAWAX name: ", name + '_startTrip')
 
 def recordEndTrip(qhawax_name, details):
     qhawax_id=same_helper.getQhawaxID(qhawax_name)
