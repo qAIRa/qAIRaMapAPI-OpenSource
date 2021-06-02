@@ -67,6 +67,7 @@ def handleProcessedDataByQhawax():
 def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
     #print(str(datetime.datetime.now()))
+    print("qHAWAX name: ",data_json['ID'])
     try:
         product_id = data_json['ID']
         if (data_json is not None):
@@ -76,7 +77,6 @@ def handleProcessedDataByMobileQhawax():
             state = get_business_helper.queryQhawaxStatus(product_id)
             mode = same_helper.getQhawaxMode(product_id)
             if(state=='OFF'):
-                print("qHAWAX name: ",product_id)
                 post_business_helper.saveTurnOnLastTime(product_id) #update last_turn_on - qhawax_installation_history
                 post_business_helper.saveStatusQhawaxTable(product_id,'ON',1) # state = ON - tabla qhawax
                 # escritura en bitacora es necesario
