@@ -68,10 +68,8 @@ def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
     try:
         product_id = data_json['ID']
-        print(data_json['ID'])
-        print(data_json)
         if (data_json is not None):
-            data_json = util_helper.validAndBeautyJsonProcessedLatest(data_json)
+            if('zone' in data_json): data_json.pop('zone')
             post_data_helper.storeProcessedDataInDB(data_json)
             data_json['ID'] = product_id
             state = get_business_helper.queryQhawaxStatus(product_id)
