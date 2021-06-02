@@ -148,7 +148,9 @@ def qhawaxQueryUpdateFilterByQhawaxId(json, qhawax_id):
 
 def qhawaxInstallationQueryUpdate(json, qhawax_name):
     installation_id=getInstallationIdBaseName(qhawax_name)
+    print("id de la tabla qhawax_installation_history: ", str(installation_id))
     if(installation_id is not None):
+        print("Hora de Turn On: ",str(json['last_time_physically_turn_on_zone']))
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
         session.commit()
 

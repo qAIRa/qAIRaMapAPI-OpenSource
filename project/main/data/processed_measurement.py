@@ -6,7 +6,7 @@ import project.main.same_function_helper as same_helper
 import project.main.business.get_business_helper as get_business_helper
 from flask import jsonify, make_response, request
 from project import app, socketio
-from datetime import timedelta
+from datetime import date, timedelta
 import dateutil.parser
 import dateutil.tz
 import datetime
@@ -66,6 +66,7 @@ def handleProcessedDataByQhawax():
 @app.route('/api/dataProcessedMobile/', methods=['POST'])
 def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
+    #print(str(datetime.datetime.now()))
     try:
         product_id = data_json['ID']
         if (data_json is not None):
@@ -75,21 +76,19 @@ def handleProcessedDataByMobileQhawax():
             state = get_business_helper.queryQhawaxStatus(product_id)
             mode = same_helper.getQhawaxMode(product_id)
             if(state=='OFF'):
-                post_business_helper.saveTurnOnLastTime(product_id)
-                post_business_helper.saveStatusQhawaxTable(product_id,'ON',1)
-                #update last_turn_on
+                print("qHAWAX name: ",product_id)
+                post_business_helper.saveTurnOnLastTime(product_id) #update last_turn_on - qhawax_installation_history
+                post_business_helper.saveStatusQhawaxTable(product_id,'ON',1) # state = ON - tabla qhawax
+                # escritura en bitacora es necesario
             if(mode == "Customer"):
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
                 if(minutes_difference!=None):
                     if(minutes_difference<5):
                         if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
-                            if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
-                            # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
-                            # aqui escribo flight start pero solo 1 vez por qhawax
+                            if(not(same_helper.isMobileQhawaxInATrip(product_id))): 
                                 post_data_helper.recordStartTrip(product_id)
                             post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
                             
-                            # actualice el trip_end: script de checkQhawaxActive
                     elif(minutes_difference>=5):
                         if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
                             if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
@@ -227,9 +226,12 @@ def getProcessedByPollutantDuringTrip():
 @app.route('/api/function_testers/', methods=['GET'])
 def testerFunction():
     try:
-        qhawax_name = 'qH004'
+        qhawax_name = 'qH022'
+
+
+        post_business_helper.saveTurnOnLastTime(qhawax_name)
         #start_trip = datetime.datetime.now()
-        get_business_helper.getHoursDifference(qhawax_name)
+        #get_business_helper.getHoursDifference(qhawax_name)
         #post_data_helper.recordStartTrip(qhawax_name)
         # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
         # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
