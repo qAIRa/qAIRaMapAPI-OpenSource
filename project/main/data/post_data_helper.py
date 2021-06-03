@@ -290,7 +290,6 @@ def recordStartTrip(qhawax_name):
 def recordEndTrip(qhawax_name, details):
     qhawax_id=same_helper.getQhawaxID(qhawax_name)
     name = qhawax_name.strip()
-    print(qhawax_id)
     if(qhawax_id!=None):
         finish_trip = datetime.datetime.now(dateutil.tz.tzutc())
         socketio.emit(name + '_finishTrip', str(finish_trip))

@@ -1,4 +1,4 @@
-from flask import jsonify, make_response, request
+from flask import json, jsonify, make_response, request
 import project.main.same_function_helper as same_helper
 import project.main.exceptions as exception_helper
 import project.main.business.get_business_helper as get_business_helper
@@ -95,7 +95,7 @@ def sendQhawaxStatusOff():
     try:
         qH_name = exception_helper.getStatusOffTargetofJson(req_json)
         post_business_helper.saveStatusQhawaxTable(qH_name,'OFF',-1)
-        lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qH_name)
+        lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qH_name) # obtuve la ultima medida enviada a la tabla procesed open
         post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,lessfive)
         post_business_helper.writeBinnacle(qH_name,description,'API')
         jsonsend['main_inca'] = -1
@@ -103,11 +103,10 @@ def sendQhawaxStatusOff():
         socketio.emit('update_inca', jsonsend)
         type = same_helper.queryQhawaxType(qH_name)
         if (type == 'MOBILE_EXT'):
-            #print("I am a Mobile qHAWAX!")
-            # record end trip
             post_data_helper.recordEndTrip(qH_name, "Turned off by API")
             jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
-            post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
+            if(jsonLatLon!=None):
+                post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
 
         return make_response({'Success': 'qHAWAX OFF'}, 200)
     except (ValueError, TypeError) as e:
@@ -124,7 +123,7 @@ def sendQhawaxStatusOn():
         qhawax_name = str(req_json['qhawax_name']).strip()
         post_business_helper.saveStatusQhawaxTable(qhawax_name,'ON',0)
         post_business_helper.saveTurnOnLastTime(qhawax_name)
-        post_business_helper.writeBinnacle(qhawax_name,description,None)
+        post_business_helper.writeBinnacle(qhawax_name,description,"API")
         jsonsend['main_inca'] = 0
         jsonsend['name'] = qhawax_name
         return make_response({'Success': 'qHAWAX ON physically'}, 200)

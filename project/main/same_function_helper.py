@@ -149,10 +149,8 @@ def qhawaxQueryUpdateFilterByQhawaxId(json, qhawax_id):
 
 def qhawaxInstallationQueryUpdate(json, qhawax_name):
     installation_id=getInstallationIdBaseName(qhawax_name)
-    print("id de la tabla qhawax_installation_history: ", str(installation_id))
+    # print("id de la tabla qhawax_installation_history: ", str(installation_id))
     if(installation_id is not None):
-        for key, value in json.items():
-            print(key, str(value))
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
         session.commit()
 

@@ -67,7 +67,7 @@ def handleProcessedDataByQhawax():
 def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
     #print(str(datetime.datetime.now()))
-    print("qHAWAX name: ",data_json['ID'])
+    #print("qHAWAX name: ",data_json['ID'])
     try:
         product_id = data_json['ID']
         if (data_json is not None):
