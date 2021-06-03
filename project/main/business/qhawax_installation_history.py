@@ -11,9 +11,7 @@ def getQhawaxInMap():
     """ Gets a list of qHAWAXs filter by company ID """
     try:
         qhawax_in_field = get_business_helper.queryQhawaxTypeInFieldInPublicMode('STATIC')
-        if (qhawax_in_field!=[]):
-            return make_response(jsonify(qhawax_in_field), 200)
-        return make_response(jsonify({'Warning':'qHAWAXs in field not found'}), 400)
+        return make_response(jsonify(qhawax_in_field), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
