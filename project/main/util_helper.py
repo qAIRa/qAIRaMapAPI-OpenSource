@@ -17,9 +17,9 @@ array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
 array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_name',\
                          'connection_type','season','is_public','person_in_charge']
 
-# mobile qhawax specific constants
-lat_lima_interval = [-12.08,-12.02]
-lon_lima_interval = [-77.07, -77.00]
+# mobile qhawax specific constants to cover Lima
+lat_lima_interval = [-12.67,-11.59]
+lon_lima_interval = [-77.20,-76.75]
 
 def validTimeJsonProcessed(data_json):
     data_json = exceptions.checkDictionaryVariable(data_json)
