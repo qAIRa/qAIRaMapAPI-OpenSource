@@ -73,7 +73,6 @@ def storeValidProcessedDataMobileInDB(data, qhawax_id, product_id):
       session.add(valid_processed_measurement)
       session.commit()
 
-
 def storeValidProcessedDataInDB(data, product_id):
     """ Helper Processed Measurement function to insert Valid Processed Data """
     installation_id = same_helper.getInstallationIdBaseName(product_id)
@@ -111,17 +110,18 @@ def storeValidProcessedDataInDBMobile(data, product_id):
 def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
     data_json = exceptions.checkDictionaryVariable(data_json)
     product_id = exceptions.checkStringVariable(product_id)
-    storeValidProcessedDataInDBMobile(data_json, product_id)
-    for i in range(len(pollutants)):
-        socket_name = data_json['ID'] +'_'+ str(pollutants[i])+'_valid'
-        pollutant = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
-        new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
-        new_data_json[pollutants[i]]= data_json[pollutant]
-        socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
-    # if(inca_value==0.0):
-    #   post_business_helper.updateMainIncaInDB(1,product_id)
-    #   post_business_helper.updateMainIncaQhawaxInstallationTable(1,product_id)
-
+    # aqui verifico los lat y lon con los limites
+    if(util_helper.checkValidLatLonValues(data_json)):
+        storeValidProcessedDataInDBMobile(data_json, product_id)
+        for i in range(len(pollutants)):
+            socket_name = data_json['ID'] +'_'+ str(pollutants[i])+'_valid'
+            pollutant = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
+            new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
+            new_data_json[pollutants[i]]= data_json[pollutant]
+            socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
+        # if(inca_value==0.0):
+        #   post_business_helper.updateMainIncaInDB(1,product_id)
+        #   post_business_helper.updateMainIncaQhawaxInstallationTable(1,product_id)
 
 def validAndBeautyJsonValidProcessed(data_json,product_id,inca_value):
     """ Helper function to valid json Valid Processed table """
@@ -217,13 +217,11 @@ def formatTelemetryForStorage(telemetry):
         'yaw': telemetry['yaw'] # obligatorio
     }
 
-
 def recordDroneTakeoff(flight_start, qhawax_name):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     gas_inca_processed = DroneFlightLog(flight_start=flight_start, qhawax_id=qhawax_id)
     session.add(gas_inca_processed)
     session.commit()
-
 
 def recordDroneLanding(flight_end, qhawax_name,flight_detail):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
@@ -304,3 +302,4 @@ def updateLastestLatLonMobile(qhawax_name, json_val):
         filter_by(qhawax_id=qhawax_id, end_date_zone=None).update(values=json_val)
         # json_val should have {"lat": 12.123, "lon": 12.123}
     session.commit()
+

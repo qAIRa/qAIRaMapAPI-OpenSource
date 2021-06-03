@@ -4,6 +4,7 @@ import dateutil
 import dateutil.parser
 import project.main.exceptions as exceptions
 
+
 pollutant=['SO2','NO2','O3','CO','H2S']
 
 array_ppb = ['CO','H2S','NO2','O3','SO2','PM1','PM10','PM25','spl','UV',\
@@ -15,6 +16,10 @@ array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
 
 array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_name',\
                          'connection_type','season','is_public','person_in_charge']
+
+# mobile qhawax specific constants
+lat_lima_interval = [-12.08,-12.02]
+lon_lima_interval = [-77.07, -77.00]
 
 def validTimeJsonProcessed(data_json):
     data_json = exceptions.checkDictionaryVariable(data_json)
@@ -156,3 +161,9 @@ def beautyFormatDate(date):
 def addZero(number):
     number = exceptions.checkIntegerVariable(number)
     return "0"+str(number) if (number<10) else str(number)
+
+def checkValidLatLonValues(data_json):
+    if(data_json['lat']>=lat_lima_interval[0] and data_json['lat']<=lat_lima_interval[1] and 
+        data_json['lon']>=lon_lima_interval[0] and data_json['lon']<=lon_lima_interval[1]):
+        return True
+    return False
