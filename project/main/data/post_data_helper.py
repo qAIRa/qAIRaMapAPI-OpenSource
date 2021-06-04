@@ -298,12 +298,17 @@ def recordEndTrip(qhawax_name, details):
     qhawax_id=same_helper.getQhawaxID(qhawax_name)
     name = qhawax_name.strip()
     if(qhawax_id!=None):
-        finish_trip = datetime.datetime.now(dateutil.tz.tzutc())
-        socketio.emit(name + '_finishTrip', str(finish_trip))
-        finish_json = {"trip_end":finish_trip,"details":details}
-        session.query(TripLog). \
-            filter_by(qhawax_id=qhawax_id, trip_end=None).update(values=finish_json)
-        session.commit()
+        finish_date = session.query(TripLog.trip_end).filter(TripLog.qhawax_id==qhawax_id).order_by(TripLog.id.desc()).first()
+        if(finish_date==None):
+            installation_id =same_helper.getInstallationIdBaseName(qhawax_name)
+            if(installation_id is not None):
+                value=session.query(ValidProcessedMeasurement.timestamp_zone).filter_by(qhawax_installation_id=installation_id) \
+                    .order_by(ValidProcessedMeasurement.id.desc()).first().timestamp_zone
+                socketio.emit(name + '_finishTrip', str(value))
+                finish_json = {"trip_end":value,"details":details}
+                session.query(TripLog). \
+                    filter_by(qhawax_id=qhawax_id, trip_end=None).update(values=finish_json)
+                session.commit()
 
 def updateLastestLatLonMobile(qhawax_name, json_val):
     qhawax_id=same_helper.getQhawaxID(qhawax_name)

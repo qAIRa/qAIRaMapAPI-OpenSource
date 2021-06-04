@@ -191,6 +191,41 @@ def queryDBProcessedByPollutant(qhawax_name, initial_timestamp, final_timestamp,
         return [t._asdict() for t in measurements]
     return None
 
+
+def queryDBProcessedByPollutantMobile(qhawax_name, initial_timestamp, final_timestamp,pollutant):
+    """ Helper function to get Processed Measurement filter by qHAWAX between timestamp"""
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        column_array = [ProcessedMeasurement.CO.label('pollutant'), ProcessedMeasurement.H2S.label('pollutant'),
+                        ProcessedMeasurement.NO2.label('pollutant'), ProcessedMeasurement.O3.label('pollutant'),
+                        ProcessedMeasurement.PM25.label('pollutant'), ProcessedMeasurement.PM10.label('pollutant'),
+                        ProcessedMeasurement.SO2.label('pollutant'),ProcessedMeasurement.CO2.label('pollutant'),
+                        ProcessedMeasurement.VOC.label('pollutant')]
+#sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
+        for i in range(len(mobile_sensor_array)):
+            if(pollutant==mobile_sensor_array[i]):
+                sensors = (ProcessedMeasurement.timestamp_zone, column_array[i], ProcessedMeasurement.lat,ProcessedMeasurement.lon)
+
+        measurements = session.query(*sensors).filter(ProcessedMeasurement.qhawax_id == qhawax_id). \
+                               filter(ProcessedMeasurement.timestamp_zone >= initial_timestamp). \
+                               filter(ProcessedMeasurement.timestamp_zone <= final_timestamp). \
+                               order_by(ProcessedMeasurement.timestamp_zone.asc()).all()
+        
+        factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25,
+                    'SO2': 100/20, 'O3': 100/120, 'H2S': 100/150}
+        values=[]
+        if (pollutant in factor_final_json):
+            for t in measurements:
+                dictValue = t._asdict()
+                dictValue['pollutant'] = round(dictValue['pollutant']*factor_final_json[pollutant],3)
+                values.append(dictValue)
+            return values
+        else:
+            return [t._asdict() for t in measurements]
+
+    return None
+
+
 def qHAWAXIsInFlight(qhawax_name):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):

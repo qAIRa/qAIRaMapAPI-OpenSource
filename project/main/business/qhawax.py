@@ -103,7 +103,7 @@ def sendQhawaxStatusOff():
         socketio.emit('update_inca', jsonsend)
         type = same_helper.queryQhawaxType(qH_name)
         if (type == 'MOBILE_EXT'):
-            post_data_helper.recordEndTrip(qH_name, "Turned off by API")
+            post_data_helper.recordEndTrip(qH_name, "Apagado por la WEB")
             jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
             if(jsonLatLon!=None):
                 post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
@@ -124,6 +124,12 @@ def sendQhawaxStatusOn():
         post_business_helper.saveStatusQhawaxTable(qhawax_name,'ON',0)
         post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,"API")
+        type = same_helper.queryQhawaxType(qhawax_name)
+        if (type == 'MOBILE_EXT'):
+            post_data_helper.recordEndTrip(qhawax_name, "Apagado por la WEB")
+            jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
+            if(jsonLatLon!=None):
+                post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
         jsonsend['main_inca'] = 0
         jsonsend['name'] = qhawax_name
         return make_response({'Success': 'qHAWAX ON physically'}, 200)
@@ -162,7 +168,7 @@ def qhawaxChangeToCalibration():
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
         type = same_helper.queryQhawaxType(qH_name)
         if (type == 'MOBILE_EXT'):
-            post_data_helper.recordEndTrip(qH_name, "Turned off by API")
+            post_data_helper.recordEndTrip(qH_name, "Apagado por la WEB")
             jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
             if(jsonLatLon!=None):
                 post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
