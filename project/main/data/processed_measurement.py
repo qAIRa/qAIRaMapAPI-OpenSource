@@ -95,7 +95,7 @@ def handleProcessedDataByMobileQhawax():
                             post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
 
             return make_response('OK', 200) 
-        return make_response('Time is not correct', 400)
+        return make_response('ID not found', 400)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)

@@ -232,7 +232,7 @@ def sendQhawaxStatusOnBaseOnLossSignal():
 def getMobileLEDColor():
     try:
         name = request.args.get('name')
-        return get_business_helper.queryMobileQhawaxColor(name)
+        return make_response(jsonify(get_business_helper.queryMobileQhawaxColor(name)),200)
     except Exception as e:
         json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
