@@ -163,7 +163,8 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
     person_in_charge = exceptions.checkStringVariable(person_in_charge)
     qHAWAX_ID = same_helper.getQhawaxID(qhawax_name)
     if(qHAWAX_ID is not None):
-        bitacora = {'timestamp_zone': now, 'observation_type': 'Interna','description': description, 'qhawax_id':qHAWAX_ID,\
+        now2 = datetime.datetime.now(dateutil.tz.tzutc())
+        bitacora = {'timestamp_zone': now2, 'observation_type': 'Interna','description': description, 'qhawax_id':qHAWAX_ID,\
                     'solution':None,'person_in_charge':person_in_charge, 'end_date_zone':None,'start_date_zone':None}
         bitacora_update = Bitacora(**bitacora)
         session.add(bitacora_update)
