@@ -50,12 +50,14 @@ def saveStatusOffQhawaxInstallationTable(qhawax_name,time):
 
 def saveTurnOnLastTime(qhawax_name):
     """ Set qHAWAX ON in qHAWAX Installation table  """
-    qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now.replace(tzinfo=None)}
+    now2 = datetime.datetime.now(dateutil.tz.tzutc())
+    qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
 
 def turnOnAfterCalibration(qhawax_name):
     """ Set qHAWAX ON in qHAWAX Installation table"""
-    qhawax_json_on_after_calibration = {'last_time_physically_turn_on_zone': now.replace(tzinfo=None)}
+    now2 = datetime.datetime.now(dateutil.tz.tzutc())
+    qhawax_json_on_after_calibration = {'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on_after_calibration,qhawax_name)
 
 def saveEndWorkFieldDate(qhawax_name,end_date):

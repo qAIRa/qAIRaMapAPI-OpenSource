@@ -160,6 +160,12 @@ def qhawaxChangeToCalibration():
         post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qH_name)
         post_business_helper.changeMode(qH_name,"Calibration")
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
+        type = same_helper.queryQhawaxType(qH_name)
+        if (type == 'MOBILE_EXT'):
+            post_data_helper.recordEndTrip(qH_name, "Turned off by API")
+            jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
+            if(jsonLatLon!=None):
+                post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
         return make_response({'Success': 'qHAWAX has been changed to calibration mode - open'}, 200)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
