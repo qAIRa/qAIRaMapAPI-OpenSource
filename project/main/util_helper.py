@@ -167,3 +167,33 @@ def checkValidLatLonValues(data_json):
         data_json['lon']>=lon_lima_interval[0] and data_json['lon']<=lon_lima_interval[1]):
         return True
     return False
+
+def getColorBaseOnGasValuesMobile(qhawax_inca):
+    if(isinstance(qhawax_inca, float) is not True):
+        raise TypeError("qHAWAX Inca value "+str(qhawax_inca)+" should be float")
+    
+    if qhawax_inca == 50:
+        return 'green'
+    elif qhawax_inca == 100:
+        return'yellow'
+    elif qhawax_inca == 500:
+        return'orange'
+    elif qhawax_inca == 600:
+        return'red'
+    return 'green'
+
+
+def validaPollutant(val):
+    calificacionInca = 0
+    if val >=0 and val<= 50 :
+        calificacionInca = 50
+    elif val >50 and val<=100:
+        calificacionInca = 100
+    elif val >100 and val<=150:
+        calificacionInca = 500
+    elif val>=150:
+        calificacionInca = 600
+    else:
+        calificacionInca = -1
+    return calificacionInca
+    

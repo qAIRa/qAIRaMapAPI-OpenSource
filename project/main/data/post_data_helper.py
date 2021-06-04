@@ -113,12 +113,21 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
     # aqui verifico los lat y lon con los limites
     if(util_helper.checkValidLatLonValues(data_json)):
         storeValidProcessedDataInDBMobile(data_json, product_id)
+        max_value = 0
         for i in range(len(pollutants)):
             socket_name = data_json['ID'] +'_'+ str(pollutants[i])+'_valid'
-            pollutant = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
+            pollutantStr = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
             new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
-            new_data_json[pollutants[i]]= data_json[pollutant]
-            socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
+            factor_final_json = {'CO': round(100/10000,3), 'NO2': round(100/200,3), 'PM10': round(100/150,3), 'PM25': round(100/25,3),
+                                'SO2': round(100/20,3), 'O3': round(100/120,3), 'H2S': round(100/150,3)}
+            if (data_json[pollutantStr]!=None): 
+                if (pollutants[i] in factor_final_json): data_json[pollutantStr] = data_json[pollutantStr]*factor_final_json[pollutants[i]]
+                new_data_json[pollutants[i]]= data_json[pollutantStr]
+                socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
+                if data_json[pollutantStr]>=max_value: max_value = data_json[pollutantStr]
+        
+        post_business_helper.updateMainIncaQhawaxTable(util_helper.validaPollutant(max_value),product_id)
+
         # if(inca_value==0.0):
         #   post_business_helper.updateMainIncaInDB(1,product_id)
         #   post_business_helper.updateMainIncaQhawaxInstallationTable(1,product_id)

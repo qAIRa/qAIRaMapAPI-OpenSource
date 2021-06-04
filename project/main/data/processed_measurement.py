@@ -66,8 +66,6 @@ def handleProcessedDataByQhawax():
 @app.route('/api/dataProcessedMobile/', methods=['POST'])
 def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
-    #print(str(datetime.datetime.now()))
-    #print("qHAWAX name: ",data_json['ID'])
     try:
         product_id = data_json['ID']
         if (data_json is not None):
@@ -76,10 +74,11 @@ def handleProcessedDataByMobileQhawax():
             data_json['ID'] = product_id
             state = get_business_helper.queryQhawaxStatus(product_id)
             mode = same_helper.getQhawaxMode(product_id)
+            # what if I am Calibration?
             if(state=='OFF'):
-                post_business_helper.saveTurnOnLastTime(product_id) #update last_turn_on - qhawax_installation_history
-                post_business_helper.saveStatusQhawaxTable(product_id,'ON',1) # state = ON - tabla qhawax
-                # escritura en bitacora es necesario
+                post_business_helper.saveTurnOnLastTimeProcessedMobile(product_id) #update last_turn_on - qhawax_installation_history
+                post_business_helper.saveStatusQhawaxTable(product_id,'ON',1) # state = ON - qhawax
+                post_business_helper.writeBinnacle(product_id, "Reconnection", "API") # escritura en bitacora es necesario
             if(mode == "Customer"):
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
                 if(minutes_difference!=None):
@@ -94,9 +93,6 @@ def handleProcessedDataByMobileQhawax():
                             if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
                                 post_data_helper.recordStartTrip(product_id)
                             post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
-                            # verificar que el qhawax objetivo tenga como valor en trip_end del trip_start que le corresponda igual a null
-                            # aqui escribo flight start pero solo 1 vez por qhawax
-                            # actualice el trip_end: script de checkQhawaxActive
 
             return make_response('OK', 200) 
         return make_response('Time is not correct', 400)
@@ -226,10 +222,10 @@ def getProcessedByPollutantDuringTrip():
 @app.route('/api/function_testers/', methods=['GET'])
 def testerFunction():
     try:
-        qhawax_name = 'qH022'
+        qhawax_name = 'qH020'
+        post_business_helper.saveTurnOnLastTimeProcessed(qhawax_name)
 
-
-        post_business_helper.saveTurnOnLastTime(qhawax_name)
+        #post_business_helper.saveTurnOnLastTime(qhawax_name)
         #start_trip = datetime.datetime.now()
         #get_business_helper.getHoursDifference(qhawax_name)
         #post_data_helper.recordStartTrip(qhawax_name)

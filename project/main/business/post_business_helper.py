@@ -54,6 +54,17 @@ def saveTurnOnLastTime(qhawax_name):
     qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
 
+def saveTurnOnLastTimeProcessedMobile(qhawax_name):
+    """ Set last_time_physically_turn_on_zone based on latest processed measurement timestamp  """
+    latest_processed_timestamp = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name)
+    if(not(latest_processed_timestamp==None or latest_processed_timestamp==[])):
+        now2 = datetime.datetime.now(dateutil.tz.tzutc())
+        difference = now2 - latest_processed_timestamp
+        seconds_interval = 300
+        if(seconds_interval<int(difference.total_seconds())): # if reconnection takes longer than 5 minutes, we update the last_turn_on
+            qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
+            same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
+
 def turnOnAfterCalibration(qhawax_name):
     """ Set qHAWAX ON in qHAWAX Installation table"""
     now2 = datetime.datetime.now(dateutil.tz.tzutc())
@@ -176,3 +187,22 @@ def saveTimeQhawaxOff(qhawax_name):
     if(installation_id!=None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_registration_time_zone':datetime.datetime.now(dateutil.tz.tzutc())})
         session.commit()
+
+def updateTimeOnPreviousTurnOn(qhawax_name,mins):
+    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        turn_on = get_business_helper.queryLatestTurnOffTimestamp(qhawax_name)
+        # what if the turn_on is very recent? does not matter as long as there a value
+        if(turn_on!=None):
+            turn_off = turn_on - datetime.timedelta(minutes=mins)
+            session.query(QhawaxInstallationHistory).\
+            filter_by(id=installation_id).\
+            update(values={'last_registration_time_zone':turn_off})
+            session.commit()
+        else:            
+            turn_on = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120-mins) 
+            turn_off = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120)
+            session.query(QhawaxInstallationHistory).\
+            filter_by(id=installation_id).\
+            update(values={'last_time_physically_turn_on_zone':turn_on,'last_registration_time_zone':turn_off})
+            session.commit()

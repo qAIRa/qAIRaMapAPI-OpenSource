@@ -98,10 +98,10 @@ def getNoiseData(qhawax_name):
 def getLastValuesOfQhawax(qH_name):
     """Helper qHAWAX function to get last values"""
     mode = "Stand By"
-    description="qHAWAX has changed to stand by mode"
+    description="qHAWAX has been changed to stand by mode"
     if(isItFieldQhawax(qH_name) == True):
         mode = "Customer"
-        description="qHAWAX has changed to customer mode"
+        description="qHAWAX has been changed to customer mode"
     main_inca = 0 if(queryQhawaxStatus(qH_name)=='ON') else -1
     return mode, description, main_inca
 
@@ -159,3 +159,28 @@ def getAllMobileQhawaxID():
     qhawax_list =  session.query(Qhawax.id).filter(Qhawax.qhawax_type.like(search)). \
                         order_by(Qhawax.id).all()
     return [qhawax._asdict() for qhawax in qhawax_list]
+
+def queryLatestTurnOffTimestamp(qhawax_name):
+    qhawax_id = same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        last_turn_on= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone). \
+                                filter(QhawaxInstallationHistory.qhawax_id == qhawax_id, QhawaxInstallationHistory.end_date_zone==None).first()
+        return last_turn_on[0]
+    return None
+
+def queryMobileQhawaxColor(name):
+    """ Helper qHAWAX function to get main inca value  """
+    qhawax_id =same_helper.getQhawaxID(name)
+    if(qhawax_id is not None):
+        main_inca = getMainIncaQhawaxTable(qhawax_id)
+        if(main_inca is not None):
+            return util_helper.getColorBaseOnGasValuesMobile(main_inca)
+    return None
+
+def getMainIncaQhawaxTable(qhawax_id):
+    """ Get qHAWAX Main Inca """
+    qhawax_list = session.query(Qhawax.main_inca).filter_by(id=qhawax_id).all()
+    if(qhawax_list == []):
+        return None
+    main_inca = session.query(Qhawax.main_inca).filter_by(id=qhawax_id).one()[0]
+    return main_inca

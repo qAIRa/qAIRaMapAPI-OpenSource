@@ -183,6 +183,7 @@ def qhawaxEndCalibration():
         mode, description, main_inca = get_business_helper.getLastValuesOfQhawax(qH_name)
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qH_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qH_name)
+        post_business_helper.updateTimeOnPreviousTurnOn(qH_name,1) # update last_registration relatively to the physically_turn_on
         post_business_helper.changeMode(qH_name,mode)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
         return make_response({'Success': 'qHAWAX has been changed to original mode - open'}, 200)
@@ -219,4 +220,13 @@ def sendQhawaxStatusOnBaseOnLossSignal():
         return make_response({'Warning': 'qHAWAX name has not been found'}, 400)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/get_qhawax_mobile_color/', methods=['GET'])
+def getMobileLEDColor():
+    try:
+        name = request.args.get('name')
+        return get_business_helper.queryMobileQhawaxColor(name)
+    except Exception as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
         return make_response(json_message, 400)
