@@ -225,6 +225,40 @@ def queryDBProcessedByPollutantMobile(qhawax_name, initial_timestamp, final_time
 
     return None
 
+def queryDBValidProcessedByPollutantMobile(qhawax_name, initial_timestamp, final_timestamp,pollutant):
+    """ Helper function to get Valid Processed Measurement filter by qHAWAX between timestamp"""
+    qhawax_installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(qhawax_installation_id is not None):
+        column_array = [ValidProcessedMeasurement.CO.label('pollutant'), ValidProcessedMeasurement.H2S.label('pollutant'),
+                        ValidProcessedMeasurement.NO2.label('pollutant'), ValidProcessedMeasurement.O3.label('pollutant'),
+                        ValidProcessedMeasurement.PM25.label('pollutant'), ValidProcessedMeasurement.PM10.label('pollutant'),
+                        ValidProcessedMeasurement.SO2.label('pollutant'),ValidProcessedMeasurement.CO2.label('pollutant'),
+                        ValidProcessedMeasurement.VOC.label('pollutant')]
+#sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
+        for i in range(len(mobile_sensor_array)):
+            if(pollutant==mobile_sensor_array[i]):
+                sensors = (ValidProcessedMeasurement.timestamp_zone, column_array[i], ValidProcessedMeasurement.lat,ValidProcessedMeasurement.lon)
+
+        measurements = session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == qhawax_installation_id). \
+                               filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
+                               filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
+                               order_by(ValidProcessedMeasurement.timestamp_zone.asc()).all()
+        
+        factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25,
+                    'SO2': 100/20, 'O3': 100/120, 'H2S': 100/150}
+        values=[]
+        if (pollutant in factor_final_json):
+            for t in measurements:
+                dictValue = t._asdict()
+                dictValue['pollutant'] = round(dictValue['pollutant']*factor_final_json[pollutant],3)
+                values.append(dictValue)
+            return values
+        else:
+            return [t._asdict() for t in measurements]
+
+    return None
+
+
 
 def qHAWAXIsInFlight(qhawax_name):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)

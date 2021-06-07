@@ -211,7 +211,7 @@ def getProcessedByPollutantDuringTrip():
         if(start_trip is not None):
             final_timestamp = datetime.datetime.now(dateutil.tz.tzutc())
             # verify which sensors
-            processed_measurements = get_data_helper.queryDBProcessedByPollutantMobile(qhawax_name, start_trip, final_timestamp,pollutant)
+            processed_measurements = get_data_helper.queryDBValidProcessedByPollutantMobile(qhawax_name, start_trip, final_timestamp,pollutant)
             if processed_measurements is not None:
                 return make_response(jsonify(processed_measurements), 200)
         return make_response(jsonify('Measurements not found'), 200)
@@ -223,8 +223,14 @@ def getProcessedByPollutantDuringTrip():
 # def testerFunction():
 #     try:
 #         qhawax_name = 'qH022'
+#         initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+#         final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
 #         #post_business_helper.saveTurnOnLastTimeProcessed(qhawax_name)
-#         post_data_helper.recordEndTrip(qhawax_name,"hi")
+#         #post_data_helper.recordEndTrip(qhawax_name,"hi")
+#         jsonofJsons = get_data_helper.queryDBProcessedByPollutant(qhawax_name,initial_timestamp=initial_timestamp_utc,
+#                                                     final_timestamp=final_timestamp_utc,pollutant='SO2')
+
+
 
 #         #post_business_helper.saveTurnOnLastTime(qhawax_name)
 #         #start_trip = datetime.datetime.now()
@@ -233,7 +239,7 @@ def getProcessedByPollutantDuringTrip():
 #         # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
 #         # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
 #         # return make_response(jsonify(jsonLatLon), 200)
-#         return make_response(jsonify("OK"), 200)
+#         return make_response(jsonify(jsonofJsons), 200)
 #     except Exception as e:
 #         json_message = jsonify({'error': ' \'%s\' ' % (e)})
 #         return make_response(json_message, 400)  

@@ -98,7 +98,7 @@ def getFlightLogDuringFlight():
 
 @app.route('/api/mobile_log_info_during_trip/', methods=['GET'])
 def getMobileLogDuringTrip():
-    """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
+    """ Lists all trips """
     try:
         allQhawaxsInFlight = get_data_helper.AllqHAWAXIsInTrip()
         if(allQhawaxsInFlight!=[]):

@@ -118,10 +118,10 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
             socket_name = data_json['ID'] +'_'+ str(pollutants[i])+'_valid'
             pollutantStr = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
             new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
-            factor_final_json = {'CO': round(100/10000,3), 'NO2': round(100/200,3), 'PM10': round(100/150,3), 'PM25': round(100/25,3),
-                                'SO2': round(100/20,3), 'O3': round(100/120,3), 'H2S': round(100/150,3)}
+            factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25,
+                                'SO2': 100/20, 'O3': 100/120, 'H2S': 100/150}
             if (data_json[pollutantStr]!=None): 
-                if (pollutants[i] in factor_final_json): data_json[pollutantStr] = data_json[pollutantStr]*factor_final_json[pollutants[i]]
+                if (pollutants[i] in factor_final_json): data_json[pollutantStr] = round(data_json[pollutantStr]*factor_final_json[pollutants[i]],3)
                 new_data_json[pollutants[i]]= data_json[pollutantStr]
                 socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
                 if data_json[pollutantStr]>=max_value: max_value = data_json[pollutantStr]
@@ -288,18 +288,18 @@ def recordStartTrip(qhawax_name):
     name = qhawax_name.strip()
     if(qhawax_id!=None):
         start_trip = datetime.datetime.now(dateutil.tz.tzutc())
-        socketio.emit(name + '_startTrip', str(start_trip))
         start = TripLog(trip_start=datetime.datetime.now(dateutil.tz.tzutc()), qhawax_id=qhawax_id)
         session.add(start)
         session.commit()
-        print("Start trip: ", str(start_trip), "qHAWAX name: ", name + '_startTrip')
+        socketio.emit(name + '_startTrip', str(start_trip))
+        # print("Start trip: ", str(start_trip), "qHAWAX name: ", name + '_startTrip')
 
 def recordEndTrip(qhawax_name, details):
     qhawax_id=same_helper.getQhawaxID(qhawax_name)
     name = qhawax_name.strip()
     if(qhawax_id!=None):
         finish_date = session.query(TripLog.trip_end).filter(TripLog.qhawax_id==qhawax_id).order_by(TripLog.id.desc()).first()
-        if(finish_date==None):
+        if(finish_date[0]==None):
             installation_id =same_helper.getInstallationIdBaseName(qhawax_name)
             if(installation_id is not None):
                 value=session.query(ValidProcessedMeasurement.timestamp_zone).filter_by(qhawax_installation_id=installation_id) \
