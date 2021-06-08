@@ -142,6 +142,7 @@ def queryMobileTripsByTimestamp(initial_timestamp, final_timestamp):
                     join(Qhawax, TripLog.qhawax_id == Qhawax.id). \
                     join(QhawaxInstallationHistory, TripLog.qhawax_id == QhawaxInstallationHistory.qhawax_id). \
                     group_by(Qhawax.id, TripLog.id, QhawaxInstallationHistory.id). \
+                    filter(QhawaxInstallationHistory.end_date_zone == None). \
                     filter(initial_timestamp <= TripLog.trip_start). \
                     filter(final_timestamp >= TripLog.trip_end).order_by(TripLog.id).all()
     if(trip!=None):

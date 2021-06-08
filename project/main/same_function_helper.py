@@ -62,7 +62,7 @@ def companyExistBasedOnRUC(ruc):
 def getQhawaxID(qhawax_name):
     """ Helper function to get qHAWAX ID base on qHAWAX name """
     if(qhawaxExistBasedOnName(qhawax_name)):
-        return int(session.query(Qhawax.id).filter_by(name= qhawax_name).first()[0])
+        return int(session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0])
     return None
 
 def getInstallationId(qhawax_id):

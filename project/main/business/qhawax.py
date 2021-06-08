@@ -94,6 +94,7 @@ def sendQhawaxStatusOff():
     description = "qHAWAX off"
     try:
         qH_name = exception_helper.getStatusOffTargetofJson(req_json)
+        comercial_name = same_helper.getComercialName(qH_name)
         post_business_helper.saveStatusQhawaxTable(qH_name,'OFF',-1)
         lessfive = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qH_name) # obtuve la ultima medida enviada a la tabla procesed open
         post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,lessfive)
@@ -103,7 +104,7 @@ def sendQhawaxStatusOff():
         socketio.emit('update_inca', jsonsend)
         type = same_helper.queryQhawaxType(qH_name)
         if (type == 'MOBILE_EXT'):
-            post_data_helper.recordEndTrip(qH_name, "Apagado por la WEB")
+            post_data_helper.recordEndTrip(qH_name, str(comercial_name))
             jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
             if(jsonLatLon!=None):
                 post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
@@ -121,17 +122,16 @@ def sendQhawaxStatusOn():
     description="qHAWAX turned on after a general reset"
     try:
         qhawax_name = str(req_json['qhawax_name']).strip()
+        comercial_name = same_helper.getComercialName(qhawax_name)
         post_business_helper.saveStatusQhawaxTable(qhawax_name,'ON',0)
         post_business_helper.saveTurnOnLastTime(qhawax_name)
         post_business_helper.writeBinnacle(qhawax_name,description,"API")
         type = same_helper.queryQhawaxType(qhawax_name)
         if (type == 'MOBILE_EXT'):
-            post_data_helper.recordEndTrip(qhawax_name, "Apagado por la WEB")
+            post_data_helper.recordEndTrip(qhawax_name, str(comercial_name))
             jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
             if(jsonLatLon!=None):
                 post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
-        jsonsend['main_inca'] = 0
-        jsonsend['name'] = qhawax_name
         return make_response({'Success': 'qHAWAX ON physically'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
@@ -161,6 +161,7 @@ def qhawaxChangeToCalibration():
     description = "qHAWAX has been changed to calibration mode"
     try:
         qH_name, in_charge = exception_helper.getChangeCalibrationFields(req_json)
+        comercial_name = same_helper.getComercialName(qH_name)
         post_business_helper.updateMainIncaQhawaxTable(-2,qH_name)
         post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off)
         post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qH_name)
@@ -168,7 +169,7 @@ def qhawaxChangeToCalibration():
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
         type = same_helper.queryQhawaxType(qH_name)
         if (type == 'MOBILE_EXT'):
-            post_data_helper.recordEndTrip(qH_name, "Apagado por la WEB")
+            post_data_helper.recordEndTrip(qH_name, str(comercial_name))
             jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
             if(jsonLatLon!=None):
                 post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)

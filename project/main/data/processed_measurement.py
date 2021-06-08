@@ -74,11 +74,13 @@ def handleProcessedDataByMobileQhawax():
             data_json['ID'] = product_id
             state = get_business_helper.queryQhawaxStatus(product_id)
             mode = same_helper.getQhawaxMode(product_id)
-            # what if I am Calibration?
             if(state=='OFF'):
                 post_business_helper.saveTurnOnLastTimeProcessedMobile(product_id) #update last_turn_on - qhawax_installation_history
                 post_business_helper.saveStatusQhawaxTable(product_id,'ON',1) # state = ON - qhawax
                 post_business_helper.writeBinnacle(product_id, "Reconnection", "API") # escritura en bitacora es necesario
+
+                # para reducir e
+
             if(mode == "Customer"):
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
                 if(minutes_difference!=None):
