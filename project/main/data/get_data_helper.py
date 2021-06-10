@@ -93,6 +93,31 @@ def queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp):
         return all_measurement
     return None
 
+def queryDBValidProcessed(qhawax_name, initial_timestamp, final_timestamp):
+
+    qhawax_installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(qhawax_installation_id is not None):
+        sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.H2S,
+                   ValidProcessedMeasurement.NO2, ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25,
+                   ValidProcessedMeasurement.PM10,ValidProcessedMeasurement.SO2, ValidProcessedMeasurement.humidity,
+                   ValidProcessedMeasurement.pressure, ValidProcessedMeasurement.temperature, ValidProcessedMeasurement.lat,
+                   ValidProcessedMeasurement.lon, ValidProcessedMeasurement.timestamp_zone,
+                   ValidProcessedMeasurement.CO_ug_m3, ValidProcessedMeasurement.H2S_ug_m3, ValidProcessedMeasurement.NO2_ug_m3,
+                   ValidProcessedMeasurement.O3_ug_m3, ValidProcessedMeasurement.SO2_ug_m3, ValidProcessedMeasurement.I_temperature)
+
+        valid_processed_measurements = session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == qhawax_installation_id). \
+                                         filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
+                                         filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
+                                         order_by(ValidProcessedMeasurement.timestamp_zone).all()
+        all_measurement = []
+        for measurement in valid_processed_measurements:
+          measurement = measurement._asdict()
+          for key, value in measurement.items():
+            if((type(value) is float) and math.isnan(value)): measurement[key] = None
+          all_measurement.append(measurement)
+        return all_measurement
+    return None
+
 def queryLastMainInca(qhawax_name):
     """Helper function to get last main inca based on qHAWAX ID """
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
@@ -308,6 +333,19 @@ def getQhawaxLatestTimestampProcessedMeasurement(qhawax_name):
                 .order_by(ProcessedMeasurement.id.desc()).first().timestamp_zone
             return processed_measurement_timestamp
     return None
+
+def getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name):
+    """ Helper qHAWAX function to get latest timestamp in UTC 00 from Processed Measurement """
+    qhawax_installation_id =same_helper.getInstallationIdBaseName(qhawax_name)
+    if(qhawax_installation_id is not None):
+        qhawax_time = session.query(ValidProcessedMeasurement.timestamp_zone).filter_by(qhawax_installation_id=qhawax_installation_id).first()
+        valid_measurement_timestamp=""
+        if(qhawax_time!=None):
+            valid_measurement_timestamp = session.query(ValidProcessedMeasurement.timestamp_zone).filter_by(qhawax_installation_id=qhawax_installation_id) \
+                .order_by(ValidProcessedMeasurement.timestamp_zone.desc()).first().timestamp_zone
+            return valid_measurement_timestamp
+    return None
+
 
 def getMobileLatestLatLonValidProcessedMeasurement(qhawax_name):
     installation_id =same_helper.getInstallationIdBaseName(qhawax_name)

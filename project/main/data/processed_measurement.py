@@ -75,22 +75,20 @@ def handleProcessedDataByMobileQhawax():
             state = get_business_helper.queryQhawaxStatus(product_id)
             mode = same_helper.getQhawaxMode(product_id)
             if(state=='OFF'):
-                post_business_helper.saveTurnOnLastTimeProcessedMobile(product_id) #update last_turn_on - qhawax_installation_history
+                post_business_helper.saveTurnOnLastTimeProcessedMobile(product_id)
                 post_business_helper.saveStatusQhawaxTable(product_id,'ON',1) # state = ON - qhawax
                 post_business_helper.writeBinnacle(product_id, "Reconnection", "API") # escritura en bitacora es necesario
-
-                # para reducir e
 
             if(mode == "Customer"):
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
                 if(minutes_difference!=None):
-                    if(minutes_difference<5):
-                        if(last_time_turn_on + datetime.timedelta(minutes=10) < datetime.datetime.now(dateutil.tz.tzutc())):
+                    if(minutes_difference<30 and minutes_difference>=0):
+                        if(last_time_turn_on + datetime.timedelta(minutes=5)< datetime.datetime.now(dateutil.tz.tzutc())):
                             if(not(same_helper.isMobileQhawaxInATrip(product_id))): 
                                 post_data_helper.recordStartTrip(product_id)
                             post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
                             
-                    elif(minutes_difference>=5):
+                    elif(minutes_difference>=30):
                         if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
                             if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
                                 post_data_helper.recordStartTrip(product_id)
@@ -203,6 +201,21 @@ def getProcessedDataFromMobileQhawax():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+@app.route('/api/valid_processed_measurements_mobile_qhawax/', methods=['GET'])
+def getValidProcessedDataFromMobileQhawax():
+    """ Lists all measurements of processed measurement of the target drone within the initial and final date """
+    qhawax_name = request.args.get('qhawax_name')
+    initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+    try:
+        processed_measurements = get_data_helper.queryDBValidProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        if processed_measurements is not None:
+            return make_response(jsonify(processed_measurements), 200)
+        return make_response(jsonify('Measurements not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
 @app.route('/api/measurements_by_pollutant_during_trip/', methods=['GET'])
 def getProcessedByPollutantDuringTrip():
     """ Lists all measurements of processed measurement of the target qHAWAX within the initial and final date """
@@ -221,30 +234,31 @@ def getProcessedByPollutantDuringTrip():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-# @app.route('/api/function_testers/', methods=['GET'])
-# def testerFunction():
-#     try:
-#         qhawax_name = 'qH022'
-#         initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
-#         final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
-#         #post_business_helper.saveTurnOnLastTimeProcessed(qhawax_name)
-#         #post_data_helper.recordEndTrip(qhawax_name,"hi")
-#         jsonofJsons = get_data_helper.queryDBProcessedByPollutant(qhawax_name,initial_timestamp=initial_timestamp_utc,
-#                                                     final_timestamp=final_timestamp_utc,pollutant='SO2')
+@app.route('/api/function_testers/', methods=['GET'])
+def testerFunction():
+    try:
+        qhawax_name = 'qH022'
+        # initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+        # final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+        #post_business_helper.saveTurnOnLastTimeProcessed(qhawax_name)
+        #post_data_helper.recordEndTrip(qhawax_name,"hi")
+        # jsonofJsons = get_data_helper.queryDBProcessedByPollutant(qhawax_name,initial_timestamp=initial_timestamp_utc,
+        #                                             final_timestamp=final_timestamp_utc,pollutant='SO2')
+        time_stamp = get_data_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name)
 
 
 
-#         #post_business_helper.saveTurnOnLastTime(qhawax_name)
-#         #start_trip = datetime.datetime.now()
-#         #get_business_helper.getHoursDifference(qhawax_name)
-#         #post_data_helper.recordStartTrip(qhawax_name)
-#         # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
-#         # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
-#         # return make_response(jsonify(jsonLatLon), 200)
-#         return make_response(jsonify(jsonofJsons), 200)
-#     except Exception as e:
-#         json_message = jsonify({'error': ' \'%s\' ' % (e)})
-#         return make_response(json_message, 400)  
+        #post_business_helper.saveTurnOnLastTime(qhawax_name)
+        #start_trip = datetime.datetime.now()
+        #get_business_helper.getHoursDifference(qhawax_name)
+        #post_data_helper.recordStartTrip(qhawax_name)
+        # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
+        # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
+        # return make_response(jsonify(jsonLatLon), 200)
+        return make_response(jsonify(time_stamp), 200)
+    except Exception as e:
+        json_message = jsonify({'error': ' \'%s\' ' % (e)})
+        return make_response(json_message, 400)  
 
 
 
