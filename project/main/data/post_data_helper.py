@@ -125,8 +125,10 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
                 socketio.emit(socket_name, new_data_json) #qH006_CO_valid
                 if data_json[pollutantStr]>=max_value: # same percentage comparison logic to obtain the highest percentage out of all pollutants
                     max_value = data_json[pollutantStr]
-                    sensor_name = pollutants[i] 
-        post_business_helper.updateMainIncaQhawaxTable(util_helper.validaPollutant(max_value,sensor_name),product_id)
+                    sensor_name = pollutants[i]
+        calInca = util_helper.validaPollutant(max_value,sensor_name)
+        post_business_helper.updateMainIncaQhawaxTable(calInca,product_id)
+        post_business_helper.updateMainIncaQhawaxInstallationTable(calInca,product_id)
 
         # if(inca_value==0.0):
         #   post_business_helper.updateMainIncaInDB(1,product_id)
