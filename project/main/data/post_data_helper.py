@@ -31,7 +31,7 @@ def storeAirQualityDataInDB(data):
                           'O3_ug_m3': data['O3_ug_m3'], 'PM25': data['PM25'], 'PM10': data['PM10'], 'O3': data['O3'],
                           'lat': data['lat'],'lon': data['lon'], 'alt': data['alt'], 'uv':data['UV'],'spl':data['SPL'], 
                           'temperature':data['temperature'],'timestamp_zone': data['timestamp_zone'],
-                          'I_temperature':data['I_temperature'],'humidity':data['humidity'],'pressure':data['pressure'],}
+                          'I_temperature':data['I_temperature'],'humidity':data['humidity'],'pressure':data['pressure']}
         air_quality_measurement = AirQualityMeasurement(**air_quality_data, qhawax_id=qhawax_id)
         session.add(air_quality_measurement)
         session.commit()
@@ -110,7 +110,6 @@ def storeValidProcessedDataInDBMobile(data, product_id):
 def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
     data_json = exceptions.checkDictionaryVariable(data_json)
     product_id = exceptions.checkStringVariable(product_id)
-    # aqui verifico los lat y lon con los limites
     if(util_helper.checkValidLatLonValues(data_json)):
         storeValidProcessedDataInDBMobile(data_json, product_id)
         max_value = 0
@@ -123,10 +122,11 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
             if (data_json[pollutantStr]!=None): 
                 if (pollutants[i] in factor_final_json): data_json[pollutantStr] = round(data_json[pollutantStr]*factor_final_json[pollutants[i]],3)
                 new_data_json[pollutants[i]]= data_json[pollutantStr]
-                socketio.emit(socket_name, new_data_json) #qH006_CO_proccessed
-                if data_json[pollutantStr]>=max_value: max_value = data_json[pollutantStr]
-        
-        post_business_helper.updateMainIncaQhawaxTable(util_helper.validaPollutant(max_value),product_id)
+                socketio.emit(socket_name, new_data_json) #qH006_CO_valid
+                if data_json[pollutantStr]>=max_value: # same percentage comparison logic to obtain the highest percentage out of all pollutants
+                    max_value = data_json[pollutantStr]
+                    sensor_name = pollutants[i] 
+        post_business_helper.updateMainIncaQhawaxTable(util_helper.validaPollutant(max_value,sensor_name),product_id)
 
         # if(inca_value==0.0):
         #   post_business_helper.updateMainIncaInDB(1,product_id)

@@ -80,6 +80,29 @@ def updateTimeOffWithLastTurnOff(time_turn_off_binnacle, qhawax_name):
     qhawax_json_last_turn_off = {'last_registration_time_zone':time_turn_off_binnacle}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_last_turn_off,qhawax_name)
 
+def updateTimeOnPreviousTurnOn(qhawax_name,mins):
+    MINUTES_ALLOWED = 240
+    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        turn_on = get_data_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name)
+        # what if the turn_on is very recent? does not matter as long as there a value
+        now = datetime.datetime.now(dateutil.tz.tzutc())
+        if(turn_on!=None):
+            minutes_difference = int((now - turn_on).total_seconds() / 60)
+            #if(minutes_difference>=)
+            turn_off = turn_on - datetime.timedelta(minutes=mins)
+            session.query(QhawaxInstallationHistory).\
+            filter_by(id=installation_id).\
+            update(values={'last_registration_time_zone':turn_off})
+            session.commit()
+        else:            
+            turn_on = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120-mins) 
+            turn_off = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120)
+            session.query(QhawaxInstallationHistory).\
+            filter_by(id=installation_id).\
+            update(values={'last_time_physically_turn_on_zone':turn_on,'last_registration_time_zone':turn_off})
+            session.commit()
+
 def updateLastLocation(qhawax_name, location):
     """ Helper Drone Log function to update location of andean drone in qHAWAX Installation table """
     location = exceptions.checkDictionaryVariable(location)
@@ -187,22 +210,3 @@ def saveTimeQhawaxOff(qhawax_name):
     if(installation_id!=None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_registration_time_zone':datetime.datetime.now(dateutil.tz.tzutc())})
         session.commit()
-
-def updateTimeOnPreviousTurnOn(qhawax_name,mins):
-    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
-    if(installation_id is not None):
-        turn_on = get_business_helper.queryLatestTurnOffTimestamp(qhawax_name)
-        # what if the turn_on is very recent? does not matter as long as there a value
-        if(turn_on!=None):
-            turn_off = turn_on - datetime.timedelta(minutes=mins)
-            session.query(QhawaxInstallationHistory).\
-            filter_by(id=installation_id).\
-            update(values={'last_registration_time_zone':turn_off})
-            session.commit()
-        else:            
-            turn_on = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120-mins) 
-            turn_off = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120)
-            session.query(QhawaxInstallationHistory).\
-            filter_by(id=installation_id).\
-            update(values={'last_time_physically_turn_on_zone':turn_on,'last_registration_time_zone':turn_off})
-            session.commit()

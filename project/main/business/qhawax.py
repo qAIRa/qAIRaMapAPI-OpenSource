@@ -162,17 +162,18 @@ def qhawaxChangeToCalibration():
     try:
         qH_name, in_charge = exception_helper.getChangeCalibrationFields(req_json)
         comercial_name = same_helper.getComercialName(qH_name)
+        qhawax_type = same_helper.queryQhawaxType(qH_name)
         post_business_helper.updateMainIncaQhawaxTable(-2,qH_name)
-        post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off)
+        if(qhawax_type!='MOBILE_EXT'): # Mobile qhawaxs should not be affected by this condition. Nor any other qhawaxs though..
+            post_business_helper.saveStatusOffQhawaxInstallationTable(qH_name,qhawax_time_off) 
         post_business_helper.updateMainIncaQhawaxInstallationTable(-2,qH_name)
         post_business_helper.changeMode(qH_name,"Calibration")
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
-        type = same_helper.queryQhawaxType(qH_name)
-        if (type == 'MOBILE_EXT'):
-            post_data_helper.recordEndTrip(qH_name, str(comercial_name))
-            jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
-            if(jsonLatLon!=None):
-                post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
+        # if (qhawax_type == 'MOBILE_EXT'):
+        #     post_data_helper.recordEndTrip(qH_name, str(comercial_name))
+        #     jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qH_name)
+        #     if(jsonLatLon!=None):
+        #         post_data_helper.updateLastestLatLonMobile(qH_name,jsonLatLon)
         return make_response({'Success': 'qHAWAX has been changed to calibration mode - open'}, 200)
     except (TypeError,ValueError) as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
@@ -190,7 +191,7 @@ def qhawaxEndCalibration():
         mode, description, main_inca = get_business_helper.getLastValuesOfQhawax(qH_name)
         post_business_helper.updateMainIncaQhawaxTable(main_inca, qH_name)
         post_business_helper.updateMainIncaQhawaxInstallationTable(main_inca, qH_name)
-        post_business_helper.updateTimeOnPreviousTurnOn(qH_name,1) # update last_registration relatively to the physically_turn_on
+        #post_business_helper.updateTimeOnPreviousTurnOn(qH_name,1) # update last_registration relatively to the physically_turn_on
         post_business_helper.changeMode(qH_name,mode)
         post_business_helper.writeBinnacle(qH_name,description,in_charge)
         return make_response({'Success': 'qHAWAX has been changed to original mode - open'}, 200)

@@ -82,7 +82,7 @@ def handleProcessedDataByMobileQhawax():
             if(mode == "Customer"):
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
                 if(minutes_difference!=None):
-                    if(minutes_difference<30 and minutes_difference>=0):
+                    if(minutes_difference<30):
                         if(last_time_turn_on + datetime.timedelta(minutes=5)< datetime.datetime.now(dateutil.tz.tzutc())):
                             if(not(same_helper.isMobileQhawaxInATrip(product_id))): 
                                 post_data_helper.recordStartTrip(product_id)

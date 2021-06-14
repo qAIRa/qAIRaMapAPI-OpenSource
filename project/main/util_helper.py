@@ -183,17 +183,91 @@ def getColorBaseOnGasValuesMobile(qhawax_inca):
     return 'green'
 
 
-def validaPollutant(val):
+def validaPollutant(val, sensor_name):
     calificacionInca = 0
-    if val >=0 and val<= 50 :
-        calificacionInca = 50
-    elif val >50 and val<=100:
-        calificacionInca = 100
-    elif val >100 and val<=150:
-        calificacionInca = 500
-    elif val>=150:
-        calificacionInca = 600
+    if(sensor_name == 'O3'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=175:
+            calificacionInca = 500
+        elif val>175:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'SO2'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=625:
+            calificacionInca = 500
+        elif val>625:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'CO'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=150:
+            calificacionInca = 500
+        elif val>150:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'H2S'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=1000:
+            calificacionInca = 500
+        elif val>1000:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'NO2'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=150:
+            calificacionInca = 500
+        elif val>150:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'PM10'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=167:
+            calificacionInca = 500
+        elif val>167:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'PM25'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=500:
+            calificacionInca = 500
+        elif val>500:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
     else:
-        calificacionInca = -1
-    return calificacionInca
-    
+        return -1
