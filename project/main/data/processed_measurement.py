@@ -31,6 +31,85 @@ def getProcessedData():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+# @app.route('/api/dataProcessed/', methods=['POST'])
+# def handleProcessedDataByQhawax():
+#     """
+#     Records processed and valid processed measurements every five seconds
+#     qHAWAX: Record new measurement
+#     """
+#     flag_email = False
+#     data_json = request.get_json()
+#     try:
+#         if (data_json is not None):
+#             product_id = data_json['ID']
+#             data_json = util_helper.validTimeJsonProcessed(data_json)
+#             data_json = util_helper.validAndBeautyJsonProcessed(data_json)
+#             post_data_helper.storeProcessedDataInDB(data_json) # it stores no matter the type
+#             data_json['ID'] = product_id
+#             data_json['zone'] = "Undefined Zone"
+#             mode = same_helper.getQhawaxMode(product_id)
+#             inca_value = same_helper.getMainIncaQhawaxTable(product_id)
+#             type = same_helper.queryQhawaxType(product_id)
+#             state = get_business_helper.queryQhawaxStatus(product_id)
+#             # same endpoint for every qHAWAX but logic different per type of qHAWAX
+#             if(type!=None):
+#                 if(type == 'STATIC_EXT'):
+#                     if(mode == "Customer" and inca_value!=None):
+#                         data_json['zone'] = get_business_helper.getNoiseData(product_id)
+#                         minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
+#                         if(minutes_difference!=None):
+#                             if(minutes_difference<5):
+#                                 post_data_helper.validTimeOfValidProcessed(10,"minute",last_time_turn_on,data_json,product_id,inca_value)
+#                             elif(minutes_difference>=5):
+#                                 post_data_helper.validTimeOfValidProcessed(2,"hour",last_time_turn_on,data_json,product_id,inca_value)
+#                     data_json = util_helper.setNoneStringElements(data_json)
+#                     socketio.emit(data_json['ID'] + '_processed', data_json)
+#                     return make_response('OK', 200)
+#                 elif(type == 'MOBILE_EXT'):
+#                     if('zone' in data_json): data_json.pop('zone')
+#                     #post_data_helper.storeProcessedDataInDB(data_json) 
+#                     if(state=='OFF'):
+#                         post_business_helper.saveTurnOnLastTimeProcessedMobile(product_id)
+#                         post_business_helper.saveStatusQhawaxTable(product_id,'ON',1)
+#                         post_business_helper.writeBinnacle(product_id, "Reconnection", "API")
+
+#                     if(mode == "Customer"):
+#                         minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
+#                         if(minutes_difference!=None): # either one of these
+#                             if(minutes_difference<30):
+#                                 if(last_time_turn_on + datetime.timedelta(minutes=5)< datetime.datetime.now(dateutil.tz.tzutc())):
+#                                     if(not(same_helper.isMobileQhawaxInATrip(product_id))): 
+#                                         post_data_helper.recordStartTrip(product_id)
+#                                     post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id) # socket emit
+                                    
+#                             elif(minutes_difference>=30):
+#                                 if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
+#                                     if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
+#                                         post_data_helper.recordStartTrip(product_id)
+#                                     post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id) # socket emit
+
+#                     return make_response('OK', 200) 
+#                 elif(type == 'AEREAL'):
+#                     if(mode == "Customer" and inca_value!=None):
+#                         data_json['zone'] = get_business_helper.getNoiseData(product_id)
+#                         minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
+#                         if(minutes_difference!=None):
+#                             if(minutes_difference<5):
+#                                 post_data_helper.validTimeOfValidProcessed(10,"minute",last_time_turn_on,data_json,product_id,inca_value)
+#                             elif(minutes_difference>=5):
+#                                 post_data_helper.validTimeOfValidProcessed(2,"hour",last_time_turn_on,data_json,product_id,inca_value)
+#                     data_json = util_helper.setNoneStringElements(data_json)
+#                     socketio.emit(data_json['ID'] + '_processed', data_json)
+#                     return make_response('OK', 200)
+#                 else:
+#                     return make_response('qHAWAX type not supported', 200)
+#             else:
+#                 return make_response('qHAWAX type not defined', 200)
+        
+#     except TypeError as e:
+#         json_message = jsonify({'error': '\'%s\'' % (e)})
+#         return make_response(json_message, 400)
+
 @app.route('/api/dataProcessed/', methods=['POST'])
 def handleProcessedDataByQhawax():
     """
@@ -48,6 +127,7 @@ def handleProcessedDataByQhawax():
         data_json['zone'] = "Undefined Zone"
         mode = same_helper.getQhawaxMode(product_id)
         inca_value = same_helper.getMainIncaQhawaxTable(product_id)
+        # same endpoint for every qHAWAX but logic different per type of qHAWAX
         if(mode == "Customer" and inca_value!=None):
             data_json['zone'] = get_business_helper.getNoiseData(product_id)
             minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
@@ -63,6 +143,7 @@ def handleProcessedDataByQhawax():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
+
 @app.route('/api/dataProcessedMobile/', methods=['POST'])
 def handleProcessedDataByMobileQhawax():
     data_json = request.get_json()
@@ -74,10 +155,10 @@ def handleProcessedDataByMobileQhawax():
             data_json['ID'] = product_id
             state = get_business_helper.queryQhawaxStatus(product_id)
             mode = same_helper.getQhawaxMode(product_id)
-            if(state=='OFF'):
+            if(state=='OFF'): # if API turned it off
                 post_business_helper.saveTurnOnLastTimeProcessedMobile(product_id)
                 post_business_helper.saveStatusQhawaxTable(product_id,'ON',1) # state = ON - qhawax
-                post_business_helper.writeBinnacle(product_id, "Reconnection", "API") # escritura en bitacora es necesario
+                post_business_helper.writeBinnacle(product_id, "Reconnection", "API")
 
             if(mode == "Customer"):
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
@@ -244,7 +325,8 @@ def testerFunction():
         #post_data_helper.recordEndTrip(qhawax_name,"hi")
         # jsonofJsons = get_data_helper.queryDBProcessedByPollutant(qhawax_name,initial_timestamp=initial_timestamp_utc,
         #                                             final_timestamp=final_timestamp_utc,pollutant='SO2')
-        time_stamp = get_data_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name)
+        #time_stamp = get_data_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name)
+        time_stamp = get_business_helper.queryLastRegistrationTimezone(qhawax_name)
 
 
 
