@@ -159,7 +159,7 @@ def queryFlightsFilterByTime(initial_timestamp, final_timestamp):
     return new_flight
 
 def queryMobileTripsByTimestamp(initial_timestamp, final_timestamp):
-    trip_columns = (TripLog.trip_start, TripLog.trip_end, QhawaxInstallationHistory.comercial_name,\
+    trip_columns = (TripLog.trip_start, TripLog.trip_end, TripLog.id.label('trip_id'), QhawaxInstallationHistory.comercial_name,\
                     TripLog.details,Qhawax.name.label('qhawax_name'),\
                     QhawaxInstallationHistory.lat.label('last_latitude_position'), QhawaxInstallationHistory.lon.label('last_longitude_position'))
     
@@ -284,6 +284,34 @@ def queryDBValidProcessedByPollutantMobile(qhawax_name, initial_timestamp, final
 
     return None
 
+def queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, initial_timestamp, final_timestamp):
+    qhawax_installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
+    if(qhawax_installation_id is not None):
+        sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.H2S, ValidProcessedMeasurement.NO2, 
+                        ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
+                        ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.CO2, ValidProcessedMeasurement.VOC,
+                        ValidProcessedMeasurement.timestamp_zone, ValidProcessedMeasurement.lat, ValidProcessedMeasurement.lon)
+        validMeasurements = session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == qhawax_installation_id). \
+                                    filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
+                                    filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
+                                    order_by(ValidProcessedMeasurement.timestamp_zone.asc()).all()
+
+        factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25, 'SO2': 100/20, 'O3': 100/120, 'H2S': 100/150}
+        print(len(validMeasurements))
+        print(" ")
+        print(type(validMeasurements))
+        #for i in range(len(mobile_sensor_array)):
+        values =[]
+        for t in validMeasurements:
+            dictValue = t._asdict()
+            for key in factor_final_json:
+                if(dictValue[key]!=None): dictValue[key] = round(dictValue[key] * factor_final_json[key],3)
+            #print(dictValue) # json 
+            # {'CO': 2076.038, 'H2S': 17.78, 'NO2': 75.955, 'O3': -16.706, 'PM25': 42.196, 'PM10': 69.863, 'SO2': 47.115, 'CO2': None, 'VOC': None, 'timestamp_zone': datetime.datetime(2021, 6, 14, 14, 59, 57, tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0,
+            # name=None)), 'lat': -12.048906, 'lon': -77.037643}
+            values.append(dictValue)
+
+        return values
 
 
 def qHAWAXIsInFlight(qhawax_name):
@@ -300,8 +328,6 @@ def qHAWAXIsInTrip(qhawax_name):
     if(qhawax_id is not None):
         trip = session.query(TripLog.trip_start).\
             filter(TripLog.qhawax_id==qhawax_id, TripLog.trip_end == None).order_by(TripLog.id).all()
-        #print(flight[0][0])
-                        #filter(DroneFlightLog.qhawax_id==qhawax_id,DroneFlightLog.flight_end == None).order_by(DroneFlightLog.id).all()
         if(trip!=[]):
           return trip[0][0]
     return None
@@ -353,4 +379,14 @@ def getMobileLatestLatLonValidProcessedMeasurement(qhawax_name):
         values=session.query(ValidProcessedMeasurement.lat,ValidProcessedMeasurement.lon).filter_by(qhawax_installation_id=installation_id) \
             .order_by(ValidProcessedMeasurement.id.desc()).first()
         return values._asdict()
+    return None
+
+def getqHAWAXMobileTripByTurn(qhawax_name, turn, id):
+    installation_id =same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id != None):
+        query = session.query(TripLog.trip_start).filter_by(id=id).first()
+        if(query!= None):
+            trip_time = query[0]
+            start_time, finish_time = util_helper.getStartAndFinishTimestampBasedOnTurnAndTimestampMobile(trip_time, turn)
+            return queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, start_time, finish_time)            
     return None

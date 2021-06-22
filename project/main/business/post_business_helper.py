@@ -55,11 +55,11 @@ def saveTurnOnLastTime(qhawax_name):
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
 
 def saveTurnOnLastTimeProcessedMobile(qhawax_name):
-    """ Updates last_time_physically_turn_on_zone based on latest processed measurement timestamp  """
-    latest_processed_timestamp = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name)
-    if(not(latest_processed_timestamp==None or latest_processed_timestamp==[])):
+    """ Updates last_time_physically_turn_on_zone based on last registration time zone  """
+    latest_turn_off = get_business_helper.queryLastRegistrationTimezone(qhawax_name)
+    if(not(latest_turn_off==None or latest_turn_off==[])):
         now2 = datetime.datetime.now(dateutil.tz.tzutc())
-        difference = now2 - latest_processed_timestamp
+        difference = now2 - latest_turn_off
         seconds_interval = 1800
         if(seconds_interval<int(difference.total_seconds())): # if reconnection takes longer than 30 minutes, we update the last_turn_on
             qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
