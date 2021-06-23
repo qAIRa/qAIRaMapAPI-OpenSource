@@ -160,7 +160,7 @@ def getAllMobileQhawaxID():
                         order_by(Qhawax.id).all()
     return [qhawax._asdict() for qhawax in qhawax_list]
 
-def queryLatestTurnOffTimestamp(qhawax_name):
+def queryLastTimePhysicallyTurnOnZone(qhawax_name):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
         last_turn_on= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone). \

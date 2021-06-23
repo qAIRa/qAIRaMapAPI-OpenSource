@@ -64,6 +64,19 @@ def saveTurnOnLastTimeProcessedMobile(qhawax_name):
         if(seconds_interval<int(difference.total_seconds())): # if reconnection takes longer than 30 minutes, we update the last_turn_on
             qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
             same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
+        # we need to evaluate if we continue the trip at this point based on the physically_turn_on and
+        # last_registration. First, we must verify that the qHAWAX is ready to send valid data.
+        # latest_turn_on = get_business_helper.queryLastTimePhysicallyTurnOnZone(qhawax_name)
+        # on_minus_off = latest_turn_on - latest_turn_off
+        # secs_diff = int(on_minus_off.total_seconds())
+            # to continue the trip, we must take in mind that the data is still valid and 2 cases:
+            # 1. The finished trip does not belong to the same day as the last_registration.
+            # 2. The finished trip belongs to the same day as the last_registration.
+                # What happens then if last_registration is 23/06 and 
+        # since the last trip was ended because the qHAWAX was not able to send data 
+        # two possible reasons emerge at this point:
+        # 1. qHAWAX lost signal - difference should be less than 120 minutes
+        # 2. qHAWAX was turned off - difference should be more than 120 minutes
 
 def turnOnAfterCalibration(qhawax_name):
     """ Set qHAWAX ON in qHAWAX Installation table"""
