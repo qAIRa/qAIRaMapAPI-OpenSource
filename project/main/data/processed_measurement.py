@@ -164,15 +164,11 @@ def handleProcessedDataByMobileQhawax():
                 minutes_difference,last_time_turn_on = get_business_helper.getHoursDifference(product_id)
                 if(minutes_difference!=None):
                     if(minutes_difference<30):
-                        if(last_time_turn_on + datetime.timedelta(minutes=5)< datetime.datetime.now(dateutil.tz.tzutc())):
-                            if(not(same_helper.isMobileQhawaxInATrip(product_id))): 
-                                post_data_helper.recordStartTrip(product_id)
+                        if(last_time_turn_on + datetime.timedelta(minutes=1)< datetime.datetime.now(dateutil.tz.tzutc())):
                             post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
                             
                     elif(minutes_difference>=30):
                         if(last_time_turn_on + datetime.timedelta(hours=2) < datetime.datetime.now(dateutil.tz.tzutc())):
-                            if(not(same_helper.isMobileQhawaxInATrip(product_id))): #in case trip has finished, a new one has to begin...
-                                post_data_helper.recordStartTrip(product_id)
                             post_data_helper.validAndBeautyJsonValidProcessedMobile(data_json,product_id)
 
             return make_response('OK', 200) 
@@ -315,32 +311,32 @@ def getProcessedByPollutantDuringTrip():
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return make_response(json_message, 400)
 
-@app.route('/api/function_testers/', methods=['GET'])
-def testerFunction():
-    try:
-        qhawax_name = 'qH022'
-        # initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
-        # final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
-        #post_business_helper.saveTurnOnLastTimeProcessed(qhawax_name)
-        #post_data_helper.recordEndTrip(qhawax_name,"hi")
-        # jsonofJsons = get_data_helper.queryDBProcessedByPollutant(qhawax_name,initial_timestamp=initial_timestamp_utc,
-        #                                             final_timestamp=final_timestamp_utc,pollutant='SO2')
-        #time_stamp = get_data_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name)
-        time_stamp = get_business_helper.queryLastRegistrationTimezone(qhawax_name)
+# @app.route('/api/function_testers/', methods=['GET'])
+# def testerFunction():
+#     try:
+#         qhawax_name = 'qH022'
+#         # initial_timestamp_utc = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+#         # final_timestamp_utc = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+#         #post_business_helper.saveTurnOnLastTimeProcessed(qhawax_name)
+#         #post_data_helper.recordEndTrip(qhawax_name,"hi")
+#         # jsonofJsons = get_data_helper.queryDBProcessedByPollutant(qhawax_name,initial_timestamp=initial_timestamp_utc,
+#         #                                             final_timestamp=final_timestamp_utc,pollutant='SO2')
+#         #time_stamp = get_data_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name)
+#         time_stamp = post_data_helper.recordEndTrip(qhawax_name,'holi')
 
 
 
-        #post_business_helper.saveTurnOnLastTime(qhawax_name)
-        #start_trip = datetime.datetime.now()
-        #get_business_helper.getHoursDifference(qhawax_name)
-        #post_data_helper.recordStartTrip(qhawax_name)
-        # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
-        # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
-        # return make_response(jsonify(jsonLatLon), 200)
-        return make_response(jsonify(time_stamp), 200)
-    except Exception as e:
-        json_message = jsonify({'error': ' \'%s\' ' % (e)})
-        return make_response(json_message, 400)  
+#         #post_business_helper.saveTurnOnLastTime(qhawax_name)
+#         #start_trip = datetime.datetime.now()
+#         #get_business_helper.getHoursDifference(qhawax_name)
+#         #post_data_helper.recordStartTrip(qhawax_name)
+#         # jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
+#         # post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
+#         # return make_response(jsonify(jsonLatLon), 200)
+#         return make_response(jsonify("ok"), 200)
+#     except Exception as e:
+#         json_message = jsonify({'error': ' \'%s\' ' % (e)})
+#         return make_response(json_message, 400)  
 
 
 

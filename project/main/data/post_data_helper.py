@@ -111,6 +111,8 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
     data_json = exceptions.checkDictionaryVariable(data_json)
     product_id = exceptions.checkStringVariable(product_id)
     if(util_helper.checkValidLatLonValues(data_json)):
+        if(not(same_helper.isMobileQhawaxInATrip(product_id))):  #in case trip has finished, a new one has to begin...
+            recordStartTrip(product_id)
         storeValidProcessedDataInDBMobile(data_json, product_id)
         max_value = 0
         for i in range(len(pollutants)):
