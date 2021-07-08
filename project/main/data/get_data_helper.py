@@ -287,19 +287,23 @@ def queryDBValidProcessedByPollutantMobile(qhawax_name, initial_timestamp, final
 def queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, initial_timestamp, final_timestamp):
     qhawax_installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(qhawax_installation_id is not None):
+        # sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.H2S, ValidProcessedMeasurement.NO2, 
+        #                 ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
+        #                 ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.CO2, ValidProcessedMeasurement.VOC,
+        #                 ValidProcessedMeasurement.timestamp_zone, ValidProcessedMeasurement.lat, ValidProcessedMeasurement.lon)
         sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.H2S, ValidProcessedMeasurement.NO2, 
-                        ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
-                        ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.CO2, ValidProcessedMeasurement.VOC,
-                        ValidProcessedMeasurement.timestamp_zone, ValidProcessedMeasurement.lat, ValidProcessedMeasurement.lon)
+                    ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
+                    ValidProcessedMeasurement.SO2, ValidProcessedMeasurement.timestamp_zone, 
+                    ValidProcessedMeasurement.lat, ValidProcessedMeasurement.lon)
         validMeasurements = session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == qhawax_installation_id). \
                                     filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
                                     filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
                                     order_by(ValidProcessedMeasurement.timestamp_zone.asc()).all()
 
-        factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25, 'SO2': 100/20, 'O3': 100/120, 'H2S': 100/150}
-        print(len(validMeasurements))
-        print(" ")
-        print(type(validMeasurements))
+        factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25, 'SO2': 100/20, 'O3': 100/100, 'H2S': 100/150}
+        # print(len(validMeasurements))
+        # print(" ")
+        # print(type(validMeasurements))
         #for i in range(len(mobile_sensor_array)):
         values =[]
         for t in validMeasurements:
