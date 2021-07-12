@@ -287,10 +287,6 @@ def queryDBValidProcessedByPollutantMobile(qhawax_name, initial_timestamp, final
 def queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, initial_timestamp, final_timestamp):
     qhawax_installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(qhawax_installation_id is not None):
-        # sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.H2S, ValidProcessedMeasurement.NO2, 
-        #                 ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
-        #                 ValidProcessedMeasurement.SO2,ValidProcessedMeasurement.CO2, ValidProcessedMeasurement.VOC,
-        #                 ValidProcessedMeasurement.timestamp_zone, ValidProcessedMeasurement.lat, ValidProcessedMeasurement.lon)
         sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.H2S, ValidProcessedMeasurement.NO2, 
                     ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
                     ValidProcessedMeasurement.SO2, ValidProcessedMeasurement.timestamp_zone, 
@@ -301,10 +297,6 @@ def queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, initial_times
                                     order_by(ValidProcessedMeasurement.timestamp_zone.asc()).all()
 
         factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25, 'SO2': 100/20, 'O3': 100/100, 'H2S': 100/150}
-        # print(len(validMeasurements))
-        # print(" ")
-        # print(type(validMeasurements))
-        #for i in range(len(mobile_sensor_array)):
         values =[]
         for t in validMeasurements:
             dictValue = t._asdict()
@@ -394,3 +386,17 @@ def getqHAWAXMobileTripByTurn(qhawax_name, turn, id):
             start_time, finish_time = util_helper.getStartAndFinishTimestampBasedOnTurnAndTimestampMobile(trip_time, turn)
             return queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, start_time, finish_time)            
     return None
+
+def getqHAWAXMobileLatestTripStart(qhawax_name):
+    # Returns the latest trip_start of the target qHAWAX - datetime.datetime format
+    qhawax_id =same_helper.getQhawaxID(qhawax_name)
+    if(qhawax_id != None):
+        query = session.query(TripLog.trip_start, TripLog.id) \
+                    .join(QhawaxInstallationHistory, QhawaxInstallationHistory.qhawax_id == TripLog.qhawax_id) \
+                    .filter(QhawaxInstallationHistory.end_date_zone == None, TripLog.qhawax_id == qhawax_id) \
+                    .order_by(TripLog.trip_start.desc()).first()
+        if(query != None):
+            # 2021-07-09 12:29:44
+            queryTimestamp = query[0].replace(microsecond=0, tzinfo=None)
+            return queryTimestamp, query[1]
+    return None, None

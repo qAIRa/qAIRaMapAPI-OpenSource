@@ -1,4 +1,5 @@
 from flask.json import jsonify
+from sqlalchemy.sql.elements import Null
 from project import app, db
 from project.database.models import  Qhawax, QhawaxInstallationHistory, EcaNoise, Company, TripLog
 import project.main.util_helper as util_helper
@@ -166,3 +167,8 @@ def queryQhawaxType(name):
     if(qhawaxExistBasedOnName(name)):
         return session.query(Qhawax.qhawax_type).filter_by(name=name).one()[0]
     return None
+
+def setTripEndNull(trip_id):
+    json = {'trip_end':None}
+    session.query(TripLog).filter_by(id=trip_id).update(values=json)
+    session.commit()
