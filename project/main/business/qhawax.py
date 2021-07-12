@@ -211,14 +211,23 @@ def sendQhawaxStatusOnBaseOnLossSignal():
         qhawax_state = same_helper.getQhawaxStatus(qH_name)
         description='qHAWAX turned on after a loss of signal'
         json_email = {'description':description,'person_in_charge':'Firmware'}
+        qhawax_type = same_helper.queryQhawaxType(qH_name)
         if(qhawax_state is not None):
             mode = same_helper.getQhawaxMode(qH_name)
             on_loop = int(same_helper.getQhawaxOnLoop(qH_name)) +1
             if(qhawax_state=='OFF'):
-                post_business_helper.saveStatusQhawaxTable(qH_name, "ON",0)
+                post_business_helper.saveStatusQhawaxTable(qH_name, "ON",0) # tabla qHAWAX
                 post_business_helper.setLastMeasurementOfQhawax(qH_name)
                 post_business_helper.writeBinnacle(qH_name,json_email['description'],json_email['person_in_charge'])
                 post_business_helper.resetOnLoop(qH_name,0)
+                if (qhawax_type=='MOBILE_EXT'): 
+                    # only if mobile, we have to check if there is a previous trip that we must continue
+                    trip_start, trip_id = get_data_helper.getqHAWAXMobileLatestTripStart(qH_name)
+                    if(trip_id!=None and trip_start!=None):
+                        #trip_start = datetime.datetime.strptime('2021-07-12 12:00:00', '%Y-%m-%d %H:%M:%S') # test
+                        date_start = (trip_start - datetime.timedelta(hours=5)).date() #local
+                        now_date = (datetime.datetime.now(dateutil.tz.tzutc())-datetime.timedelta(hours=5)).date()
+                        if(date_start == now_date): same_helper.setTripEndNull(trip_id)
                 return make_response({'Success': description}, 200)
             else:
                 post_business_helper.resetOnLoop(qH_name,0) if(on_loop==20) else post_business_helper.resetOnLoop(qH_name,on_loop)
