@@ -128,10 +128,12 @@ def sendQhawaxStatusOn():
         post_business_helper.writeBinnacle(qhawax_name,description,"API")
         type = same_helper.queryQhawaxType(qhawax_name)
         if (type == 'MOBILE_EXT'):
-            post_data_helper.recordEndTrip(qhawax_name, str(comercial_name))
-            jsonLatLon = get_data_helper.getMobileLatestLatLonValidProcessedMeasurement(qhawax_name)
-            if(jsonLatLon!=None):
-                post_data_helper.updateLastestLatLonMobile(qhawax_name,jsonLatLon)
+            trip_start, trip_id = get_data_helper.getqHAWAXMobileLatestTripStart(qhawax_name)
+            if(trip_id!=None and trip_start!=None):
+                date_start = (trip_start - datetime.timedelta(hours=5)).date() #local
+                now_date = (datetime.datetime.now(dateutil.tz.tzutc())-datetime.timedelta(hours=5)).date()
+                if(date_start == now_date):
+                    same_helper.setTripEndNull(trip_id)  # trip is continued if there is any that started in the same day
         return make_response({'Success': 'qHAWAX ON physically'}, 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
