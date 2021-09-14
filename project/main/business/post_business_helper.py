@@ -50,12 +50,33 @@ def saveStatusOffQhawaxInstallationTable(qhawax_name,time):
 
 def saveTurnOnLastTime(qhawax_name):
     """ Set qHAWAX ON in qHAWAX Installation table  """
-    qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now.replace(tzinfo=None)}
+    now2 = datetime.datetime.now(dateutil.tz.tzutc())
+    qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
+
+def saveTurnOnLastTimeProcessedMobile(qhawax_name):
+    """ Updates last_time_physically_turn_on_zone based on last registration time zone  """
+    latest_turn_off = get_business_helper.queryLastRegistrationTimezone(qhawax_name)
+    if(not(latest_turn_off==None or latest_turn_off==[])):
+        now2 = datetime.datetime.now(dateutil.tz.tzutc())
+        difference = now2 - latest_turn_off
+        seconds_interval = 1800
+        if(seconds_interval<int(difference.total_seconds())): # if reconnection takes longer than 30 minutes, we update the last_turn_on
+            # every reconnection longer than 30 mins, includes the ones that last longer than a day so they should not be an issue
+            qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
+            same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
+
+        trip_start, trip_id = get_data_helper.getqHAWAXMobileLatestTripStart(qhawax_name)
+        if(trip_id!=None and trip_start!=None):
+            #trip_start = datetime.datetime.strptime('2021-07-12 12:00:00', '%Y-%m-%d %H:%M:%S') # test
+            date_start = (trip_start - datetime.timedelta(hours=5)).date() #local
+            now_date = (datetime.datetime.now(dateutil.tz.tzutc())-datetime.timedelta(hours=5)).date()
+            if(date_start == now_date): same_helper.setTripEndNull(trip_id)
 
 def turnOnAfterCalibration(qhawax_name):
     """ Set qHAWAX ON in qHAWAX Installation table"""
-    qhawax_json_on_after_calibration = {'last_time_physically_turn_on_zone': now.replace(tzinfo=None)}
+    now2 = datetime.datetime.now(dateutil.tz.tzutc())
+    qhawax_json_on_after_calibration = {'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on_after_calibration,qhawax_name)
 
 def saveEndWorkFieldDate(qhawax_name,end_date):
@@ -66,6 +87,29 @@ def saveEndWorkFieldDate(qhawax_name,end_date):
 def updateTimeOffWithLastTurnOff(time_turn_off_binnacle, qhawax_name):
     qhawax_json_last_turn_off = {'last_registration_time_zone':time_turn_off_binnacle}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_last_turn_off,qhawax_name)
+
+def updateTimeOnPreviousTurnOn(qhawax_name,mins):
+    MINUTES_ALLOWED = 240
+    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id is not None):
+        turn_on = get_data_helper.getQhawaxLatestTimestampValidProcessedMeasurement(qhawax_name)
+        # what if the turn_on is very recent? does not matter as long as there a value
+        now = datetime.datetime.now(dateutil.tz.tzutc())
+        if(turn_on!=None):
+            minutes_difference = int((now - turn_on).total_seconds() / 60)
+            #if(minutes_difference>=)
+            turn_off = turn_on - datetime.timedelta(minutes=mins)
+            session.query(QhawaxInstallationHistory).\
+            filter_by(id=installation_id).\
+            update(values={'last_registration_time_zone':turn_off})
+            session.commit()
+        else:            
+            turn_on = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120-mins) 
+            turn_off = datetime.datetime.now(dateutil.tz.tzutc()) - datetime.timedelta(minutes=120)
+            session.query(QhawaxInstallationHistory).\
+            filter_by(id=installation_id).\
+            update(values={'last_time_physically_turn_on_zone':turn_on,'last_registration_time_zone':turn_off})
+            session.commit()
 
 def updateLastLocation(qhawax_name, location):
     """ Helper Drone Log function to update location of andean drone in qHAWAX Installation table """
@@ -110,7 +154,7 @@ def setLastMeasurementOfQhawax(qH_name):
     if(last_main_inca_value!=None):
         updateMainIncaQhawaxInstallationTable(int(last_main_inca_value),qH_name)
         updateMainIncaQhawaxTable(int(last_main_inca_value),qH_name)
-    last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qH_name)
+    last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qH_name) # query of the timestamp of the last description with "qHAWAX off" made by the API
     if(last_time_of_turn_off_binnacle!=None):
         updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle,qH_name)
 
@@ -161,7 +205,8 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
     person_in_charge = exceptions.checkStringVariable(person_in_charge)
     qHAWAX_ID = same_helper.getQhawaxID(qhawax_name)
     if(qHAWAX_ID is not None):
-        bitacora = {'timestamp_zone': now, 'observation_type': 'Interna','description': description, 'qhawax_id':qHAWAX_ID,\
+        now2 = datetime.datetime.now(dateutil.tz.tzutc())
+        bitacora = {'timestamp_zone': now2, 'observation_type': 'Interna','description': description, 'qhawax_id':qHAWAX_ID,\
                     'solution':None,'person_in_charge':person_in_charge, 'end_date_zone':None,'start_date_zone':None}
         bitacora_update = Bitacora(**bitacora)
         session.add(bitacora_update)

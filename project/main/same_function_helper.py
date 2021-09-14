@@ -1,5 +1,7 @@
+from flask.json import jsonify
+from sqlalchemy.sql.elements import Null
 from project import app, db
-from project.database.models import  Qhawax, QhawaxInstallationHistory, EcaNoise, Company
+from project.database.models import  Qhawax, QhawaxInstallationHistory, EcaNoise, Company, TripLog
 import project.main.util_helper as util_helper
 import project.main.exceptions as exceptions
 
@@ -21,7 +23,7 @@ def qhawaxExistBasedOnName(qhawax_name):
     if(qhawax_list == []):
         return False
     return True
-        
+
 def qhawaxInstallationExistBasedOnID(installation_id):
     """ Helper function to check if qHAWAX Installation ID exist """
     installation_id = exceptions.checkIntegerVariable(installation_id)
@@ -61,7 +63,7 @@ def companyExistBasedOnRUC(ruc):
 def getQhawaxID(qhawax_name):
     """ Helper function to get qHAWAX ID base on qHAWAX name """
     if(qhawaxExistBasedOnName(qhawax_name)):
-        return int(session.query(Qhawax.id).filter_by(name= qhawax_name).first()[0])
+        return int(session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0])
     return None
 
 def getInstallationId(qhawax_id):
@@ -87,9 +89,9 @@ def getQhawaxName(qhawax_id):
     return None
 
 def getInstallationIdBaseName(qhawax_name):
-    """ Helper function to get qHAWAX Installation ID  
-        qHAWAX name could be exist in qHAWAX table, 
-        but it could not exist in qHAWAX Installation table """
+    """ Helper function to get qHAWAX Installation ID
+        qHAWAX name could be exist in qHAWAX table,
+        but it might not exist in qHAWAX Installation table """
     if(qhawaxExistBasedOnName(qhawax_name)):
         qhawax_id = getQhawaxID(qhawax_name)
         return getInstallationId(qhawax_id)
@@ -108,7 +110,7 @@ def getQhawaxMode(qhawax_name):
     return None
 
 def getTimeQhawaxHistory(qhawax_name):
-    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone, 
+    fields = (QhawaxInstallationHistory.last_time_physically_turn_on_zone,
               QhawaxInstallationHistory.last_registration_time_zone)
 
     installation_id = getInstallationIdBaseName(qhawax_name)
@@ -116,7 +118,7 @@ def getTimeQhawaxHistory(qhawax_name):
     if(installation_id is not None):
         values= session.query(*fields).filter(QhawaxInstallationHistory.id == installation_id).first()
         if (values!=None):
-            return {'last_time_on': values[0], 'last_time_registration': values[1]} 
+            return {'last_time_on': values[0], 'last_time_registration': values[1]}
     return None
 
 def getQhawaxStatus(qhawax_name):
@@ -148,6 +150,25 @@ def qhawaxQueryUpdateFilterByQhawaxId(json, qhawax_id):
 
 def qhawaxInstallationQueryUpdate(json, qhawax_name):
     installation_id=getInstallationIdBaseName(qhawax_name)
-    if(installation_id is not None): 
+    # print("id de la tabla qhawax_installation_history: ", str(installation_id))
+    if(installation_id is not None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
         session.commit()
+
+def isMobileQhawaxInATrip(qhawax_name): # returns True when trip has started and hasn't finished yet
+    qhawax_id=getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        date = session.query(TripLog.trip_start).filter_by(trip_end=None, qhawax_id=qhawax_id).order_by(TripLog.id.desc()).first()
+        if (date!=None):
+            return True
+    return False
+
+def queryQhawaxType(name):
+    if(qhawaxExistBasedOnName(name)):
+        return session.query(Qhawax.qhawax_type).filter_by(name=name).one()[0]
+    return None
+
+def setTripEndNull(trip_id):
+    json = {'trip_end':None}
+    session.query(TripLog).filter_by(id=trip_id).update(values=json)
+    session.commit()

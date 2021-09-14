@@ -17,6 +17,6 @@ from project.main.data import processed_measurement, air_quality,gas_inca, drone
 import project.database.models as models
 from project.database.models import Company, Qhawax ,ProcessedMeasurement, AirQualityMeasurement, \
 									EcaNoise, GasInca, QhawaxInstallationHistory, ValidProcessedMeasurement,\
-									DroneTelemetry, DroneFlightLog
+									DroneTelemetry, DroneFlightLog, TripLog
 
 db.create_all()
