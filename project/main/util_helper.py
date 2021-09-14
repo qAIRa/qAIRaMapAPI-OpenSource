@@ -90,9 +90,9 @@ def areFieldsValid(data):
     return True
 
 def getFormatData(gas_average_measurement):
-    data = exceptions.checkListVariable(gas_average_measurement)
     gas_average_measurement_list = []
     if gas_average_measurement is not None:
+        data = exceptions.checkListVariable(gas_average_measurement)
         next_hour = -1
         for measurement in gas_average_measurement:
             gas_measurement = measurement._asdict() 
@@ -121,6 +121,7 @@ def getFormatData(gas_average_measurement):
 
 def setNoneStringElements(data_json):
     string_fields = ['ID','timestamp_zone','timestamp','zone']
+    data_json = exceptions.checkDictionaryVariable(data_json)
     for key in data_json:
         if((type(data_json[key]) is str) and (key not in string_fields)):
             data_json[key]=None
@@ -130,4 +131,5 @@ def beautyFormatDate(date):
     return addZero(date.day)+"-"+addZero(date.month)+"-"+addZero(date.year)+" "+addZero(date.hour)+":"+addZero(date.minute)+":"+addZero(date.second)
 
 def addZero(number):
+    number = exceptions.checkIntegerVariable(number)
     return "0"+str(number) if (number<10) else str(number)

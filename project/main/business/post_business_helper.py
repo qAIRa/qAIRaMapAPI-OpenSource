@@ -1,5 +1,6 @@
 from project.database.models import Qhawax, EcaNoise, QhawaxInstallationHistory, Company, Bitacora
 import project.main.business.get_business_helper as get_business_helper
+import project.main.data.get_data_helper as get_data_helper
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
 import project.main.exceptions as exceptions
@@ -42,9 +43,9 @@ def updateMainIncaQhawaxInstallationTable(new_main_inca, qhawax_name):
     qhawax_json_main_inca_installation = {'main_inca': new_main_inca}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_main_inca_installation,qhawax_name)
 
-def saveStatusOffQhawaxInstallationTable(qhawax_name,qhawax_lost_timestamp):
+def saveStatusOffQhawaxInstallationTable(qhawax_name,time):
     """ Set qHAWAX OFF in qHAWAX Installation table """
-    qhawax_json_status_off = {'main_inca': -1,'last_registration_time_zone':qhawax_lost_timestamp}
+    qhawax_json_status_off = {'main_inca': -1,'last_registration_time_zone':time}
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_status_off,qhawax_name)
 
 def saveTurnOnLastTime(qhawax_name):
@@ -89,21 +90,21 @@ def util_qhawax_installation_set_up(qhawax_name,availability,mode,description,pe
     changeMode(qhawax_name, mode)
     writeBinnacle(qhawax_name,description,person_in_charge)
 
-def reset_on_loop(qhawax_name, loop):
+def resetOnLoop(qhawax_name, loop):
     """ qHAWAX function to reset loop """
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
         json_loop = {'on_loop':loop}
-        qhawaxQueryUpdateFilterByQhawaxId(json_reset_loop, qhawax_id)
+        same_helper.qhawaxQueryUpdateFilterByQhawaxId(json_loop, qhawax_id)
 
-def record_first_time_loop(qhawax_name, timestamp):
+def recordFirstTimeLoop(qhawax_name, timestamp):
     """ qHAWAX function to record first time loop """
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
         json_first_time_loop = {'first_time_loop':timestamp}
-        qhawaxQueryUpdateFilterByQhawaxId(json_first_time_loop, qhawax_id)
+        same_helper.qhawaxQueryUpdateFilterByQhawaxId(json_first_time_loop, qhawax_id)
 
-def setLastMeasurementOfQhawax(mode,qH_name):
+def setLastMeasurementOfQhawax(qH_name):
     """ qHAWAX function to update last measurement """
     last_main_inca_value = get_data_helper.queryLastMainInca(qH_name)
     if(last_main_inca_value!=None):
@@ -164,4 +165,11 @@ def writeBinnacle(qhawax_name,description,person_in_charge):
                     'solution':None,'person_in_charge':person_in_charge, 'end_date_zone':None,'start_date_zone':None}
         bitacora_update = Bitacora(**bitacora)
         session.add(bitacora_update)
+        session.commit()
+
+def saveTimeQhawaxOff(qhawax_name):
+    """ Save time qHAWAX off with timestamp in UTC 0 """
+    installation_id=same_helper.getInstallationIdBaseName(qhawax_name)
+    if(installation_id!=None):
+        session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values={'last_registration_time_zone':datetime.datetime.now(dateutil.tz.tzutc())})
         session.commit()

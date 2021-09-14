@@ -38,10 +38,8 @@ def getStatusOffTargetofJson(data):
 
     if 'qhawax_name' not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'qhawax_lost_timestamp' not in data:
-        raise ValueError("No target qhawax_lost_timestamp in given json")
 
-    return str(data['qhawax_name']).strip(), data['qhawax_lost_timestamp']
+    return str(data['qhawax_name']).strip()
 
 def getChangeCalibrationFields(data):
     data = checkDictionaryVariable(data)

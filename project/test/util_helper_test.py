@@ -4,6 +4,7 @@ from datetime import timedelta
 import dateutil
 import dateutil.parser
 import project.main.util_helper as util_helper
+import project.main.data.get_data_helper as get_data_helper
 import pytz
 
 class TestUtilHelper(unittest.TestCase):
@@ -109,18 +110,51 @@ class TestUtilHelper(unittest.TestCase):
 		self.assertRaises(TypeError,util_helper.getFormatData,5)
 		self.assertRaises(TypeError,util_helper.getFormatData,"year")
 		self.assertRaises(TypeError,util_helper.getFormatData,-1,1)
-		self.assertRaises(TypeError,util_helper.getFormatData,None)
 		self.assertRaises(TypeError,util_helper.getFormatData,True)
 
-	#def test_get_format_data_valid(self):
-	#	naive_time = datetime.time(0,0,0)
-	#	date = datetime.date(2021, 1, 6)
-	#	naive_datetime = datetime.datetime.combine(date, naive_time)
-	#	timezone = pytz.timezone('UTC')
-	#	aware_datetime = timezone.localize(naive_datetime)
-	#	a = [(aware_datetime, 1986.208)]
-	#	b = [{'timestamp_zone': aware_datetime, 'sensor': 1986.208}]
-	#	self.assertAlmostEqual(util_helper.getFormatData(a),b)
+	def test_get_format_data_valid(self):
+		gas_average_measurement = None
+		self.assertAlmostEqual(util_helper.getFormatData(gas_average_measurement),None)
+		gas_average_measurement = get_data_helper.queryDBGasAverageMeasurement("qH021", "NO2")
+		gas_average_measurement = util_helper.getFormatData(gas_average_measurement)
+
+	def test_add_zero_not_valid(self):
+		self.assertRaises(TypeError,util_helper.addZero,{"test":"test"},5)
+		self.assertRaises(TypeError,util_helper.addZero,[5,4,3])
+		self.assertRaises(TypeError,util_helper.addZero,"test")
+
+	def test_add_zero_valid(self):
+		self.assertAlmostEqual(util_helper.addZero(5),"05")
+		self.assertAlmostEqual(util_helper.addZero(20),"20")
+
+	def test_beauty_format_date_not_valid(self):
+		self.assertRaises(TypeError,util_helper.beautyFormatDate,{"test":"test"},5)
+
+	def test_beauty_format_date_valid(self):
+		naive_time = datetime.time(19,7,7)
+		date = datetime.date(2021, 1, 20)
+		naive_datetime = datetime.datetime.combine(date, naive_time)
+		timezone = pytz.timezone('UTC')
+		aware_datetime = timezone.localize(naive_datetime)
+		self.assertAlmostEqual(util_helper.beautyFormatDate(aware_datetime),"20-01-2021 19:07:07")
+
+	def test_set_none_string_elements_not_valid(self):
+		self.assertRaises(TypeError,util_helper.setNoneStringElements,"test")
+		self.assertRaises(TypeError,util_helper.setNoneStringElements,54)
+		self.assertRaises(TypeError,util_helper.setNoneStringElements,[5,4,3])
+
+	def test_set_none_string_elements_valid(self):
+		data={'ID': 1,'CO': 1, 'CO_ug_m3': "string",'H2S': 1,'H2S_ug_m3': 1.39,'NO2': "string",'NO2_ug_m3': 1.88,'O3':1,
+			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00",
+			  'VOC':None,'CO2':None,'I_temperature':None}
+		processed={'ID': 1,'CO': 1, 'CO_ug_m3': None,'H2S': 1,'H2S_ug_m3': 1.39,'NO2': None,'NO2_ug_m3': 1.88,'O3':1,
+			  'O3_ug_m3': 1.96, 'PM1': 1,'PM10': 1,'PM25': 1,'SO2': 1,'SO2_ug_m3': 2.62,'spl': 1,'UV': 1,
+			  'UVA': 1,'UVB': 1,'humidity': 1,'lat':-12.000000,'lon':-77.00000,'pressure': 100,
+			  'temperature': 20,'timestamp': "2020-01-01 00:00:00",'timestamp_zone':"2020-01-01 00:00:00",
+			  'VOC':None,'CO2':None,'I_temperature':None}
+		self.assertAlmostEqual(util_helper.setNoneStringElements(data),processed)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
