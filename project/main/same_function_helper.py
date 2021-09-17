@@ -1,5 +1,5 @@
 from project import app, db
-from project.database.models import  Qhawax, QhawaxInstallationHistory, EcaNoise, Company
+from project.database.models import  Qhawax, QhawaxInstallationHistory, EcaNoise, Company, TripLog
 import project.main.util_helper as util_helper
 import project.main.exceptions as exceptions
 
@@ -61,7 +61,7 @@ def companyExistBasedOnRUC(ruc):
 def getQhawaxID(qhawax_name):
     """ Helper function to get qHAWAX ID based on qHAWAX name """
     if(qhawaxExistBasedOnName(qhawax_name)):
-        return int(session.query(Qhawax.id).filter_by(name= qhawax_name).first()[0])
+        return int(session.query(Qhawax.id).filter_by(name=qhawax_name).first()[0])
     return None
 
 def getInstallationId(qhawax_id):
@@ -149,3 +149,21 @@ def qhawaxInstallationQueryUpdate(json, qhawax_name):
     if(installation_id is not None):
         session.query(QhawaxInstallationHistory).filter_by(id=installation_id).update(values=json)
         session.commit()
+
+def isMobileQhawaxInATrip(qhawax_name): # returns True when trip has started and hasn't finished yet
+    qhawax_id=getQhawaxID(qhawax_name)
+    if(qhawax_id is not None):
+        date = session.query(TripLog.trip_start).filter_by(trip_end=None, qhawax_id=qhawax_id).order_by(TripLog.id.desc()).first()
+        if (date!=None):
+            return True
+    return False
+
+def queryQhawaxType(name):
+    if(qhawaxExistBasedOnName(name)):
+        return session.query(Qhawax.qhawax_type).filter_by(name=name).one()[0]
+    return None
+
+def setTripEndNull(trip_id):
+    json = {'trip_end':None}
+    session.query(TripLog).filter_by(id=trip_id).update(values=json)
+    session.commit()

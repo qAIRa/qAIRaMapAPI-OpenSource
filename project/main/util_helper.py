@@ -4,6 +4,7 @@ import dateutil
 import dateutil.parser
 import project.main.exceptions as exceptions
 
+
 pollutant=['SO2','NO2','O3','CO','H2S']
 
 array_ppb = ['CO','H2S','NO2','O3','SO2','PM1','PM10','PM25','spl','UV',\
@@ -16,6 +17,10 @@ array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
 array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_name',\
                          'connection_type','season','is_public','person_in_charge']
 
+# mobile qhawax specific constants to cover Lima
+lat_lima_interval = [-12.67,-11.59]
+lon_lima_interval = [-77.20,-76.75]
+
 def validTimeJsonProcessed(data_json):
     data_json = exceptions.checkDictionaryVariable(data_json)
     datetime_array = data_json['timestamp'].split() 
@@ -23,6 +28,16 @@ def validTimeJsonProcessed(data_json):
     if(measurement_year > datetime.date.today().year):
         data_json['timestamp'] = (datetime.datetime.now(dateutil.tz.tzutc())-datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
         data_json['timestamp_zone'] = (datetime.datetime.now(dateutil.tz.tzutc())).strftime("%Y-%m-%d %H:%M:%S")
+    return data_json
+
+def validTimeJsonProcessedTest(data_json,time_zone,location_time_zone):
+    datetime_timestamp= datetime.datetime.strptime(data_json['timestamp'], '%Y-%m-%d %H:%M:%S%z') #lo pasamos a utc 00
+    local_time = (datetime.datetime.now() + datetime.timedelta(hours=time_zone)).replace(microsecond=0)
+    loc_dt = location_time_zone.localize(local_time)
+    now_datetime = (loc_dt +datetime.timedelta(minutes=2))
+    now_datetime_past = (loc_dt -datetime.timedelta(minutes=2))
+    if (datetime_timestamp>=now_datetime or datetime_timestamp<=now_datetime_past):
+        return None
     return data_json
 
 def validAndBeautyJsonProcessed(data_json):
@@ -36,6 +51,19 @@ def validAndBeautyJsonProcessed(data_json):
     data_json['pressure']= float(data_json['pressure'])*0.01 if (data_json['pressure']!="Nan") else "Nan"
     data_json = roundUpThree(data_json)
     return data_json
+
+# def validAndBeautyJsonProcessedLatest(data_json):
+#     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C 
+#     data_json = exceptions.checkDictionaryVariable(data_json)
+    
+#     if  'timestamp_zone' not in data_json:
+#         data_json["timestamp_zone"] = data_json["timestamp"]
+#     data_json = gasConversionPPBtoMG(data_json, arr_season)
+#     #Convertir los pascales a hectopascales
+#     data_json['pressure']= float(data_json['pressure'])*0.01 if (data_json['pressure']!="Nan") else "Nan"
+#     data_json['spl'] = None if (data_json['spl']<=0) else data_json['spl']
+#     data_json = roundUpThree(data_json)
+#     return data_json
 
 def gasConversionPPBtoMG(data_json,season):
     data_json = exceptions.checkDictionaryVariable(data_json)
@@ -133,3 +161,131 @@ def beautyFormatDate(date):
 def addZero(number):
     number = exceptions.checkIntegerVariable(number)
     return "0"+str(number) if (number<10) else str(number)
+
+def checkValidLatLonValues(data_json):
+    if(data_json['lat']>=lat_lima_interval[0] and data_json['lat']<=lat_lima_interval[1] and 
+        data_json['lon']>=lon_lima_interval[0] and data_json['lon']<=lon_lima_interval[1]):
+        return True
+    return False
+
+def getColorBaseOnGasValuesMobile(qhawax_inca):
+    if(isinstance(qhawax_inca, float) is not True):
+        raise TypeError("qHAWAX Inca value "+str(qhawax_inca)+" should be float")
+    
+    if qhawax_inca == 50:
+        return 'green'
+    elif qhawax_inca == 100:
+        return'yellow'
+    elif qhawax_inca == 500:
+        return'orange'
+    elif qhawax_inca == 600:
+        return'red'
+    return 'green'
+
+
+def validaPollutant(val, sensor_name):
+    calificacionInca = 0
+    if(sensor_name == 'O3'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=175:
+            calificacionInca = 500
+        elif val>175:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'SO2'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=625:
+            calificacionInca = 500
+        elif val>625:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'CO'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=150:
+            calificacionInca = 500
+        elif val>150:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'H2S'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=1000:
+            calificacionInca = 500
+        elif val>1000:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'NO2'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=150:
+            calificacionInca = 500
+        elif val>150:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'PM10'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=167:
+            calificacionInca = 500
+        elif val>167:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    elif(sensor_name == 'PM25'):
+        if val >=0 and val<= 50 :
+            calificacionInca = 50
+        elif val >50 and val<=100:
+            calificacionInca = 100
+        elif val >100 and val<=500:
+            calificacionInca = 500
+        elif val>500:
+            calificacionInca = 600
+        else:
+            calificacionInca = -1
+        return calificacionInca
+    else:
+        return -1
+
+def getStartAndFinishTimestampBasedOnTurnAndTimestampMobile(timestamp, turn):
+    date_conc = timestamp.strftime("%Y-%m-%d")
+    if(turn==1): #UTC
+        time_start = '13:00:00'
+        time_finish = '15:00:00'
+    elif(turn==2):
+        time_start = '15:00:00'
+        time_finish = '17:00:00'
+    elif(turn==3):
+        time_start = '19:00:00'
+        time_finish = '21:00:00'
+    elif(turn==4):
+        time_start = '21:00:00'
+        time_finish = '23:00:00'
+    start_time_reconstructed = dateutil.parser.parse(date_conc + ' ' + time_start)
+    finish_time_reconstructed = dateutil.parser.parse(date_conc + ' ' + time_finish)
+    return start_time_reconstructed, finish_time_reconstructed
