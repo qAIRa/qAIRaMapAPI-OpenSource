@@ -173,14 +173,14 @@ def getColorBaseOnGasValuesMobile(qhawax_inca):
         raise TypeError("qHAWAX Inca value "+str(qhawax_inca)+" should be float")
     
     if qhawax_inca == 50:
-        return 'green'
+        return_color = 'green'
     elif qhawax_inca == 100:
-        return'yellow'
+        return_color = 'yellow'
     elif qhawax_inca == 500:
-        return'orange'
+        return_color = 'orange'
     elif qhawax_inca == 600:
-        return'red'
-    return 'green'
+        return_color = 'red'
+    return return_color
 
 
 def validaPollutant(val, sensor_name):
@@ -196,7 +196,6 @@ def validaPollutant(val, sensor_name):
             calificacionInca = 600
         else:
             calificacionInca = -1
-        return calificacionInca
     elif(sensor_name == 'SO2'):
         if val >=0 and val<= 50 :
             calificacionInca = 50
@@ -208,7 +207,6 @@ def validaPollutant(val, sensor_name):
             calificacionInca = 600
         else:
             calificacionInca = -1
-        return calificacionInca
     elif(sensor_name == 'CO'):
         if val >=0 and val<= 50 :
             calificacionInca = 50
@@ -220,7 +218,6 @@ def validaPollutant(val, sensor_name):
             calificacionInca = 600
         else:
             calificacionInca = -1
-        return calificacionInca
     elif(sensor_name == 'H2S'):
         if val >=0 and val<= 50 :
             calificacionInca = 50
@@ -232,7 +229,6 @@ def validaPollutant(val, sensor_name):
             calificacionInca = 600
         else:
             calificacionInca = -1
-        return calificacionInca
     elif(sensor_name == 'NO2'):
         if val >=0 and val<= 50 :
             calificacionInca = 50
@@ -244,7 +240,6 @@ def validaPollutant(val, sensor_name):
             calificacionInca = 600
         else:
             calificacionInca = -1
-        return calificacionInca
     elif(sensor_name == 'PM10'):
         if val >=0 and val<= 50 :
             calificacionInca = 50
@@ -256,7 +251,6 @@ def validaPollutant(val, sensor_name):
             calificacionInca = 600
         else:
             calificacionInca = -1
-        return calificacionInca
     elif(sensor_name == 'PM25'):
         if val >=0 and val<= 50 :
             calificacionInca = 50
@@ -268,9 +262,9 @@ def validaPollutant(val, sensor_name):
             calificacionInca = 600
         else:
             calificacionInca = -1
-        return calificacionInca
     else:
-        return -1
+        calificacionInca = -1
+    return calificacionInca
 
 def getStartAndFinishTimestampBasedOnTurnAndTimestampMobile(timestamp, turn):
     date_conc = timestamp.strftime("%Y-%m-%d")
