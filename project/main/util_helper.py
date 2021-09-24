@@ -172,6 +172,7 @@ def getColorBaseOnGasValuesMobile(qhawax_inca):
     if(isinstance(qhawax_inca, float) is not True):
         raise TypeError("qHAWAX Inca value "+str(qhawax_inca)+" should be float")
     
+    return_color = 'green'
     if qhawax_inca == 50:
         return_color = 'green'
     elif qhawax_inca == 100:
