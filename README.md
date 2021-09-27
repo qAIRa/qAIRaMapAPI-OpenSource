@@ -56,13 +56,12 @@ Also, to set environment variables you need to run this command:
 
 
 ```
-
 $Env:SQLALCHEMY_DATABASE_URI_OPEN='postgres://open_qaira:open_qaira@qairamap-open.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/open-qairamap'
+```
 
 or
-
+```
 export SQLALCHEMY_DATABASE_URI_OPEN='postgres://open_qaira:open_qaira@qairamap-open.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/open-qairamap'
-
 ```
 Now you are ready to run the main code
 
