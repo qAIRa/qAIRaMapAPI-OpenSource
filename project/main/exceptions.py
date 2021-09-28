@@ -1,140 +1,178 @@
 import json
 
+
 def getCompanyTargetofJson(data):
     data = checkDictionaryVariable(data)
-    array = ['company_name','email_group','ruc','address','phone','contact_person']
+    array = [
+        "company_name",
+        "email_group",
+        "ruc",
+        "address",
+        "phone",
+        "contact_person",
+    ]
 
     for i in range(len(array)):
         if array[i] not in data:
-            raise ValueError("No target "+array[i]+" in given json")
+            raise ValueError("No target " + array[i] + " in given json")
+
 
 def getQhawaxTargetofJson(data):
     data = checkDictionaryVariable(data)
 
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'qhawax_type' not in data:
+    if "qhawax_type" not in data:
         raise ValueError("No target qhawax_type in given json")
-    if 'person_in_charge' not in data:
+    if "person_in_charge" not in data:
         raise ValueError("No target person_in_charge in given json")
-    if 'description' not in data:
+    if "description" not in data:
         raise ValueError("No target description in given json")
 
-    return str(data['qhawax_name']),str(data['qhawax_type']),\
-           str(data['person_in_charge']), str(data['description'])
+    return (
+        str(data["qhawax_name"]),
+        str(data["qhawax_type"]),
+        str(data["person_in_charge"]),
+        str(data["description"]),
+    )
+
 
 def getIncaTargetofJson(data):
-    data = checkDictionaryVariable(data) 
+    data = checkDictionaryVariable(data)
 
-    if 'name' not in data:
+    if "name" not in data:
         raise ValueError("No target name in given json")
-    if 'value_inca' not in data:
+    if "value_inca" not in data:
         raise ValueError("No target value_inca in given json")
 
-    return str(data['name']).strip(),int(data['value_inca'])
+    return str(data["name"]).strip(), int(data["value_inca"])
+
 
 def getStatusOffTargetofJson(data):
-    data = checkDictionaryVariable(data) 
+    data = checkDictionaryVariable(data)
 
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
 
-    return str(data['qhawax_name']).strip()
+    return str(data["qhawax_name"]).strip()
+
 
 def getChangeCalibrationFields(data):
     data = checkDictionaryVariable(data)
 
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'person_in_charge' not in data:
+    if "person_in_charge" not in data:
         raise ValueError("No target person_in_charge in given json")
 
-    return str(data['qhawax_name']).strip(), str(data['person_in_charge'])
+    return str(data["qhawax_name"]).strip(), str(data["person_in_charge"])
+
 
 def getEndCalibrationFields(data):
     data = checkDictionaryVariable(data)
 
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'person_in_charge' not in data:
+    if "person_in_charge" not in data:
         raise ValueError("No target person_in_charge in given json")
 
-    return str(data['qhawax_name']).strip(), str(data['person_in_charge'])
+    return str(data["qhawax_name"]).strip(), str(data["person_in_charge"])
+
 
 def getInstallationFields(data):
     data = checkDictionaryVariable(data)
 
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'person_in_charge' not in data:
+    if "person_in_charge" not in data:
         raise ValueError("No target person_in_charge in given json")
 
-    return str(data['qhawax_name']), str(data['person_in_charge'])
+    return str(data["qhawax_name"]), str(data["person_in_charge"])
+
 
 def validEndWorkFieldJson(data):
     data = checkDictionaryVariable(data)
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'end_date' not in data:
+    if "end_date" not in data:
         raise ValueError("No target end_date in given json")
-    if 'person_in_charge' not in data:
+    if "person_in_charge" not in data:
         raise ValueError("No target person_in_charge in given json")
 
-    return str(data['qhawax_name']), data['end_date'], str(data['person_in_charge'])
+    return (
+        str(data["qhawax_name"]),
+        data["end_date"],
+        str(data["person_in_charge"]),
+    )
+
 
 def getQhawaxSignalJson(data):
     data = checkDictionaryVariable(data)
 
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'timestamp_turn_on_conection' not in data:
+    if "timestamp_turn_on_conection" not in data:
         raise ValueError("No target timestamp_turn_on_conection in given json")
 
-    return str(data['qhawax_name']).strip(),str(data['timestamp_turn_on_conection'])
+    return str(data["qhawax_name"]).strip(), str(
+        data["timestamp_turn_on_conection"]
+    )
+
 
 def checkIntegerVariable(variable):
-    if(type(variable) not in [int]):
-        raise TypeError("Variable "+str(variable)+" should be int")
+    if type(variable) not in [int]:
+        raise TypeError("Variable " + str(variable) + " should be int")
     return variable
+
 
 def checkStringVariable(variable):
-    if(isinstance(variable, str) is not True):  
-        raise TypeError("Variable "+str(variable)+" should be string")
+    if isinstance(variable, str) is not True:
+        raise TypeError("Variable " + str(variable) + " should be string")
     return variable
+
 
 def checkFloatVariable(variable):
-    if(type(variable) not in [float]):
-        raise TypeError("Variable "+str(variable)+" should be float")
+    if type(variable) not in [float]:
+        raise TypeError("Variable " + str(variable) + " should be float")
     return variable
+
 
 def checkDictionaryVariable(variable):
-    if(isinstance(variable, dict) is not True):
-        raise TypeError("Variable "+str(variable)+" should be Json")
+    if isinstance(variable, dict) is not True:
+        raise TypeError("Variable " + str(variable) + " should be Json")
     return variable
 
+
 def checkListVariable(variable):
-    if(isinstance(variable, list) is not True):
-        raise TypeError("Variable "+str(variable)+" should be List")
+    if isinstance(variable, list) is not True:
+        raise TypeError("Variable " + str(variable) + " should be List")
     return variable
+
 
 def getJsonOfTakeOff(data):
     data = checkDictionaryVariable(data)
-    if 'flight_start' not in data:
+    if "flight_start" not in data:
         raise ValueError("No target flight_start in given json")
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
 
-    return data['flight_start'], str(data['qhawax_name'])
+    return data["flight_start"], str(data["qhawax_name"])
+
 
 def getJsonOfLanding(data):
     data = checkDictionaryVariable(data)
-    if 'flight_end' not in data:
+    if "flight_end" not in data:
         raise ValueError("No target flight_end in given json")
-    if 'qhawax_name' not in data:
+    if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
-    if 'flight_detail' not in data:
+    if "flight_detail" not in data:
         raise ValueError("No target flight_detail in given json")
-    if 'location' not in data:
+    if "location" not in data:
         raise ValueError("No target location in given json")
 
-    return data['flight_end'], str(data['qhawax_name']) ,str(data['flight_detail']), data['location']
+    return (
+        data["flight_end"],
+        str(data["qhawax_name"]),
+        str(data["flight_detail"]),
+        data["location"],
+    )
