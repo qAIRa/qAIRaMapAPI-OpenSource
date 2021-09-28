@@ -10,18 +10,7 @@ import dateutil.tz
 import pytz
 import requests
 
-# DATA_PROCESSED_ENDPOINT = 'api/dataProcessedMobile/'
-# OPEN_BASE_URL = 'https://openqairamapnapi.qairadrones.com/'
-
-BASE_URL = "https://qairamapnapi.qairadrones.com/"
-DATA_PROCESSED_TEST = "api/dataProcessedTest/"
-
-# PROCESSED_MEASUREMENT= OPEN_BASE_URL + DATA_PROCESSED_ENDPOINT
-# produccion
-PROCESSED_MEASUREMENT = BASE_URL + DATA_PROCESSED_TEST
-print(PROCESSED_MEASUREMENT)
-print("https://qairamapnapi.qairadrones.com/api/dataProcessedTest/")
-# CO, CO2, NO2, O3, SO2, H2S, PM25, PM10, VOC  ug_m3
+############# DON'T RUN THIS PLEASE, THANK YOU :)  ######################
 
 # "2021-05-26 12:20:00-05:00"
 #'2021-05-26 17:19:15.560919+00:00'
