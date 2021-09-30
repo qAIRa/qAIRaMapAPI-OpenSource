@@ -15,7 +15,7 @@ array_ug_m3 = ['CO','CO_ug_m3','H2S','H2S_ug_m3','NO2','NO2_ug_m3','O3',\
                'UVA','UVB','humidity','pressure']
 
 array_installation =['lat','lon','comercial_name','company_id','eca_noise_id','qhawax_name',\
-                         'connection_type','season','is_public','person_in_charge']
+                         'connection_type','is_public','person_in_charge'] # season not needed
 
 # mobile qhawax specific constants to cover Lima
 lat_lima_interval = [-12.67,-11.59]

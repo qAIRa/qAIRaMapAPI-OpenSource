@@ -10,7 +10,7 @@ from project import app
 def getQhawaxInMap():
     """ Gets a list of qHAWAXs filter by company ID """
     try:
-        qhawax_in_field = get_business_helper.queryQhawaxTypeInFieldInPublicMode('STATIC')
+        qhawax_in_field = get_business_helper.queryQhawaxTypeInFieldInPublicMode('STATIC_EXT')
         return make_response(jsonify(qhawax_in_field), 200)
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
