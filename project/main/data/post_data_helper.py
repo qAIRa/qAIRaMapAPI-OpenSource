@@ -111,6 +111,8 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
     data_json = exceptions.checkDictionaryVariable(data_json)
     product_id = exceptions.checkStringVariable(product_id)
     if(util_helper.checkValidLatLonValues(data_json)):
+        if(not(same_helper.isMobileQhawaxInATrip(product_id))):  #in case trip has finished, a new one has to begin...
+            recordStartTrip(product_id)
         storeValidProcessedDataInDBMobile(data_json, product_id)
         max_value = 0
         for i in range(len(pollutants)):
@@ -118,7 +120,7 @@ def validAndBeautyJsonValidProcessedMobile(data_json,product_id):
             pollutantStr = str(pollutants[i]) + "_ug_m3" if(pollutants[i] in ['CO','NO2','O3','H2S','SO2']) else str(pollutants[i])
             new_data_json = {"sensor": pollutants[i],"center":{"lat":data_json["lat"],"lng":data_json["lon"]}}
             factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25,
-                                'SO2': 100/20, 'O3': 100/120, 'H2S': 100/150}
+                                'SO2': 100/20, 'O3': 100/100, 'H2S': 100/150}
             if (data_json[pollutantStr]!=None): 
                 if (pollutants[i] in factor_final_json): data_json[pollutantStr] = round(data_json[pollutantStr]*factor_final_json[pollutants[i]],3)
                 new_data_json[pollutants[i]]= data_json[pollutantStr]

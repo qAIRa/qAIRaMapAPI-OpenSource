@@ -113,9 +113,9 @@ def queryLastTimeOffDueLackEnergy(qhawax_name):
                                     filter_by(qhawax_id=qhawax_id). \
                                     filter_by(description="qHAWAX off"). \
                                     order_by(Bitacora.timestamp_zone.desc()).\
-                                    limit(2).all()
+                                    limit(1).all()
         if(list_last_turn_off != []):
-            return list_last_turn_off[1][0]
+            return list_last_turn_off[0][0]
         else:
             list_last_turn_on= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone). \
                                     filter_by(qhawax_id=qhawax_id). \
@@ -160,11 +160,11 @@ def getAllMobileQhawaxID():
                         order_by(Qhawax.id).all()
     return [qhawax._asdict() for qhawax in qhawax_list]
 
-def queryLatestTurnOffTimestamp(qhawax_name):
+def queryLastTimePhysicallyTurnOnZone(qhawax_name):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if(qhawax_id is not None):
         last_turn_on= session.query(QhawaxInstallationHistory.last_time_physically_turn_on_zone). \
-                                filter(QhawaxInstallationHistory.qhawax_id == qhawax_id, QhawaxInstallationHistory.end_date_zone==None).first()
+                                filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
         return last_turn_on[0]
     return None
 
@@ -184,3 +184,11 @@ def getMainIncaQhawaxTable(qhawax_id):
         return None
     main_inca = session.query(Qhawax.main_inca).filter_by(id=qhawax_id).one()[0]
     return main_inca
+
+def queryLastRegistrationTimezone(name):
+    qhawax_id = same_helper.getQhawaxID(name)
+    if(qhawax_id is not None):
+        last_turn_on= session.query(QhawaxInstallationHistory.last_registration_time_zone). \
+                                filter(QhawaxInstallationHistory.qhawax_id == qhawax_id).first()
+        return last_turn_on[0]
+    return None

@@ -55,15 +55,23 @@ def saveTurnOnLastTime(qhawax_name):
     same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
 
 def saveTurnOnLastTimeProcessedMobile(qhawax_name):
-    """ Updates last_time_physically_turn_on_zone based on latest processed measurement timestamp  """
-    latest_processed_timestamp = get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(qhawax_name)
-    if(not(latest_processed_timestamp==None or latest_processed_timestamp==[])):
+    """ Updates last_time_physically_turn_on_zone based on last registration time zone  """
+    latest_turn_off = get_business_helper.queryLastRegistrationTimezone(qhawax_name)
+    if(not(latest_turn_off==None or latest_turn_off==[])):
         now2 = datetime.datetime.now(dateutil.tz.tzutc())
-        difference = now2 - latest_processed_timestamp
+        difference = now2 - latest_turn_off
         seconds_interval = 1800
         if(seconds_interval<int(difference.total_seconds())): # if reconnection takes longer than 30 minutes, we update the last_turn_on
+            # every reconnection longer than 30 mins, includes the ones that last longer than a day so they should not be an issue
             qhawax_json_on = {'main_inca': 0, 'last_time_physically_turn_on_zone': now2.replace(tzinfo=None)}
             same_helper.qhawaxInstallationQueryUpdate(qhawax_json_on,qhawax_name)
+
+        trip_start, trip_id = get_data_helper.getqHAWAXMobileLatestTripStart(qhawax_name)
+        if(trip_id!=None and trip_start!=None):
+            #trip_start = datetime.datetime.strptime('2021-07-12 12:00:00', '%Y-%m-%d %H:%M:%S') # test
+            date_start = (trip_start - datetime.timedelta(hours=5)).date() #local
+            now_date = (datetime.datetime.now(dateutil.tz.tzutc())-datetime.timedelta(hours=5)).date()
+            if(date_start == now_date): same_helper.setTripEndNull(trip_id)
 
 def turnOnAfterCalibration(qhawax_name):
     """ Set qHAWAX ON in qHAWAX Installation table"""
@@ -146,7 +154,7 @@ def setLastMeasurementOfQhawax(qH_name):
     if(last_main_inca_value!=None):
         updateMainIncaQhawaxInstallationTable(int(last_main_inca_value),qH_name)
         updateMainIncaQhawaxTable(int(last_main_inca_value),qH_name)
-    last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qH_name)
+    last_time_of_turn_off_binnacle = get_business_helper.queryLastTimeOffDueLackEnergy(qH_name) # query of the timestamp of the last description with "qHAWAX off" made by the API
     if(last_time_of_turn_off_binnacle!=None):
         updateTimeOffWithLastTurnOff(last_time_of_turn_off_binnacle,qH_name)
 

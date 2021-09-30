@@ -271,3 +271,21 @@ def validaPollutant(val, sensor_name):
         return calificacionInca
     else:
         return -1
+
+def getStartAndFinishTimestampBasedOnTurnAndTimestampMobile(timestamp, turn):
+    date_conc = timestamp.strftime("%Y-%m-%d")
+    if(turn==1): #UTC
+        time_start = '13:00:00'
+        time_finish = '15:00:00'
+    elif(turn==2):
+        time_start = '15:00:00'
+        time_finish = '17:00:00'
+    elif(turn==3):
+        time_start = '19:00:00'
+        time_finish = '21:00:00'
+    elif(turn==4):
+        time_start = '21:00:00'
+        time_finish = '23:00:00'
+    start_time_reconstructed = dateutil.parser.parse(date_conc + ' ' + time_start)
+    finish_time_reconstructed = dateutil.parser.parse(date_conc + ' ' + time_finish)
+    return start_time_reconstructed, finish_time_reconstructed
