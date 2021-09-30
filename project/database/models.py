@@ -1,7 +1,8 @@
 from project import db
 
+
 class Company(db.Model):
-    __tablename__ = 'company'
+    __tablename__ = "company"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False, unique=True)
     email_group = db.Column(db.String(300), nullable=False, unique=True)
@@ -10,8 +11,9 @@ class Company(db.Model):
     phone = db.Column(db.String(15), nullable=False, unique=True)
     contact_person = db.Column(db.String(100), nullable=False, unique=True)
 
+
 class Qhawax(db.Model):
-    __tablename__ = 'qhawax'
+    __tablename__ = "qhawax"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False, unique=True)
     main_aqi = db.Column(db.Float)
@@ -23,8 +25,9 @@ class Qhawax(db.Model):
     on_loop = db.Column(db.Integer)
     first_time_loop = db.Column(db.DateTime, nullable=False)
 
+
 class GasInca(db.Model):
-    __tablename__ = 'gas_inca'
+    __tablename__ = "gas_inca"
     id = db.Column(db.Integer, primary_key=True)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
@@ -37,18 +40,20 @@ class GasInca(db.Model):
     PM25 = db.Column(db.Float)
     PM10 = db.Column(db.Float)
     SO2 = db.Column(db.Float)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
     main_inca = db.Column(db.Float)
-    
+
+
 class EcaNoise(db.Model):
-    __tablename__ = 'eca_noise'
+    __tablename__ = "eca_noise"
     id = db.Column(db.Integer, primary_key=True)
     area_name = db.Column(db.String(100))
     max_daytime_limit = db.Column(db.Integer)
     max_night_limit = db.Column(db.Integer)
 
+
 class QhawaxInstallationHistory(db.Model):
-    __tablename__ = 'qhawax_installation_history'
+    __tablename__ = "qhawax_installation_history"
     id = db.Column(db.Integer, primary_key=True)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
@@ -56,24 +61,25 @@ class QhawaxInstallationHistory(db.Model):
     end_date_zone = db.Column(db.DateTime, nullable=False)
     link_report = db.Column(db.String(500), nullable=False, unique=True)
     observations = db.Column(db.String(300), nullable=False, unique=True)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
     district = db.Column(db.String(300), nullable=False, unique=True)
     comercial_name = db.Column(db.String(300), nullable=False, unique=True)
     address = db.Column(db.String(300), nullable=False, unique=True)
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
-    eca_noise_id = db.Column(db.Integer, db.ForeignKey('eca_noise.id'))
+    company_id = db.Column(db.Integer, db.ForeignKey("company.id"))
+    eca_noise_id = db.Column(db.Integer, db.ForeignKey("eca_noise.id"))
     connection_type = db.Column(db.String(300), nullable=False, unique=True)
     index_type = db.Column(db.String(100), nullable=False, unique=True)
     measuring_height = db.Column(db.Integer)
     season = db.Column(db.String(300), nullable=False, unique=True)
     last_time_physically_turn_on_zone = db.Column(db.DateTime, nullable=False)
     person_in_charge = db.Column(db.String(300), nullable=False, unique=True)
-    is_public  = db.Column(db.String(10), nullable=False, unique=True)
+    is_public = db.Column(db.String(10), nullable=False, unique=True)
     last_registration_time_zone = db.Column(db.DateTime, nullable=False)
     main_inca = db.Column(db.Float)
 
+
 class Bitacora(db.Model):
-    __tablename__ = 'bitacora'
+    __tablename__ = "bitacora"
     id = db.Column(db.Integer, primary_key=True)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     observation_type = db.Column(db.String(100))
@@ -82,10 +88,11 @@ class Bitacora(db.Model):
     person_in_charge = db.Column(db.String(100))
     start_date_zone = db.Column(db.DateTime, nullable=False)
     end_date_zone = db.Column(db.DateTime, nullable=False)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
+
 
 class AirQualityMeasurement(db.Model):
-    __tablename__ = 'air_quality_measurement'
+    __tablename__ = "air_quality_measurement"
     id = db.Column(db.Integer, primary_key=True)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
     CO = db.Column(db.Float)
@@ -111,10 +118,11 @@ class AirQualityMeasurement(db.Model):
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
     I_temperature = db.Column(db.Float)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
+
 
 class ProcessedMeasurement(db.Model):
-    __tablename__ = 'processed_measurement'
+    __tablename__ = "processed_measurement"
     id = db.Column(db.Integer, primary_key=True)
     CO = db.Column(db.Float)
     CO_ug_m3 = db.Column(db.Float)
@@ -145,10 +153,11 @@ class ProcessedMeasurement(db.Model):
     I_temperature = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
+
 
 class ValidProcessedMeasurement(db.Model):
-    __tablename__ = 'valid_processed_measurement'
+    __tablename__ = "valid_processed_measurement"
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
     timestamp_zone = db.Column(db.DateTime, nullable=False)
@@ -179,11 +188,14 @@ class ValidProcessedMeasurement(db.Model):
     lon = db.Column(db.Float)
     alt = db.Column(db.Float)
     I_temperature = db.Column(db.Float)
-    qhawax_installation_id = db.Column(db.Integer, db.ForeignKey('qhawax_installation_history.id'))
+    qhawax_installation_id = db.Column(
+        db.Integer, db.ForeignKey("qhawax_installation_history.id")
+    )
+
 
 class DroneTelemetry(db.Model):
-    __tablename__ = 'drone_telemetry'
-    
+    __tablename__ = "drone_telemetry"
+
     # Column's definition
     id = db.Column(db.Integer, primary_key=True)
     airspeed = db.Column(db.Float(precision=2))
@@ -231,21 +243,22 @@ class DroneTelemetry(db.Model):
     waypoint = db.Column(db.Integer)
     yaw = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime)
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
+
 
 class DroneFlightLog(db.Model):
-    __tablename__ = 'drone_flight_log'
+    __tablename__ = "drone_flight_log"
     id = db.Column(db.Integer, primary_key=True)
     flight_start = db.Column(db.DateTime, nullable=False)
     flight_end = db.Column(db.DateTime, nullable=False)
     flight_detail = db.Column(db.String(100))
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
+
 
 class TripLog(db.Model):
-    __tablename__ = 'trip_log'
+    __tablename__ = "trip_log"
     id = db.Column(db.Integer, primary_key=True)
     trip_start = db.Column(db.DateTime, nullable=False)
     trip_end = db.Column(db.DateTime)
     details = db.Column(db.String(100))
-    qhawax_id = db.Column(db.Integer, db.ForeignKey('qhawax.id'))
-
+    qhawax_id = db.Column(db.Integer, db.ForeignKey("qhawax.id"))
