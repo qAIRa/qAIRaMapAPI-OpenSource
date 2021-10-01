@@ -406,13 +406,3 @@ def _getProcessedDataCommon(is_valid):
     except TypeError as e:
         json_message = jsonify({'error': '\'%s\'' % (e)})
         return json_message, 400
-
-
-#     qhawax_name = request.args.get('name')
-#     try:
-#         #secret_key_hashed = str(req_json['secret_key']).strip()
-#         print(get_data_helper.qHAWAXIsInTrip(qhawax_name))
-#         return make_response(jsonify('Success'), 200)
-#     except Exception as e:
-#         json_message = jsonify({'error': ' \'%s\' ' % (e)})
-#         return make_response(json_message, 400)

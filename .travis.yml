@@ -14,7 +14,7 @@ script:
 after_success: coveralls
 env:
   global:
-    - SQLALCHEMY_DATABASE_URI_OPEN='postgres://qaira:qAIRa20151101@qairamap-open.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/open-qairamap'
+    - SQLALCHEMY_DATABASE_URI_OPEN='postgres://open_qaira:open_qaira@qairamap-open.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/open-qairamap'
 notifications:
   email:
     recipients:

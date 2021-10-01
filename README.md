@@ -19,6 +19,27 @@ Clone or download the project to the device where it will be used.
 git clone https://github.com/qAIRa/qAIRaMapAPI-OpenSource.git
 ```
 
+### Prerequisites for every OS
+1.  Having installed the postgreSQL driver.
+   MacOS: 
+```
+      brew install postgresql 
+``` 
+   If facing issues with brew installation: https://docs.brew.sh/Installation
+
+   Make sure to add the installed postgreSQL library to your PATH with the following
+
+```
+   export PG_HOME=/Library/PostgreSQL/14
+   export PATH=$PATH:$PG_HOME/bin
+```
+
+   Windows: https://www.postgresql.org/
+
+2. The API library requirement for psycopg2==2.8.5 makes the Python version equal to 3.8.5 a must.
+
+3. For Windows: if you need the Microsoft C++ 14.0 or higher driver, you can download them from the [link](https://visualstudio.microsoft.com/visual-cpp-build-tools/). Just make sure you leave the defaulted selected options (including the optional). Storage: around 7 GB.
+
 ### Prerequisites Ubuntu & Mac
 Now you have to open terminal
 You must have an isolated environment by executing the following command:
@@ -46,7 +67,11 @@ source venv\Scripts\activate
 
 ### After that (for all Operating Systems)
 
-Now you have to run this command to install all require libraries
+First things first:
+
+pip install psycopg2-binary
+
+Now you have to run this command to install all the required libraries
 
 ```
 pip install -r requirements.txt
@@ -54,16 +79,26 @@ pip install -r requirements.txt
 
 Also, to set environment variables you need to run this command:
 
-
+Windows PowerShell:
 ```
 $Env:SQLALCHEMY_DATABASE_URI_OPEN='postgres://open_qaira:open_qaira@qairamap-open.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/open-qairamap'
 ```
 
-or
+Windows Command Prompt:
+```
+set SQLALCHEMY_DATABASE_URI_OPEN=postgres://open_qaira:open_qaira@qairamap-open.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/open-qairamap
+```
+
+MacOS or Ubuntu:
 ```
 export SQLALCHEMY_DATABASE_URI_OPEN='postgres://open_qaira:open_qaira@qairamap-open.c6xdvtbzawt6.us-east-1.rds.amazonaws.com:5432/open-qairamap'
 ```
-Now you are ready to run the main code
+As a suggestion to test code faster, you should uncomment the code
+```
+app.run(debug = True)
+```
+
+Now you are ready to run the main code and test the API by yourself!
 
 ```
 python run.py
@@ -72,7 +107,7 @@ python run.py
 If everything went well, the following should come out
 
 ```
-* Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+* Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 
 ```
 
