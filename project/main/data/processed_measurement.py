@@ -431,6 +431,24 @@ def testerFunction():
         json_message = jsonify({"error": " '%s' " % (e)})
         return make_response(json_message, 400)
 
+def getProcessedDataCommon(is_valid):
+    """ Lists all measurements of processed measurement of the target drone within the initial and final date """
+    qhawax_name = request.args.get('qhawax_name')
+    initial_timestamp = datetime.datetime.strptime(request.args.get('initial_timestamp'), '%d-%m-%Y %H:%M:%S')
+    final_timestamp = datetime.datetime.strptime(request.args.get('final_timestamp'), '%d-%m-%Y %H:%M:%S')
+    try:
+        processed_measurements = None
+        if is_valid:
+            processed_measurements = get_data_helper.queryDBValidProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        else:
+            processed_measurements = get_data_helper.queryDBProcessed(qhawax_name, initial_timestamp, final_timestamp)
+        if processed_measurements is not None:
+            return make_response(jsonify(processed_measurements), 200)
+        return make_response(jsonify('Measurements not found'), 200)
+    except TypeError as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return json_message
+
 
 #     qhawax_name = request.args.get('name')
 #     try:
