@@ -134,6 +134,14 @@ def isAerealQhawax(qhawax_name):
         return True
     return None
 
+def getAllStaticQhawaxID():
+    """ Get all qHAWAXs STATIC (int or ext) ID - No parameters required """
+    base_string = "STATIC"
+    search = "%{}%".format(base_string)
+    qhawax_list =  session.query(Qhawax.id).filter(Qhawax.qhawax_type.like(search)). \
+                        order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]
+
 def getAllStaticQhawaxInstallationID():
     """ Get all qHAWAXs STATIC (int or ext) Installation ID - No parameters required """
     base_string = "STATIC"
@@ -144,36 +152,13 @@ def getAllStaticQhawaxInstallationID():
                         order_by(QhawaxInstallationHistory.id.desc()).all()
     return [qhawax._asdict() for qhawax in qhawax_list]
 
-
-def getAllQhawaxID_helper(base_string):
-    """
-    Helper for getting all qHAWAXs ID by the specified base_string.
-
-    Parameters required:
-    STATIC - Get all qHAWAXs STATIC (int or ext) ID
-    MOBILE_EXT - Gets all mobile qHAWAXs ID
-    """
-    search = "%{}%".format(base_string)
-    qhawax_list = (
-        session.query(Qhawax.id)
-        .filter(Qhawax.qhawax_type.like(search))
-        .order_by(Qhawax.id)
-        .all()
-    )
-    return [qhawax._asdict() for qhawax in qhawax_list]
-
-
-def getAllStaticQhawaxID():
-    """Get all qHAWAXs STATIC (int or ext) ID - No parameters required"""
-    base_string = "STATIC"
-    return getAllQhawaxID_helper(base_string)
-
-
 def getAllMobileQhawaxID():
-    """Gets all mobile qHAWAXs - No parameters required"""
+    """ Gets all mobile qHAWAXs - No parameters required """
     base_string = "MOBILE_EXT"
-    return getAllQhawaxID_helper(base_string)
-
+    search = "%{}%".format(base_string)
+    qhawax_list =  session.query(Qhawax.id).filter(Qhawax.qhawax_type.like(search)). \
+                        order_by(Qhawax.id).all()
+    return [qhawax._asdict() for qhawax in qhawax_list]
 
 def queryLastTimePhysicallyTurnOnZone(qhawax_name):
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
