@@ -20,7 +20,7 @@ def qhawaxExistBasedOnID(qhawax_id):
 
 def qhawaxExistBasedOnName(qhawax_name):
     """Helper function that checks if qHAWAX name exist"""
-    qhawax_name = exceptions.checkStringVariable(qhawax_name)
+    qhawax_name = exceptions.checkVariable_helper(qhawax_name, str)
     qhawax_list = session.query(Qhawax.name).filter_by(name=qhawax_name).all()
     if qhawax_list == []:
         return False
@@ -53,7 +53,7 @@ def areaExistBasedOnID(eca_noise_id):
 
 def companyExistBasedOnName(company_name):
     """Helper function to check if company name exist"""
-    company_name = exceptions.checkStringVariable(company_name)
+    company_name = exceptions.checkVariable_helper(company_name, str)
     company_list = (
         session.query(Company.name).filter_by(name=company_name).all()
     )
@@ -64,7 +64,7 @@ def companyExistBasedOnName(company_name):
 
 def companyExistBasedOnRUC(ruc):
     """Helper function to check if company name exist"""
-    ruc = exceptions.checkStringVariable(ruc)
+    ruc = exceptions.checkVariable_helper(ruc, str)
     company_list = session.query(Company.ruc).filter_by(ruc=ruc).all()
     if company_list == []:
         return False

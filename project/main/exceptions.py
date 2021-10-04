@@ -2,7 +2,7 @@ import json
 
 
 def getCompanyTargetofJson(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
     array = [
         "company_name",
         "email_group",
@@ -18,7 +18,7 @@ def getCompanyTargetofJson(data):
 
 
 def getQhawaxTargetofJson(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
 
     if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -38,7 +38,7 @@ def getQhawaxTargetofJson(data):
 
 
 def getIncaTargetofJson(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
 
     if "name" not in data:
         raise ValueError("No target name in given json")
@@ -49,7 +49,7 @@ def getIncaTargetofJson(data):
 
 
 def getStatusOffTargetofJson(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
 
     if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -58,7 +58,7 @@ def getStatusOffTargetofJson(data):
 
 
 def getChangeCalibrationFields(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
 
     if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -69,7 +69,7 @@ def getChangeCalibrationFields(data):
 
 
 def getEndCalibrationFields(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
 
     if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -80,7 +80,7 @@ def getEndCalibrationFields(data):
 
 
 def getInstallationFields(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
 
     if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -91,7 +91,7 @@ def getInstallationFields(data):
 
 
 def validEndWorkFieldJson(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
     if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
     if "end_date" not in data:
@@ -107,7 +107,7 @@ def validEndWorkFieldJson(data):
 
 
 def getQhawaxSignalJson(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
 
     if "qhawax_name" not in data:
         raise ValueError("No target qhawax_name in given json")
@@ -125,32 +125,36 @@ def checkIntegerVariable(variable):
     return variable
 
 
-def checkStringVariable(variable):
-    if isinstance(variable, str) is not True:
-        raise TypeError("Variable " + str(variable) + " should be string")
-    return variable
-
-
 def checkFloatVariable(variable):
     if type(variable) not in [float]:
         raise TypeError("Variable " + str(variable) + " should be float")
     return variable
 
 
-def checkDictionaryVariable(variable):
-    if isinstance(variable, dict) is not True:
-        raise TypeError("Variable " + str(variable) + " should be Json")
+
+def checkVariable_helper(variable, type):
+    """
+    helper function for checking the three types of variables: list, dictionary, and string
+
+    Parametres: 
+    variable: variable to check
+    type: list / dict / str
+
+    """
+    if isinstance(variable, type) is not True:
+        if type == list:
+            raise TypeError("Variable " + str(variable) + " should be List")
+        if type == dict:
+            raise TypeError("Variable " + str(variable) + " should be Json")
+        if type == str:
+            raise TypeError("Variable " + str(variable) + " should be string")
     return variable
 
 
-def checkListVariable(variable):
-    if isinstance(variable, list) is not True:
-        raise TypeError("Variable " + str(variable) + " should be List")
-    return variable
 
 
 def getJsonOfTakeOff(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
     if "flight_start" not in data:
         raise ValueError("No target flight_start in given json")
     if "qhawax_name" not in data:
@@ -160,7 +164,7 @@ def getJsonOfTakeOff(data):
 
 
 def getJsonOfLanding(data):
-    data = checkDictionaryVariable(data)
+    data = checkVariable_helper(data, dict)
     if "flight_end" not in data:
         raise ValueError("No target flight_end in given json")
     if "qhawax_name" not in data:

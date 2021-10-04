@@ -57,7 +57,7 @@ lon_lima_interval = [-77.20, -76.75]
 
 
 def validTimeJsonProcessed(data_json):
-    data_json = exceptions.checkDictionaryVariable(data_json)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
     datetime_array = data_json["timestamp"].split()
     measurement_year = datetime.datetime.strptime(
         datetime_array[0], "%Y-%m-%d"
@@ -93,7 +93,7 @@ def validTimeJsonProcessedTest(data_json, time_zone, location_time_zone):
 
 def validAndBeautyJsonProcessed(data_json):
     arr_season = [2.62, 1.88, 1.96, 1.15, 1.39]  # Arreglo de 25C
-    data_json = exceptions.checkDictionaryVariable(data_json)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
 
     if "timestamp_zone" not in data_json:
         data_json["timestamp_zone"] = data_json["timestamp"]
@@ -110,7 +110,7 @@ def validAndBeautyJsonProcessed(data_json):
 
 # def validAndBeautyJsonProcessedLatest(data_json):
 #     arr_season=[2.62,1.88,1.96,1.15,1.39] #Arreglo de 25C
-#     data_json = exceptions.checkDictionaryVariable(data_json)
+#     data_json = exceptions.checkVariable_helper(data_json, dict)
 
 #     if  'timestamp_zone' not in data_json:
 #         data_json["timestamp_zone"] = data_json["timestamp"]
@@ -123,8 +123,8 @@ def validAndBeautyJsonProcessed(data_json):
 
 
 def gasConversionPPBtoMG(data_json, season):
-    data_json = exceptions.checkDictionaryVariable(data_json)
-    season = exceptions.checkListVariable(season)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
+    season = exceptions.checkVariable_helper(season, list)
 
     data = {
         "ID": data_json["ID"],
@@ -176,7 +176,7 @@ def gasConversionPPBtoMG(data_json, season):
 
 
 def roundUpThree(data_json):
-    data_json = exceptions.checkDictionaryVariable(data_json)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
     for i in range(len(array_ug_m3)):
         if (type(data_json[array_ug_m3[i]]) is float) or (
             type(data_json[array_ug_m3[i]]) is int
@@ -187,7 +187,7 @@ def roundUpThree(data_json):
 
 def checkNumberValues(data_json):
     """Helper Processed Measurement function to check number values"""
-    data_json = exceptions.checkDictionaryVariable(data_json)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
     for i in range(len(array_ppb)):
         if data_json[array_ppb[i]] == "Nan":
             data_json[array_ppb[i]] = 0
@@ -195,7 +195,7 @@ def checkNumberValues(data_json):
 
 
 def areFieldsValid(data):
-    data = exceptions.checkDictionaryVariable(data)
+    data = exceptions.checkVariable_helper(data, dict)
     for i in range(len(array_installation)):
         if (
             data[array_installation[i]] == ""
@@ -208,7 +208,7 @@ def areFieldsValid(data):
 def getFormatData(gas_average_measurement):
     gas_average_measurement_list = []
     if gas_average_measurement is not None:
-        data = exceptions.checkListVariable(gas_average_measurement)
+        data = exceptions.checkVariable_helper(gas_average_measurement, list)
         next_hour = -1
         for measurement in gas_average_measurement:
             gas_measurement = measurement._asdict()
@@ -245,7 +245,7 @@ def getFormatData(gas_average_measurement):
 
 def setNoneStringElements(data_json):
     string_fields = ["ID", "timestamp_zone", "timestamp", "zone"]
-    data_json = exceptions.checkDictionaryVariable(data_json)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
     for key in data_json:
         if (type(data_json[key]) is str) and (key not in string_fields):
             data_json[key] = None
