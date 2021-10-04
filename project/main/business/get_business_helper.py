@@ -243,7 +243,6 @@ def getAllStaticQhawaxInstallationID():
 def getAllQhawaxID_helper(base_string):
     """
     Helper for getting all qHAWAXs ID by the specified base_string.
-
     Parameters required:
     STATIC - Get all qHAWAXs STATIC (int or ext) ID
     MOBILE_EXT - Gets all mobile qHAWAXs ID
