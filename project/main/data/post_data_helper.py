@@ -27,7 +27,7 @@ pollutants = ["CO", "CO2", "NO2", "O3", "H2S", "SO2", "PM25", "PM10", "VOC"]
 
 def storeAirQualityDataInDB(data):
     """Helper function to record Air Quality measurement"""
-    data = exceptions.checkDictionaryVariable(data)
+    data = exceptions.checkVariable_helper(data, dict)
     qhawax_name = data.pop("ID", None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if qhawax_id != None:
@@ -64,7 +64,7 @@ def storeAirQualityDataInDB(data):
 
 def storeGasIncaInDB(data):
     """Helper function to record GAS INCA measurement"""
-    data = exceptions.checkDictionaryVariable(data)
+    data = exceptions.checkVariable_helper(data, dict)
     gas_inca_data = {
         "CO": data["CO"],
         "H2S": data["H2S"],
@@ -85,7 +85,7 @@ def storeGasIncaInDB(data):
 
 def storeProcessedDataInDB(data):
     """Helper Processed Measurement function to store Processed Data"""
-    data = exceptions.checkDictionaryVariable(data)
+    data = exceptions.checkVariable_helper(data, dict)
     qhawax_name = data.pop("ID", None)
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     processed_measurement = ProcessedMeasurement(**data, qhawax_id=qhawax_id)
@@ -218,8 +218,8 @@ def storeValidProcessedDataInDBMobile(data, product_id):
 
 
 def validAndBeautyJsonValidProcessedMobile(data_json, product_id):
-    data_json = exceptions.checkDictionaryVariable(data_json)
-    product_id = exceptions.checkStringVariable(product_id)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
+    product_id = exceptions.checkVariable_helper(product_id, str)
     if util_helper.checkValidLatLonValues(data_json):
         if not (
             same_helper.isMobileQhawaxInATrip(product_id)
@@ -274,8 +274,8 @@ def validAndBeautyJsonValidProcessedMobile(data_json, product_id):
 
 def validAndBeautyJsonValidProcessed(data_json, product_id, inca_value):
     """Helper function to valid json Valid Processed table"""
-    data_json = exceptions.checkDictionaryVariable(data_json)
-    product_id = exceptions.checkStringVariable(product_id)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
+    product_id = exceptions.checkVariable_helper(product_id, str)
     storeValidProcessedDataInDB(data_json, product_id)
     if inca_value == 0.0:
         post_business_helper.updateMainIncaQhawaxTable(1, product_id)
@@ -289,9 +289,9 @@ def validTimeOfValidProcessed(
 ):
     """Helper function to valid time of Valid Processed table"""
     time_valid = exceptions.checkIntegerVariable(time_valid)
-    time_type = exceptions.checkStringVariable(time_type)
-    data_json = exceptions.checkDictionaryVariable(data_json)
-    product_id = exceptions.checkStringVariable(product_id)
+    time_type = exceptions.checkVariable_helper(time_type, str)
+    data_json = exceptions.checkVariable_helper(data_json, dict)
+    product_id = exceptions.checkVariable_helper(product_id, str)
     aditional_time = (
         datetime.timedelta(hours=time_valid)
         if (time_type == "hour")
@@ -305,8 +305,8 @@ def validTimeOfValidProcessed(
 
 def storeLogs(telemetry, drone_name):
     global drone_elapsed_time, drone_telemetry, drone_storage
-    telemetry = exceptions.checkDictionaryVariable(telemetry)
-    drone_name = exceptions.checkStringVariable(drone_name)
+    telemetry = exceptions.checkVariable_helper(telemetry, dict)
+    drone_name = exceptions.checkVariable_helper(drone_name, str)
     if drone_elapsed_time is None:
         drone_elapsed_time = time.time()
 
@@ -331,7 +331,7 @@ def storeLogs(telemetry, drone_name):
 
 
 def formatTelemetryForStorage(telemetry):
-    telemetry = exceptions.checkDictionaryVariable(telemetry)
+    telemetry = exceptions.checkVariable_helper(telemetry, dict)
     rcout = (
         telemetry["rcout"]
         if telemetry["rcout"] is not None

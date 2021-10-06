@@ -66,7 +66,7 @@ def queryDBValidAirQuality(
 
 def queryDBGasAverageMeasurement(qhawax_name, gas_name):
     """Helper function to get gas average measurement based on qHAWAX name and sensor name"""
-    gas_name = exceptions.checkStringVariable(gas_name)
+    gas_name = exceptions.checkVariable_helper(gas_name, str)
 
     if gas_name not in sensor_array:
         raise ValueError(

@@ -28,7 +28,7 @@ def updateMainIncaQhawaxTable(new_main_inca, qhawax_name):
 def saveStatusQhawaxTable(qhawax_name, qhawax_status, main_inca):
     """Set qHAWAX ON or OFF in qHAWAX table"""
     main_inca = exceptions.checkIntegerVariable(main_inca)
-    qhawax_status = exceptions.checkStringVariable(qhawax_status)
+    qhawax_status = exceptions.checkVariable_helper(qhawax_status, str)
     qhawax_json_status = {"state": qhawax_status, "main_inca": main_inca}
     same_helper.qhawaxQueryUpdateFilterByQhawaxName(
         qhawax_json_status, qhawax_name
@@ -37,7 +37,7 @@ def saveStatusQhawaxTable(qhawax_name, qhawax_status, main_inca):
 
 def setAvailabilityQhawax(qhawax_name, availability):
     """Update qHAWAX Availability to Occupied or Free"""
-    availability = exceptions.checkStringVariable(availability)
+    availability = exceptions.checkVariable_helper(availability, str)
     qhawax_json_availability = {"availability": availability}
     same_helper.qhawaxQueryUpdateFilterByQhawaxName(
         qhawax_json_availability, qhawax_name
@@ -46,7 +46,7 @@ def setAvailabilityQhawax(qhawax_name, availability):
 
 def changeMode(qhawax_name, mode):
     """Change To Other Mode"""
-    mode = exceptions.checkStringVariable(mode)
+    mode = exceptions.checkVariable_helper(mode, str)
     qhawax_json_mode = {"mode": mode}
     same_helper.qhawaxQueryUpdateFilterByQhawaxName(
         qhawax_json_mode, qhawax_name
@@ -187,13 +187,13 @@ def updateTimeOnPreviousTurnOn(qhawax_name, mins):
 
 def updateLastLocation(qhawax_name, location):
     """Helper Drone Log function to update location of andean drone in qHAWAX Installation table"""
-    location = exceptions.checkDictionaryVariable(location)
+    location = exceptions.checkVariable_helper(location, dict)
     same_helper.qhawaxInstallationQueryUpdate(location, qhawax_name)
 
 
 def updateQhawaxInstallation(data):
     """Update qHAWAX in Field"""
-    data = exceptions.checkDictionaryVariable(data)
+    data = exceptions.checkVariable_helper(data, dict)
     if util_helper.areFieldsValid(data) == False:
         raise Exception("qHAWAX Installation fields must have data")
 
@@ -251,8 +251,8 @@ def setLastMeasurementOfQhawax(qH_name):
 
 def createQhawax(qhawax_name, qhawax_type):
     """Create a qHAWAX module"""
-    qhawax_name = exceptions.checkStringVariable(qhawax_name)
-    qhawax_type = exceptions.checkStringVariable(qhawax_type)
+    qhawax_name = exceptions.checkVariable_helper(qhawax_name, str)
+    qhawax_type = exceptions.checkVariable_helper(qhawax_type, str)
     qhawax_data = {
         "name": qhawax_name,
         "qhawax_type": qhawax_type,
@@ -270,7 +270,7 @@ def createQhawax(qhawax_name, qhawax_type):
 
 def createCompany(json_company):
     """Create a new company"""
-    json_company = exceptions.checkDictionaryVariable(json_company)
+    json_company = exceptions.checkVariable_helper(json_company, dict)
     company_name = json_company.pop("company_name", None)
     json_company["name"] = company_name
     company_var = Company(**json_company)
@@ -280,7 +280,7 @@ def createCompany(json_company):
 
 def storeNewQhawaxInstallation(data):
     """Insert new qHAWAX in Field"""
-    data = exceptions.checkDictionaryVariable(data)
+    data = exceptions.checkVariable_helper(data, dict)
     if util_helper.areFieldsValid(data) == False:
         raise Exception("qHAWAX Installation fields have to have data")
 
@@ -305,8 +305,8 @@ def storeNewQhawaxInstallation(data):
 
 def writeBinnacle(qhawax_name, description, person_in_charge):
     """Insert observations in Binnacle"""
-    description = exceptions.checkStringVariable(description)
-    person_in_charge = exceptions.checkStringVariable(person_in_charge)
+    description = exceptions.checkVariable_helper(description, str)
+    person_in_charge = exceptions.checkVariable_helper(person_in_charge, str)
     qHAWAX_ID = same_helper.getQhawaxID(qhawax_name)
     if qHAWAX_ID is not None:
         now2 = datetime.datetime.now(dateutil.tz.tzutc())

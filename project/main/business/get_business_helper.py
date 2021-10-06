@@ -43,7 +43,7 @@ def queryQhawaxModeCustomer():
 
 def queryQhawaxTypeInFieldInPublicMode(qhawax_type):
     """Get list of qHAWAXs in field in public mode based on qhawax type"""
-    qhawax_type = exception_helper.checkStringVariable(qhawax_type)
+    qhawax_type = exception_helper.checkVariable_helper(qhawax_type, str)
     qhawax_public = (
         session.query(*columns_qhawax)
         .join(EcaNoise, QhawaxInstallationHistory.eca_noise_id == EcaNoise.id)
@@ -117,7 +117,7 @@ def getInstallationDate(qhawax_id):
 
 def isItFieldQhawax(qhawax_name):
     """Check qhawax in field"""
-    qhawax_type = exception_helper.checkStringVariable(qhawax_name)
+    qhawax_type = exception_helper.checkVariable_helper(qhawax_name, str)
     return (
         True
         if (same_helper.getInstallationIdBaseName(qhawax_name) is not None)
@@ -126,7 +126,7 @@ def isItFieldQhawax(qhawax_name):
 
 
 def queryQhawaxStatus(name):
-    qhawax_type = exception_helper.checkStringVariable(name)
+    qhawax_type = exception_helper.checkVariable_helper(name, str)
     return session.query(Qhawax.state).filter_by(name=name).one()[0]
 
 
