@@ -142,15 +142,8 @@ def checkVariable_helper(variable, type):
 
     """
     if isinstance(variable, type) is not True:
-        if type == list:
-            raise TypeError("Variable " + str(variable) + " should be List")
-        if type == dict:
-            raise TypeError("Variable " + str(variable) + " should be Json")
-        if type == str:
-            raise TypeError("Variable " + str(variable) + " should be string")
+        raise TypeError(f"Variable {str(variable)} should be {str(type)}")
     return variable
-
-
 
 
 def getJsonOfTakeOff(data):
