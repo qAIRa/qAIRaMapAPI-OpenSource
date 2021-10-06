@@ -130,7 +130,24 @@ def getMobileLogAndTurnsByQhawaxName():
         if turn not in [1,2,3,4]:
             return make_response(jsonify('Incorrect turn'),200)
         else:
-            trip_data = get_data_helper.getqHAWAXMobileTripByTurn(qhawax_name,turn,id)
+            trip_data = get_data_helper.getqHAWAXMobileTripByTurn(qhawax_name,turn,id,1)
+            if trip_data is not None:
+                return make_response(jsonify(trip_data), 200)
+        return make_response(jsonify('qHAWAX '+str(qhawax_name)+' does not have available data for the specified parameters'),200)
+    except Exception as e:
+        json_message = jsonify({'error': '\'%s\'' % (e)})
+        return make_response(json_message, 400)
+
+@app.route('/api/mobile_data_by_qhawax_name_turn_and_id/', methods=['GET'])
+def getMobileDataByTurnAndQhawaxName():
+    qhawax_name = str(request.args.get('name'))
+    turn = int(request.args.get('turn'))
+    id = int(request.args.get('id'))
+    try:
+        if turn not in [1,2,3,4]:
+            return make_response(jsonify('Incorrect turn'),200)
+        else:
+            trip_data = get_data_helper.getqHAWAXMobileTripByTurn(qhawax_name,turn,id,2)
             if trip_data is not None:
                 return make_response(jsonify(trip_data), 200)
         return make_response(jsonify('qHAWAX '+str(qhawax_name)+' does not have available data for the specified parameters'),200)

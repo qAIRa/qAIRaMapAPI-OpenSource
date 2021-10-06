@@ -1,3 +1,4 @@
+from typing import final
 from project.database.models import AirQualityMeasurement, ProcessedMeasurement, \
                                     GasInca, TripLog,ValidProcessedMeasurement, Qhawax, \
                                     DroneTelemetry, DroneFlightLog,QhawaxInstallationHistory
@@ -11,6 +12,8 @@ import math
 session = db.session
 sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
 mobile_sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2','CO2','VOC']
+mobile_ext_sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
+
 def queryDBValidAirQuality(qhawax_id, initial_timestamp, final_timestamp): #validar con sabri
     """ Helper function to get Air Quality measurement """
     sensors = (AirQualityMeasurement.CO_ug_m3, AirQualityMeasurement.H2S_ug_m3, AirQualityMeasurement.NO2_ug_m3,
@@ -255,14 +258,13 @@ def queryDBValidProcessedByPollutantMobile(qhawax_name, initial_timestamp, final
     """ Helper function to get Valid Processed Measurement filter by qHAWAX between timestamp"""
     qhawax_installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(qhawax_installation_id is not None):
-        column_array = [ValidProcessedMeasurement.CO.label('pollutant'), ValidProcessedMeasurement.H2S.label('pollutant'),
-                        ValidProcessedMeasurement.NO2.label('pollutant'), ValidProcessedMeasurement.O3.label('pollutant'),
+        column_array = [ValidProcessedMeasurement.CO_ug_m3.label('pollutant'), ValidProcessedMeasurement.H2S_ug_m3.label('pollutant'),
+                        ValidProcessedMeasurement.NO2_ug_m3.label('pollutant'), ValidProcessedMeasurement.O3_ug_m3.label('pollutant'),
                         ValidProcessedMeasurement.PM25.label('pollutant'), ValidProcessedMeasurement.PM10.label('pollutant'),
-                        ValidProcessedMeasurement.SO2.label('pollutant'),ValidProcessedMeasurement.CO2.label('pollutant'),
-                        ValidProcessedMeasurement.VOC.label('pollutant')]
+                        ValidProcessedMeasurement.SO2_ug_m3.label('pollutant')]
 #sensor_array = ['CO','H2S','NO2','O3','PM25','PM10','SO2']
-        for i in range(len(mobile_sensor_array)):
-            if(pollutant==mobile_sensor_array[i]):
+        for i in range(len(mobile_ext_sensor_array)):
+            if(pollutant==mobile_ext_sensor_array[i]):
                 sensors = (ValidProcessedMeasurement.timestamp_zone, column_array[i], ValidProcessedMeasurement.lat,ValidProcessedMeasurement.lon)
 
         measurements = session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == qhawax_installation_id). \
@@ -271,7 +273,7 @@ def queryDBValidProcessedByPollutantMobile(qhawax_name, initial_timestamp, final
                                order_by(ValidProcessedMeasurement.timestamp_zone.asc()).all()
         
         factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25,
-                    'SO2': 100/20, 'O3': 100/120, 'H2S': 100/150}
+                    'SO2': 100/40, 'O3': 100/120, 'H2S': 100/150}
         values=[]
         if (pollutant in factor_final_json):
             for t in measurements:
@@ -284,29 +286,31 @@ def queryDBValidProcessedByPollutantMobile(qhawax_name, initial_timestamp, final
 
     return None
 
-def queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, initial_timestamp, final_timestamp):
+def queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, initial_timestamp, final_timestamp, type):
     qhawax_installation_id = same_helper.getInstallationIdBaseName(qhawax_name)
     if(qhawax_installation_id is not None):
-        sensors = (ValidProcessedMeasurement.CO, ValidProcessedMeasurement.H2S, ValidProcessedMeasurement.NO2, 
-                    ValidProcessedMeasurement.O3, ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
-                    ValidProcessedMeasurement.SO2, ValidProcessedMeasurement.timestamp_zone, 
+        sensors = (ValidProcessedMeasurement.CO_ug_m3.label("CO"), ValidProcessedMeasurement.H2S_ug_m3.label("H2S"), ValidProcessedMeasurement.NO2_ug_m3.label("NO2"), 
+                    ValidProcessedMeasurement.O3_ug_m3.label("O3"), ValidProcessedMeasurement.PM25, ValidProcessedMeasurement.PM10,
+                    ValidProcessedMeasurement.SO2_ug_m3.label("SO2"), ValidProcessedMeasurement.timestamp_zone, 
                     ValidProcessedMeasurement.lat, ValidProcessedMeasurement.lon)
         validMeasurements = session.query(*sensors).filter(ValidProcessedMeasurement.qhawax_installation_id == qhawax_installation_id). \
                                     filter(ValidProcessedMeasurement.timestamp_zone >= initial_timestamp). \
                                     filter(ValidProcessedMeasurement.timestamp_zone <= final_timestamp). \
                                     order_by(ValidProcessedMeasurement.timestamp_zone.asc()).all()
 
-        factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25, 'SO2': 100/20, 'O3': 100/100, 'H2S': 100/150}
         values =[]
-        for t in validMeasurements:
-            dictValue = t._asdict()
-            for key in factor_final_json:
-                if(dictValue[key]!=None): dictValue[key] = round(dictValue[key] * factor_final_json[key],3)
-            #print(dictValue) # json 
-            # {'CO': 2076.038, 'H2S': 17.78, 'NO2': 75.955, 'O3': -16.706, 'PM25': 42.196, 'PM10': 69.863, 'SO2': 47.115, 'CO2': None, 'VOC': None, 'timestamp_zone': datetime.datetime(2021, 6, 14, 14, 59, 57, tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0,
-            # name=None)), 'lat': -12.048906, 'lon': -77.037643}
-            values.append(dictValue)
-
+        if type == 1:
+            factor_final_json = {'CO': 100/10000, 'NO2': 100/200, 'PM10': 100/150, 'PM25': 100/25, 'SO2': 100/40, 'O3': 100/100, 'H2S': 100/150}
+            for t in validMeasurements:
+                dictValue = t._asdict()
+                for key in factor_final_json:
+                    if(dictValue[key]!=None): dictValue[key] = round(dictValue[key] * factor_final_json[key],3)
+                #print(dictValue) # json 
+                # {'CO': 2076.038, 'H2S': 17.78, 'NO2': 75.955, 'O3': -16.706, 'PM25': 42.196, 'PM10': 69.863, 'SO2': 47.115, 'CO2': None, 'VOC': None, 'timestamp_zone': datetime.datetime(2021, 6, 14, 14, 59, 57, tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0,
+                # name=None)), 'lat': -12.048906, 'lon': -77.037643}
+                values.append(dictValue)
+        elif type == 2:
+            values = [values._asdict() for values in validMeasurements]
         return values
 
 
@@ -377,14 +381,14 @@ def getMobileLatestLatLonValidProcessedMeasurement(qhawax_name):
         return values._asdict()
     return None
 
-def getqHAWAXMobileTripByTurn(qhawax_name, turn, id):
+def getqHAWAXMobileTripByTurn(qhawax_name, turn, id, type):
     installation_id =same_helper.getInstallationIdBaseName(qhawax_name)
     if(installation_id != None):
         query = session.query(TripLog.trip_start).filter_by(id=id).first()
         if(query!= None):
             trip_time = query[0]
             start_time, finish_time = util_helper.getStartAndFinishTimestampBasedOnTurnAndTimestampMobile(trip_time, turn)
-            return queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, start_time, finish_time)            
+            return queryDBValidProcessedMeasurementsSimulationMobile(qhawax_name, start_time, finish_time, type)
     return None
 
 def getqHAWAXMobileLatestTripStart(qhawax_name):
