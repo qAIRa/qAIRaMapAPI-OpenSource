@@ -75,7 +75,7 @@ def getQhawaxStatus():
     name = request.args.get("name")
     try:
         return (
-            str(same_helper.getQhawaxStatus(name))
+            make_response(jsonify(same_helper.getQhawaxStatus(name)))
             if (same_helper.getQhawaxStatus(name) != None)
             else make_response(
                 {"Warning": "qHAWAX name has not been found"}, 400
