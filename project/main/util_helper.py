@@ -269,7 +269,7 @@ def beautyFormatDate(date):
 
 
 def addZero(number):
-    number = exceptions.checkIntegerVariable(number)
+    number = exceptions.checkVariable_helper(number, int)
     return "0" + str(number) if (number < 10) else str(number)
 
 

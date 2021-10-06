@@ -288,7 +288,7 @@ def validTimeOfValidProcessed(
     time_valid, time_type, last_time_turn_on, data_json, product_id, inca_value
 ):
     """Helper function to valid time of Valid Processed table"""
-    time_valid = exceptions.checkIntegerVariable(time_valid)
+    time_valid = exceptions.checkVariable_helper(time_valid, int)
     time_type = exceptions.checkVariable_helper(time_type, str)
     data_json = exceptions.checkVariable_helper(data_json, dict)
     product_id = exceptions.checkVariable_helper(product_id, str)

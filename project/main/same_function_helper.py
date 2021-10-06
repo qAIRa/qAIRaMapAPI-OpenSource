@@ -11,7 +11,7 @@ session = db.session
 
 def qhawaxExistBasedOnID(qhawax_id):
     """Helper function to check if qHAWAX id exist"""
-    qhawax_id = exceptions.checkIntegerVariable(qhawax_id)
+    qhawax_id = exceptions.checkVariable_helper(qhawax_id, int)
     qhawax_list = session.query(Qhawax.name).filter_by(id=qhawax_id).all()
     if qhawax_list == []:
         return False
@@ -29,7 +29,7 @@ def qhawaxExistBasedOnName(qhawax_name):
 
 def qhawaxInstallationExistBasedOnID(installation_id):
     """Helper function to check if qHAWAX Installation ID exist"""
-    installation_id = exceptions.checkIntegerVariable(installation_id)
+    installation_id = exceptions.checkVariable_helper(installation_id, int)
     installation_date_zone = (
         session.query(QhawaxInstallationHistory.installation_date_zone)
         .filter_by(id=installation_id)
@@ -42,7 +42,7 @@ def qhawaxInstallationExistBasedOnID(installation_id):
 
 def areaExistBasedOnID(eca_noise_id):
     """Helper function to check if Area ID exist"""
-    eca_noise_id = exceptions.checkIntegerVariable(eca_noise_id)
+    eca_noise_id = exceptions.checkVariable_helper(eca_noise_id, int)
     area_name = (
         session.query(EcaNoise.area_name).filter_by(id=eca_noise_id).all()
     )
