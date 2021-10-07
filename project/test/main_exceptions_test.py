@@ -350,20 +350,22 @@ class TestMainExceptions(unittest.TestCase):
         )
 
     def test_check_float_variable_not_valid(self):
-        self.assertRaises(TypeError, exception_helper.checkFloatVariable)
+        # self.assertRaises(TypeError, exception_helper.checkFloatVariable)
         self.assertRaises(
-            TypeError, exception_helper.checkFloatVariable, "Json"
+            TypeError, exception_helper.checkVariable_helper, "Json", float
         )
         self.assertRaises(
-            TypeError, exception_helper.checkFloatVariable, {"hola": "hola"}
+            TypeError, exception_helper.checkVariable_helper, {"hola": "hola"}, float
         )
-        self.assertRaises(TypeError, exception_helper.checkFloatVariable, None)
-        self.assertRaises(TypeError, exception_helper.checkFloatVariable, True)
+        self.assertRaises(TypeError, exception_helper.checkVariable_helper, None, float)
+        self.assertRaises(TypeError, exception_helper.checkVariable_helper, True, float)
+        self.assertRaises(TypeError, exception_helper.checkVariable_helper, 1, float)
+        self.assertRaises(TypeError, exception_helper.checkVariable_helper, [1,2,3], float)
 
     def test_check_float_variable_valid(self):
         variable = 4.3
         self.assertAlmostEqual(
-            exception_helper.checkFloatVariable(variable), variable
+            exception_helper.checkVariable_helper(variable, float), variable
         )
 
     def test_query_take_off_json_not_valid(self):

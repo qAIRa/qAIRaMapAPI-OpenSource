@@ -119,26 +119,13 @@ def getQhawaxSignalJson(data):
     )
 
 
-def checkIntegerVariable(variable):
-    if type(variable) not in [int]:
-        raise TypeError("Variable " + str(variable) + " should be int")
-    return variable
-
-
-def checkFloatVariable(variable):
-    if type(variable) not in [float]:
-        raise TypeError("Variable " + str(variable) + " should be float")
-    return variable
-
-
-
 def checkVariable_helper(variable, type):
     """
-    helper function for checking the three types of variables: list, dictionary, and string
+    helper function for checking the five types of variables: list, dictionary, string, integer, float
 
     Parametres: 
     variable: variable to check
-    type: list / dict / str
+    type: list / dict / str / int / float
 
     """
     if isinstance(variable, type) is not True:
