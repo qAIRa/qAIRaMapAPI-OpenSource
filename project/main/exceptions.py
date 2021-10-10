@@ -1,6 +1,3 @@
-import json
-
-
 def getCompanyTargetofJson(data):
     data = checkVariable_helper(data, dict)
     array = [
@@ -123,13 +120,16 @@ def checkVariable_helper(variable, type):
     """
     helper function for checking the five types of variables: list, dictionary, string, integer, float
 
-    Parametres: 
+    Parameters:
     variable: variable to check
     type: list / dict / str / int / float
 
     """
-    if isinstance(variable, type) is not True:
-        raise TypeError(f"Variable {str(variable)} should be {str(type)}")
+    # bool variables need a special check, isinstance(True, int) returns True
+    not_expecting_bool = isinstance(variable, bool) and type != bool
+
+    if not isinstance(variable, type) or not_expecting_bool:
+        raise TypeError(f"Variable {variable} should be {type}")
     return variable
 
 

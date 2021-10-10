@@ -8,8 +8,8 @@ We work with modules, called qHAWAX, that capture data from gases, dust and envi
 
 You can look for a more detailed documentation [here.](https://qaira.github.io/)
 
-Feel welcome to join our [forum](https://unicef-if.discourse.group/c/projects/qaira/11) with UNICEF. 
- 
+Feel welcome to join our [forum](https://unicef-if.discourse.group/c/projects/qaira/11) with UNICEF.
+
 ## Getting Started with installation
 
 ### Ubuntu, Mac & Windows
@@ -21,10 +21,10 @@ git clone https://github.com/qAIRa/qAIRaMapAPI-OpenSource.git
 
 ### Prerequisites for every OS
 1.  Having installed the postgreSQL driver.
-   MacOS: 
+   MacOS:
 ```
-      brew install postgresql 
-``` 
+      brew install postgresql
+```
    If facing issues with brew installation: https://docs.brew.sh/Installation
 
    Make sure to add the installed postgreSQL library to your PATH with the following
@@ -54,7 +54,7 @@ source venv/bin/activate
 ```
 ### Prerequisites Windows
 Now you have to open CMD with administrator permissions
-You must have an isolated environment by executing the following command: 
+You must have an isolated environment by executing the following command:
 
 ```
 py -3 -m pip install virtualenv
@@ -111,6 +111,21 @@ If everything went well, the following should come out
 
 ```
 
+## Tests
+
+The tests use Docker to guarantee isolated reproducible builds and a Makefile to simplify the commands.
+
+First, build the Docker containers
+```
+make build-test
+```
+You need to do this only the first time you want to run the tests, or if you ever change the Dockerfile (which shouldn't be necessary).
+
+Then, to run the tests
+```
+make test
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -137,14 +152,14 @@ Most API calls accessing a list of resources (e.g., users, issues, etc.). If you
 Why am I getting a 500?
 Server Mistake - Indicates that something went wrong on the server that prevent the server from fulfilling the request.
 
-## Issues 
+## Issues
 
 If you have found a bug in the project, you can file it here under the [“issues” tab](https://github.com/qAIRa/qAIRaMapAPI-OpenSource/issues). You can also request new features here. A set of templates for reporting issues and requesting features are provided to assist you (and us!).
 
-## Pull Requests 
+## Pull Requests
 
-If you have received a confirmation about your issue, you can file a pull request under the [“pull request” tab](https://github.com/qAIRa/qAIRaMapAPI-OpenSource/pulls), please use the PR [“template”](https://github.com/qAIRa/qAIRaMapAPI-OpenSource/blob/master/.github/PULL_REQUEST_TEMPLATE/pull_request_template.md). 
-You can also request new features here. 
+If you have received a confirmation about your issue, you can file a pull request under the [“pull request” tab](https://github.com/qAIRa/qAIRaMapAPI-OpenSource/pulls), please use the PR [“template”](https://github.com/qAIRa/qAIRaMapAPI-OpenSource/blob/master/.github/PULL_REQUEST_TEMPLATE/pull_request_template.md).
+You can also request new features here.
 
 ## License
 [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
