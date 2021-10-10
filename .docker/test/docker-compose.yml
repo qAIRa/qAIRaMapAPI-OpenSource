@@ -12,7 +12,8 @@ services:
     build:
       context: ../..
       dockerfile: .docker/test/Dockerfile
-    command: pytest -v
+    command: |
+      bash -c "coverage run -m pytest project/test/ && coveralls"
     volumes:
       - ../..:/src/
     depends_on:
