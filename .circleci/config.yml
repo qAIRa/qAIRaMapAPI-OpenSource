@@ -3,20 +3,29 @@ version: 2.1
 jobs:
   run-tests:
     docker:
-      - image: cimg/base:2021.10
+      - image: cimg/python:3.8.12
+      - image: postgres
+        auth:
+          username: postgres
+          password: postgres
+        environment:
+          POSTGRES_DB: postgres
+
     steps:
       - checkout
-      - setup_remote_docker
 
       - run:
-          name: Build test container 🔧
+          name: Install dependencies 🔧
           command: |
-            make build-test
+            pip install -r requirements.txt -r requirements_test.txt
 
       - run:
           name: Run tests 🚀
           command: |
-            make test
+            pytest -v
+          environment:
+            DATABASE_URL: "postgres://postgres:postgres@localhost:5432/postgres"
+            PYTHONUNBUFFERED: 1
 
 workflows:
   version: 2
