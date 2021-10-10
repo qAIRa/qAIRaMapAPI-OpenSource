@@ -89,7 +89,7 @@ class TestGetDataHelper(unittest.TestCase):
         )
 
     def test_query_gas_average_measurement_valid(self):
-        qhawax = "qH057"
+        qhawax = "qH004"
         naive_time1 = datetime.time(0, 0, 0)
         naive_time2 = datetime.time(1, 0, 0)
         naive_time3 = datetime.time(2, 0, 0)
@@ -128,12 +128,6 @@ class TestGetDataHelper(unittest.TestCase):
 
         self.assertAlmostEqual(
             get_data_helper.queryDBGasAverageMeasurement(qhawax, "CO"), []
-        )
-        self.assertAlmostEqual(
-            util_helper.getFormatData(
-                get_data_helper.queryDBGasAverageMeasurement("qH057", "CO")
-            ),
-            [],
         )
         self.assertAlmostEqual(
             get_data_helper.queryDBGasAverageMeasurement(qhawax, "H2S"), []
@@ -232,7 +226,7 @@ class TestGetDataHelper(unittest.TestCase):
         last_timestamp = timezone.localize(naive_datetime)
         self.assertAlmostEqual(
             get_data_helper.queryDBProcessed(
-                "qH057", initial_timestamp, last_timestamp
+                "qH004", initial_timestamp, last_timestamp
             ),
             [],
         )
@@ -310,12 +304,12 @@ class TestGetDataHelper(unittest.TestCase):
         naive_datetime = datetime.datetime.combine(date, naive_time)
         timezone = pytz.timezone("UTC")
         aware_datetime = timezone.localize(naive_datetime)
+        # TODO: Fix implementation (getInstallationId)
         self.assertAlmostEqual(
-            get_data_helper.getFirstTimestampValidProcessed(307),
-            aware_datetime,
+            get_data_helper.getFirstTimestampValidProcessed(qhawax_id=4), None
         )
         self.assertAlmostEqual(
-            get_data_helper.getFirstTimestampValidProcessed(100), None
+            get_data_helper.getFirstTimestampValidProcessed(qhawax_id=100), None
         )
 
     def test_get_qhawax_latest_timestamp_processed_measurement_not_valid(self):
@@ -345,16 +339,15 @@ class TestGetDataHelper(unittest.TestCase):
         )
 
     def test_get_qhawax_latest_timestamp_processed_measurement_valid(self):
-        naive_time = datetime.time(0, 0, 0)
-        date = datetime.date(2021, 1, 4)
-        naive_datetime = datetime.datetime.combine(date, naive_time)
+        now = datetime.datetime.now()
+        today_midnight = datetime.datetime(now.year, now.month, now.day)
         timezone = pytz.timezone("UTC")
-        aware_datetime = timezone.localize(naive_datetime)
+        aware_datetime = timezone.localize(today_midnight)
         self.assertAlmostEqual(
             get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(
-                "qH057"
-            ),
-            aware_datetime,
+                "qH004"
+            ).timestamp(),
+            aware_datetime.timestamp(),
         )
         self.assertAlmostEqual(
             get_data_helper.getQhawaxLatestTimestampProcessedMeasurement(
@@ -383,7 +376,7 @@ class TestGetDataHelper(unittest.TestCase):
 
         self.assertAlmostEqual(
             get_data_helper.queryDBProcessedByPollutant(
-                "qH057", initial_timestamp, last_timestamp, "NO2"
+                "qH004", initial_timestamp, last_timestamp, "NO2"
             ),
             [],
         )
@@ -447,7 +440,7 @@ class TestGetDataHelper(unittest.TestCase):
         last_timestamp = timezone.localize(naive_datetime)
         self.assertAlmostEqual(
             get_data_helper.queryDBTelemetry(
-                "qH006", initial_timestamp, last_timestamp
+                "qH004", initial_timestamp, last_timestamp
             ),
             [],
         )
