@@ -1,0 +1,22 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
+      SQLALCHEMY_DATABASE_URI_OPEN: postgres://postgres:postgres@test_database:5432/postgres
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Build test container 🔧
+        run: |
+          make build-test
+
+      - name: Run tests 🚀
+        run: |
+          make test
