@@ -16,3 +16,9 @@ jobs:
           name: Run tests 🚀
           command: |
             make test
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - run-tests
