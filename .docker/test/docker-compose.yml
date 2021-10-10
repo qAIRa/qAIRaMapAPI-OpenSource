@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  test_database:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  test:
+    build:
+      context: ../..
+      dockerfile: .docker/test/Dockerfile
+    command: pytest -v
+    volumes:
+      - ../..:/src/
+    depends_on:
+      - test_database

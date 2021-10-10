@@ -1,0 +1,4 @@
+coverage==4.5.4
+python-coveralls==2.9.3
+pytest==6.2.5
+pytest-cov==2.10.1
