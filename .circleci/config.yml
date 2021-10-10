@@ -6,5 +6,13 @@ jobs:
       - image: cimg/base:2021.10
     steps:
       - checkout
-      - run: make build-test
-      - run: make test
+
+      - run:
+          name: Build test container 🔧
+          command: |
+            make build-test
+
+      - run:
+          name: Run tests 🚀
+          command: |
+            make test
