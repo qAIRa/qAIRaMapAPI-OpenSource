@@ -23,7 +23,7 @@ jobs:
           command: |
             pytest -v
           environment:
-            DATABASE_URL: "postgres://postgres:postgres@localhost:5432/postgres"
+            SQLALCHEMY_DATABASE_URI_OPEN: "postgres://postgres:postgres@localhost:5432/postgres"
             PYTHONUNBUFFERED: 1
 
 workflows:
