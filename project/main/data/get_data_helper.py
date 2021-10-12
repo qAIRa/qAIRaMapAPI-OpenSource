@@ -1,6 +1,7 @@
 import datetime
 import math
-
+import dateutil.parser
+import dateutil.tz
 import project.main.exceptions as exceptions
 import project.main.same_function_helper as same_helper
 import project.main.util_helper as util_helper
@@ -77,9 +78,10 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
 
     qhawax_id = same_helper.getQhawaxID(qhawax_name)
     if qhawax_id != None:
-        initial_timestamp = datetime.datetime.now()
-        last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
-
+        initial_timestamp = datetime.datetime.now(dateutil.tz.tzutc()).replace(minute=0,second=0, microsecond=0)        
+        last_timestamp = (datetime.datetime.now(dateutil.tz.tzutc()) 
+                        - datetime.timedelta(hours=23)).replace(minute=0,second=0, microsecond=0)        
+        
         column_array = [
             AirQualityMeasurement.CO.label("sensor"),
             AirQualityMeasurement.H2S.label("sensor"),
@@ -96,14 +98,21 @@ def queryDBGasAverageMeasurement(qhawax_name, gas_name):
                     AirQualityMeasurement.timestamp_zone,
                     column_array[i],
                 )
-
-        return (
-            session.query(*sensors)
-            .filter(AirQualityMeasurement.qhawax_id == qhawax_id)
-            .filter(AirQualityMeasurement.timestamp_zone >= last_timestamp)
-            .filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp)
-            .order_by(AirQualityMeasurement.timestamp_zone.asc())
-            .all()
+        series = session.query(
+                 db.func.generate_series(last_timestamp,initial_timestamp,
+                                         datetime.timedelta(hours=1)).label('timestamp_zone')).subquery()
+        values = session.query(*sensors).\
+              filter(AirQualityMeasurement.qhawax_id == qhawax_id).\
+              filter(AirQualityMeasurement.timestamp_zone >= last_timestamp).\
+              filter(AirQualityMeasurement.timestamp_zone <= initial_timestamp).\
+              subquery()
+        
+        return (            
+            session.query(values.c.sensor,series.c.timestamp_zone,
+            db.func.coalesce(values.c.sensor, 0)).\
+            outerjoin(series, values.c.timestamp_zone == series.c.timestamp_zone, full=True).\
+            order_by(series.c.timestamp_zone).\
+            all()
         )
     return None
 
