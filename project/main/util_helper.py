@@ -208,38 +208,13 @@ def areFieldsValid(data):
 def getFormatData(gas_average_measurement):
     gas_average_measurement_list = []
     if gas_average_measurement is not None:
-        data = exceptions.checkVariable_helper(gas_average_measurement, list)
-        next_hour = -1
+        data = exceptions.checkVariable_helper(gas_average_measurement, list)        
         for measurement in gas_average_measurement:
             gas_measurement = measurement._asdict()
-            hour = gas_measurement["timestamp_zone"].hour
-            if next_hour == -1:
-                gas_average_measurement_list.append(gas_measurement)
-                next_hour = hour + 1
-            else:
-                if hour == next_hour:
-                    gas_average_measurement_list.append(gas_measurement)
-                else:
-                    if (
-                        next_hour > hour
-                    ):  # si next_hour > hour => se resta con 24 horas
-                        diff_0 = abs(24 - next_hour)
-                        diff = diff_0 + hour
-                    else:
-                        diff = abs(hour - next_hour - 1)
-                    for i in range(1, diff + 1):
-                        new_variable = {
-                            "timestamp_zone": before_date
-                            + datetime.timedelta(hours=i),
-                            "sensor": "",
-                        }
-                        gas_average_measurement_list.append(new_variable)
-                    gas_average_measurement_list.append(gas_measurement)
-                next_hour = hour + 1
-            before_date = gas_measurement["timestamp_zone"]
-            if next_hour == 24:
-                next_hour = 0
-        return gas_average_measurement_list
+            if gas_measurement["sensor"] is None:
+                gas_measurement["sensor"]=""
+            gas_average_measurement_list.append(gas_measurement)
+        return gas_average_measurement_list        
     return None
 
 
